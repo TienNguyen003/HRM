@@ -1,9 +1,9 @@
-package com.hrm.Controller.user;
+package com.hrm.Controller.role;
 
-import com.hrm.Service.user.PermissionService;
+import com.hrm.Service.role.PermissionService;
 import com.hrm.dto.response.ApiResponse;
-import com.hrm.dto.request.permission.PermissionRequest;
-import com.hrm.dto.response.user.PermissionResponse;
+import com.hrm.dto.request.role.PermissionRequest;
+import com.hrm.dto.response.role.PermissionResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

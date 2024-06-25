@@ -1,4 +1,4 @@
-package com.hrm.dto.response.user;
+package com.hrm.dto.response.token;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthenticationResponse {
-    String token;
-    boolean authentication;
+public class IntrospectResponse {
+    boolean valid;
 }

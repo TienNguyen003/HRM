@@ -8,7 +8,7 @@ import com.hrm.dto.request.user.UserCreationRequest;
 import com.hrm.dto.request.user.UserUpdateRequest;
 import com.hrm.dto.response.user.UserResponse;
 import com.hrm.enums.Role;
-import com.hrm.repository.user.RoleRepository;
+import com.hrm.repository.role.RoleRepository;
 import com.hrm.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

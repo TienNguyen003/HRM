@@ -1,8 +1,8 @@
-package com.hrm.Mapper.user;
+package com.hrm.Mapper.role;
 
-import com.hrm.Entity.user.Permission;
-import com.hrm.dto.request.permission.PermissionRequest;
-import com.hrm.dto.response.user.PermissionResponse;
+import com.hrm.Entity.role.Permission;
+import com.hrm.dto.request.role.PermissionRequest;
+import com.hrm.dto.response.role.PermissionResponse;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

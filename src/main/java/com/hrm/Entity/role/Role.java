@@ -1,9 +1,12 @@
-package com.hrm.Entity.user;
+package com.hrm.Entity.role;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Set;
 
 @Entity
 @Data
@@ -11,8 +14,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Permission {
+public class Role {
 	@Id
 	String name;
 	String des;
+
+	@ManyToMany
+	Set<Permission> permissions;
 }

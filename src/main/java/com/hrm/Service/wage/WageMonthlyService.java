@@ -32,7 +32,7 @@ public class WageMonthlyService {
     // thêm danh sách
     public WageMonthlyRespone create(WageMonthlyRequest request){
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("NO employee  not found"));
+                .orElseThrow(() -> new RuntimeException("No employee not found"));
 
         WageMonthly wageMonthly = wageMonthlyMapper.toWageMonthly(request);
 

@@ -1,9 +1,9 @@
-package com.hrm.Controller.user;
+package com.hrm.Controller.role;
 
-import com.hrm.Service.user.RoleService;
+import com.hrm.Service.role.RoleService;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.request.role.RoleRequest;
-import com.hrm.dto.response.user.RoleResponse;
+import com.hrm.dto.response.role.RoleResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

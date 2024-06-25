@@ -1,6 +1,6 @@
 package com.hrm.Service.user;
 
-import com.hrm.Entity.user.InvalidateToken;
+import com.hrm.Entity.token.InvalidateToken;
 import com.hrm.Entity.user.User;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
@@ -8,9 +8,9 @@ import com.hrm.dto.request.user.AuthenticationRequest;
 import com.hrm.dto.request.token.IntrospectRequest;
 import com.hrm.dto.request.user.LogoutRequest;
 import com.hrm.dto.request.token.RefreshRequest;
-import com.hrm.dto.response.user.AuthenticationResponse;
-import com.hrm.dto.response.user.IntrospectResponse;
-import com.hrm.repository.user.InvalidateTokenRepository;
+import com.hrm.dto.response.token.AuthenticationResponse;
+import com.hrm.dto.response.token.IntrospectResponse;
+import com.hrm.repository.token.InvalidateTokenRepository;
 import com.hrm.repository.user.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;

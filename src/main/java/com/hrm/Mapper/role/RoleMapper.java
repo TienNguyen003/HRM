@@ -1,8 +1,8 @@
-package com.hrm.Mapper.user;
+package com.hrm.Mapper.role;
 
-import com.hrm.Entity.user.Role;
+import com.hrm.Entity.role.Role;
 import com.hrm.dto.request.role.RoleRequest;
-import com.hrm.dto.response.user.RoleResponse;
+import com.hrm.dto.response.role.RoleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

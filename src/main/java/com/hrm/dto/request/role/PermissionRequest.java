@@ -1,17 +1,14 @@
-package com.hrm.dto.response.user;
+package com.hrm.dto.request.role;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RoleResponse {
-    String name;
-    String des;
-    Set<PermissionResponse> permissions;
+public class PermissionRequest {
+	String name;
+	String des;
 }

@@ -1,10 +1,10 @@
-package com.hrm.Service.user;
+package com.hrm.Service.role;
 
-import com.hrm.Mapper.user.RoleMapper;
+import com.hrm.Mapper.role.RoleMapper;
 import com.hrm.dto.request.role.RoleRequest;
-import com.hrm.dto.response.user.RoleResponse;
-import com.hrm.repository.user.PermissionRepository;
-import com.hrm.repository.user.RoleRepository;
+import com.hrm.dto.response.role.RoleResponse;
+import com.hrm.repository.role.PermissionRepository;
+import com.hrm.repository.role.RoleRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

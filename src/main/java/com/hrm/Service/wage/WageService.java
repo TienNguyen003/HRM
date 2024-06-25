@@ -27,7 +27,7 @@ public class WageService {
     // thêm danh sách
     public WageRespone create(WageRequest request){
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("NO employee  not found"));
+                .orElseThrow(() -> new RuntimeException("No employee  not found"));
 
         Wage wage = wageMapper.toWage(request);
 
@@ -41,7 +41,7 @@ public class WageService {
     // cập nhật
     public WageRespone update(int wageId, WageRequest request){
         Wage wage = wageRepository.findById(wageId)
-                .orElseThrow(() -> new RuntimeException("This salary not found"));
+                .orElseThrow(() -> new RuntimeException("This wage not found"));
 
         wageMapper.updateWage(wage, request);
 
@@ -58,7 +58,7 @@ public class WageService {
     // lấy theo id
     public WageRespone getWage(int wageId){
         return wageMapper.toWageRespone(wageRepository.findById(wageId)
-                .orElseThrow(() -> new RuntimeException("This salary  not found")));
+                .orElseThrow(() -> new RuntimeException("This wage not found")));
     }
 
     // tìm kiếm

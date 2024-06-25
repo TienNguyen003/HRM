@@ -11,6 +11,7 @@ public enum ErrorCode {
 	USERNAME_INVALID(500, "Username must be at least 6 characters", HttpStatus.BAD_REQUEST),
 	PASSWORD_INVALID(501, "Password must be at least 8 characters", HttpStatus.BAD_REQUEST),
 	USER_EXISTED(502, "User existed", HttpStatus.BAD_REQUEST),
+	BANK_EXISTED(502, "Bank existed", HttpStatus.NOT_FOUND),
 	UNAUTHENTICATED(503, "Unauthenticated", HttpStatus.UNAUTHORIZED),
 	USER_NOT_EXISTED(504, "User not existed", HttpStatus.NOT_FOUND),
 	UNAUTHORIZED(505, "You don't have permission", HttpStatus.FORBIDDEN),

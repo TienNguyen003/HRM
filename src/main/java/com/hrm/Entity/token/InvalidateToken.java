@@ -1,4 +1,4 @@
-package com.hrm.Entity.user;
+package com.hrm.Entity.token;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
