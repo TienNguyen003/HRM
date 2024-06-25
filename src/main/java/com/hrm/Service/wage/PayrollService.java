@@ -1,10 +1,12 @@
 package com.hrm.Service.wage;
 
+import com.hrm.Entity.department.Department;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Payroll;
 import com.hrm.Mapper.wage.PayRollMapper;
 import com.hrm.dto.request.wage.PayrollRequest;
 import com.hrm.dto.response.wage.PayrollRespone;
+import com.hrm.repository.DepartmentRepository;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.wage.PayrollRepository;
 import lombok.AccessLevel;
@@ -23,15 +25,19 @@ public class PayrollService {
     PayrollRepository payrollRepository;
     PayRollMapper payRollMapper;
     EmployeeRepository employeeRepository;
+    DepartmentRepository departmentRepository;
 
     // thêm danh sách
     public PayrollRespone create(PayrollRequest request){
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("No employee  not found"));
+                .orElseThrow(() -> new RuntimeException("No employee not found"));
+        Department department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Department not found"));
 
         Payroll payroll = payRollMapper.toPayRoll(request);
 
         payroll.setEmployee(employee);
+        payroll.setDepartment(department);
 
         return payRollMapper.toPayRollRespone(payrollRepository.save(payroll));
     }

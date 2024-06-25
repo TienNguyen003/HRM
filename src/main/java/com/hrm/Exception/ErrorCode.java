@@ -15,7 +15,8 @@ public enum ErrorCode {
 	USER_NOT_EXISTED(504, "User not existed", HttpStatus.NOT_FOUND),
 	UNAUTHORIZED(505, "You don't have permission", HttpStatus.FORBIDDEN),
 	DayOff_EXISTED(502, "Day of existed", HttpStatus.BAD_REQUEST),
-	WageCate_EXISTED(502, "This salary category of existed", HttpStatus.BAD_REQUEST);
+	WageCate_EXISTED(502, "This salary category of existed", HttpStatus.BAD_REQUEST),
+	Advance_Not_Edit(502, "Information cannot be edited", HttpStatus.BAD_REQUEST);
 
 	ErrorCode(int code, String message, HttpStatusCode statusCode) {
 		this.code = code;

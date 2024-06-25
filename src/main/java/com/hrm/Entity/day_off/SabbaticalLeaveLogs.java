@@ -1,10 +1,11 @@
-package com.hrm.Entity.wage;
+package com.hrm.Entity.day_off;
 
-import com.hrm.Entity.department.Department;
 import com.hrm.Entity.user.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -13,21 +14,15 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Payroll {
+public class SabbaticalLeaveLogs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
-    String time;
-    String salary;
-    String advance;
-    String totalSalary;
-    int status;
-    String qrPay;
-
-    @OneToOne
-    Employee employee;
+    LocalDateTime updateTime;
+    int fluctuatesTime;
+    String content;
 
     @ManyToOne
-    @JoinColumn(name = "department_id")
-    Department department;
+    @JoinColumn(name = "employee_id")
+    Employee employee;
 }

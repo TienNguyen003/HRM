@@ -1,10 +1,11 @@
 package com.hrm.Entity.wage;
 
-import com.hrm.Entity.department.Department;
 import com.hrm.Entity.user.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -13,21 +14,17 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Payroll {
+public class Advance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
-    String time;
-    String salary;
-    String advance;
-    String totalSalary;
+    LocalDateTime requestTime;
+    LocalDateTime approvalTime;
+    String money;
+    String approvedBy;
     int status;
-    String qrPay;
-
-    @OneToOne
-    Employee employee;
 
     @ManyToOne
-    @JoinColumn(name = "department_id")
-    Department department;
+    @JoinColumn(name = "employee_id")
+    Employee employee;
 }

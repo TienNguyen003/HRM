@@ -26,6 +26,7 @@ public class Employee {
     Date birth_date;
     Date hire_date;
     int shift_id;
+    int vacationTime;
 
     @ManyToOne
     Department department;

@@ -1,13 +1,17 @@
 package com.hrm.Mapper.wage;
 
+import com.hrm.Entity.department.Department;
 import com.hrm.Entity.wage.Payroll;
 import com.hrm.dto.request.wage.PayrollRequest;
 import com.hrm.dto.response.wage.PayrollRespone;
+import com.hrm.repository.DepartmentRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface PayRollMapper {
+
+
     Payroll toPayRoll(PayrollRequest request);
 
     PayrollRespone toPayRollRespone(Payroll payroll);

@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class DayOffService {
     DayOffRepository dayOffRepository;
     DayOffMapper dayOffMapper;
 
-    // thêm 1 ngày nghỉ vào dnah sách
+    // thêm 1 ngày nghỉ vào danh sách
     public DayOffResponse createDayOff(DayOffRequest request){
         if(dayOffRepository.existsByNameDay(request.getNameDay()))
             throw new AppException(ErrorCode.DayOff_EXISTED);
@@ -53,7 +52,6 @@ public class DayOffService {
     }
 
     // lấy theo id
-    @PostAuthorize("returnObject.username == authentication.name")
     public DayOffResponse getDayOff(int datOffId){
         return dayOffMapper.toDayOffRespone(dayOffRepository.findById(datOffId)
                 .orElseThrow(() -> new RuntimeException("Day off not found")));

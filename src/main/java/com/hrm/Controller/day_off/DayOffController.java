@@ -34,7 +34,7 @@ public class DayOffController {
     }
 
     @GetMapping("/day")
-    ApiResponse<DayOffResponse> getWage(@RequestParam int dayOffId){
+    ApiResponse<DayOffResponse> getDay(@RequestParam int dayOffId){
         return ApiResponse.<DayOffResponse>builder()
                 .result(dayOffService.getDayOff(dayOffId))
                 .build();
