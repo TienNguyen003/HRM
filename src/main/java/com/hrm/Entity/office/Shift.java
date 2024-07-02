@@ -22,4 +22,5 @@ public class Shift {
     int id;
     Time start;
     Time end;
+    String workingDay;
 }

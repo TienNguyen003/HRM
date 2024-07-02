@@ -1,24 +1,18 @@
-package com.hrm.Entity.office;
+package com.hrm.dto.request.office;
 
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Department {
-    @Id
-    String id;
+public class DepartmentRequest {
     String name;
     String shortName;
     String belongTo;
     int status;
-
-    @ManyToOne
-    OfficeI officeI;
+    int officeId;
 }

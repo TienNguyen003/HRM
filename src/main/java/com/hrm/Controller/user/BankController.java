@@ -58,6 +58,7 @@ public class BankController {
 		return bankService.updateB(id, request);
 	}
 
+	@DeleteMapping
 	ApiResponse<String> delete (@RequestParam int id){
 		bankService.deleteB(id);
 		return ApiResponse.<String>builder()

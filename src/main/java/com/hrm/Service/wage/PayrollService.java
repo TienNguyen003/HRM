@@ -6,7 +6,7 @@ import com.hrm.Entity.wage.Payroll;
 import com.hrm.Mapper.wage.PayRollMapper;
 import com.hrm.dto.request.wage.PayrollRequest;
 import com.hrm.dto.response.wage.PayrollRespone;
-import com.hrm.repository.DepartmentRepository;
+import com.hrm.repository.office.DepartmentRepository;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.wage.PayrollRepository;
 import lombok.AccessLevel;

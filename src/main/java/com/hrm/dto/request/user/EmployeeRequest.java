@@ -21,5 +21,5 @@ public class EmployeeRequest {
     Date hire_date;
     int shift_id;
     int vacationTime;
-    String department;
+    String departmentId;
 }
