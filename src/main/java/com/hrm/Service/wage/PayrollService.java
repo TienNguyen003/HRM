@@ -1,6 +1,6 @@
 package com.hrm.Service.wage;
 
-import com.hrm.Entity.department.Department;
+import com.hrm.Entity.office.Department;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Payroll;
 import com.hrm.Mapper.wage.PayRollMapper;

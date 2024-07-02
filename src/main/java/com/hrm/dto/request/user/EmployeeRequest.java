@@ -1,23 +1,17 @@
-package com.hrm.Entity.user;
+package com.hrm.dto.request.user;
 
-import com.hrm.Entity.office.Department;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+public class EmployeeRequest {
     String name;
     String email;
     String phone_number;
@@ -27,7 +21,5 @@ public class Employee {
     Date hire_date;
     int shift_id;
     int vacationTime;
-
-    @ManyToOne
-    Department department;
+    String department;
 }

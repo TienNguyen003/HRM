@@ -1,4 +1,4 @@
-package com.hrm.Entity;
+package com.hrm.Entity.office;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

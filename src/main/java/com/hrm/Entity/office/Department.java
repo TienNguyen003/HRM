@@ -1,4 +1,4 @@
-package com.hrm.Entity.department;
+package com.hrm.Entity.office;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,6 +1,6 @@
 package com.hrm.Entity.wage;
 
-import com.hrm.Entity.department.Department;
+import com.hrm.Entity.office.Department;
 import com.hrm.Entity.user.Employee;
 import jakarta.persistence.*;
 import lombok.*;
