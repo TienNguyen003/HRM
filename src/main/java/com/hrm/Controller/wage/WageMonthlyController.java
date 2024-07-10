@@ -28,7 +28,6 @@ public class WageMonthlyController {
     @GetMapping
     ApiResponse<List<WageMonthlyRespone>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<WageMonthlyRespone>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(wageService.getAllWage(pageNumber, 30))
                 .build();
     }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.prefix}role")
+@RequestMapping("${api.prefix}roles")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
@@ -27,10 +27,20 @@ public class RoleController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<RoleResponse>> getAll(){
+    @GetMapping()
+    ApiResponse<List<RoleResponse>> searchAll(@RequestParam int pageNumber,
+                                              @RequestParam(name = "name", required = false) String name){
+        List<RoleResponse> roles = roleService.searchAll(name, pageNumber, 30);
         return ApiResponse.<List<RoleResponse>>builder()
-                .result(roleService.getAll())
+                .result(roles)
+                .page(roleService.getPagination(pageNumber, roles.stream().count()))
+                .build();
+    }
+
+    @GetMapping("/role")
+    ApiResponse<RoleResponse> getRole(@RequestParam(name = "name", required = false) String name){
+        return ApiResponse.<RoleResponse>builder()
+                .result(roleService.getRole(name))
                 .build();
     }
 

@@ -28,7 +28,6 @@ public class DayOffController {
     @GetMapping
     ApiResponse<List<DayOffResponse>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<DayOffResponse>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(dayOffService.getAllDayOff(pageNumber, 30))
                 .build();
     }

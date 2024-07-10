@@ -28,7 +28,6 @@ public class PayrollController {
     @GetMapping
     ApiResponse<List<PayrollRespone>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<PayrollRespone>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(payrollService.getAllPayroll(pageNumber, 30))
                 .build();
     }

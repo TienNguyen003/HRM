@@ -29,7 +29,6 @@ public class AdvanceController {
     @GetMapping
     ApiResponse<List<AdvanceRespone>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<AdvanceRespone>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(advanceService.getAll(pageNumber, 30))
                 .build();
     }

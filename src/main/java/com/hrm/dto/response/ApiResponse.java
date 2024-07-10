@@ -1,6 +1,7 @@
 package com.hrm.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.hrm.Entity.PageCustom;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,6 +15,6 @@ public class ApiResponse <T>{
 	@Builder.Default
 	int code = 303;
 	String message;
-	String page;
 	T result;
+	PageCustom page;
 }

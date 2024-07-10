@@ -28,7 +28,6 @@ public class OfficeController {
     @GetMapping
     ApiResponse<List<OfficeRespone>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<OfficeRespone>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(officeService.getAll(pageNumber, 30))
                 .build();
     }

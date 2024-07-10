@@ -28,7 +28,6 @@ public class DepartmentController {
     @GetMapping
     ApiResponse<List<DepartmentResponse>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<DepartmentResponse>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(departmentService.getAll(pageNumber, 30))
                 .build();
     }

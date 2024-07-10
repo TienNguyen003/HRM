@@ -28,7 +28,6 @@ public class ShiftController {
     @GetMapping
     ApiResponse<List<ShiftResponse>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<ShiftResponse>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(shiftService.getAll(pageNumber, 30))
                 .build();
     }

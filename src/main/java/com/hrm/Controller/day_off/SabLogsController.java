@@ -28,7 +28,6 @@ public class SabLogsController {
     @GetMapping
     ApiResponse<List<SabbaticalLogsResponse>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<SabbaticalLogsResponse>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(sabLogsService.getAllSab(pageNumber, 30))
                 .build();
     }
@@ -36,7 +35,6 @@ public class SabLogsController {
     @GetMapping("/sab")
     ApiResponse<List<SabbaticalLogsResponse>> getByEmpId(@RequestParam int pageNumber, @RequestParam String id){
         return ApiResponse.<List<SabbaticalLogsResponse>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(sabLogsService.getByEmpId(id, pageNumber, 30))
                 .build();
     }

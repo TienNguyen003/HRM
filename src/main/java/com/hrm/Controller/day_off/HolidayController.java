@@ -28,7 +28,6 @@ public class HolidayController {
     @GetMapping
     ApiResponse<List<HolidayResponse>> getAll(@RequestParam int pageNumber){
         return ApiResponse.<List<HolidayResponse>>builder()
-                .page(String.valueOf(pageNumber))
                 .result(holidayService.getAllH(pageNumber, 30))
                 .build();
     }

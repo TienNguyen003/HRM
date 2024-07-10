@@ -1,9 +1,24 @@
 package com.hrm.repository.role;
 
 import com.hrm.Entity.role.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, String> {
+    boolean existsByName(String name);
+
+    @Query("SELECT r FROM Role r WHERE" +
+            "(:name IS NULL OR r.name LIKE %:name%)")
+    Page<Role> findByName
+            (String name, Pageable pageable);
+
+    @Query("SELECT COUNT(*) AS totalItems FROM Role")
+    Long totalItems();
+
+    @Query("SELECT CEIL(CAST(COUNT(*) AS float) / 30.0) AS totalPages FROM Role")
+    Long totalPages();
 }
