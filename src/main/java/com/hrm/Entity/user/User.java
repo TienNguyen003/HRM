@@ -20,8 +20,10 @@ public class User {
 	String id;
 	String username;
 	String password;
-	int employeeId;
 
-	@ManyToMany
-	Set<Role> role;
+	@OneToOne
+	Employee employee;
+
+	@ManyToOne
+	Role role;
 }

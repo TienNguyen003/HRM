@@ -26,14 +26,14 @@ public class DepartmentController {
     }
 
     @GetMapping
-    ApiResponse<List<DepartmentResponse>> getAll(@RequestParam int pageNumber){
+    ApiResponse<List<DepartmentResponse>> getAll(){
         return ApiResponse.<List<DepartmentResponse>>builder()
-                .result(departmentService.getAll(pageNumber, 30))
+                .result(departmentService.getAll())
                 .build();
     }
 
     @GetMapping("/department")
-    ApiResponse<DepartmentResponse> getD(@RequestParam String departmentId){
+    ApiResponse<DepartmentResponse> getD(@RequestParam int departmentId){
         return ApiResponse.<DepartmentResponse>builder()
                 .result(departmentService.getById(departmentId))
                 .build();
@@ -50,14 +50,14 @@ public class DepartmentController {
     }
 
     @PutMapping
-    ApiResponse<DepartmentResponse> update(@RequestParam String departmentId, @RequestBody DepartmentRequest request){
+    ApiResponse<DepartmentResponse> update(@RequestParam int departmentId, @RequestBody DepartmentRequest request){
         return ApiResponse.<DepartmentResponse>builder()
                 .result(departmentService.update(departmentId, request))
                 .build();
     }
 
     @DeleteMapping
-    ApiResponse<String> delete (@RequestParam String departmentId){
+    ApiResponse<String> delete (@RequestParam int departmentId){
         departmentService.delete(departmentId);
         return ApiResponse.<String>builder()
                 .result("Department has been deleted")

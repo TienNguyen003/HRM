@@ -45,9 +45,8 @@ public class OfficeService {
     }
 
     // lấy ra tất cả
-    public List<OfficeRespone> getAll(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return officeRepository.findAll(pageable)
+    public List<OfficeRespone> getAll(){
+        return officeRepository.findAll()
                 .stream().map(officeMapper::toOfficeRespone).toList();
     }
 

@@ -32,14 +32,20 @@ public class UserController {
 	}
 	
 	@GetMapping
-	ApiResponse<List<UserResponse>> getUsers() {
+	ApiResponse<List<UserResponse>> getUsers(@RequestParam("pageNumber") int pageNumber ,
+											 @RequestParam(name = "name", required = false) String name,
+											 @RequestParam(name = "username", required = false) String username,
+											 @RequestParam(name = "department", required = false) String department,
+											 @RequestParam(name = "role", required = false) String role) {
+		List<UserResponse> users = userService.getUsers(name, username, department, role, pageNumber, 30);
 		return ApiResponse.<List<UserResponse>>builder()
-				.result(userService.getUsers())
+				.result(users)
+				.page(userService.getPagination(pageNumber, users.stream().count()))
 				.build();
 	}
 
-	@GetMapping("/{userId}")
-	ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
+	@GetMapping("/user")
+	ApiResponse<UserResponse> getUser(@RequestParam String userId) {
 		return ApiResponse.<UserResponse>builder()
 				.result(userService.getUser(userId))
 				.build();
@@ -52,14 +58,16 @@ public class UserController {
 				.build();
 	}
 	
-	@PutMapping("/{userId}")
-	UserResponse updateUsser(@PathVariable String userId, @RequestBody UserUpdateRequest request) {
+	@PutMapping()
+	UserResponse updateUsser(@RequestParam String userId, @RequestBody UserUpdateRequest request) {
 		return userService.updateUser(userId, request);
 	}
 	
-	@DeleteMapping("/{userId}")
-	String deleteUser(@PathVariable String userId) {
+	@DeleteMapping()
+	ApiResponse<String> deleteUser(@RequestParam String userId) {
 		userService.deleteUser(userId);
-		return "User has been deleted";
+		return ApiResponse.<String>builder()
+				.result("User has been deleted")
+				.build();
 	}
 }

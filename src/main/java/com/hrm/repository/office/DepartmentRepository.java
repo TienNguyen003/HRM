@@ -6,10 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface DepartmentRepository extends JpaRepository<Department, String> {
+public interface DepartmentRepository extends JpaRepository<Department, Integer> {
     boolean existsByName(String name);
-
-    Page<Department> findAll(Pageable pageable);
 
     @Query("SELECT al FROM Department al WHERE " +
             "(:name IS NULL OR al.name LIKE %:name%) AND " +

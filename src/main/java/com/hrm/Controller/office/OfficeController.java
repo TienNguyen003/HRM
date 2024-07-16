@@ -25,10 +25,10 @@ public class OfficeController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<OfficeRespone>> getAll(@RequestParam int pageNumber){
+    @GetMapping()
+    ApiResponse<List<OfficeRespone>> getAll(){
         return ApiResponse.<List<OfficeRespone>>builder()
-                .result(officeService.getAll(pageNumber, 30))
+                .result(officeService.getAll())
                 .build();
     }
 

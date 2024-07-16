@@ -22,9 +22,9 @@ public class EmployeeController {
 	EmployeeService employeeService;
 	
 	@PostMapping
-	ApiResponse<EmployeeRespone> create(@RequestBody @Valid EmployeeRequest request) {
+	ApiResponse<EmployeeRespone> create(@RequestBody EmployeeRequest request, @RequestParam String username) {
 		return ApiResponse.<EmployeeRespone>builder()
-				.result(employeeService.createB(request))
+				.result(employeeService.createB(request, username))
 				.build();
 	}
 	
@@ -41,17 +41,6 @@ public class EmployeeController {
 				.result(employeeService.getById(id))
 				.build();
 	}
-
-//	@GetMapping("/search")
-//	ApiResponse<List<BankRespone>> search(@RequestParam("pageNumber") int pageNumber ,
-//										  @RequestParam(name = "name", required = false) String name,
-//										  @RequestParam(name = "status", required = false) Integer status,
-//										  @RequestParam(name = "priority", required = false) Integer priority,
-//										  @RequestParam(name = "nameBank", required = false) String nameBank){
-//		return ApiResponse.<List<BankRespone>>builder()
-//				.result(bankService.searchAllB(pageNumber, 30, name, nameBank, status, priority))
-//				.build();
-//	}
 	
 	@PutMapping
 	ApiResponse<EmployeeRespone> update(@RequestParam int id, @RequestBody EmployeeRequest request) {

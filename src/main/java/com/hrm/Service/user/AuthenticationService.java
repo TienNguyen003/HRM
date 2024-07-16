@@ -79,7 +79,7 @@ public class AuthenticationService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
 
-        if(!authenicated) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        if(!authenicated) throw new AppException(ErrorCode.PASSWORD_INCORRECT);
 
         var token = generateToken(user);
         return AuthenticationResponse.builder()
@@ -171,14 +171,11 @@ public class AuthenticationService {
 
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!CollectionUtils.isEmpty(user.getRole()))
-            user.getRole().forEach(role -> {
-                stringJoiner.add("ROLE_"+role.getName());
-                if (!CollectionUtils.isEmpty(role.getPermissions()))
-                    role.getPermissions().forEach(permission -> {
+                stringJoiner.add("ROLE_"+user.getRole().getName());
+                if (!CollectionUtils.isEmpty(user.getRole().getPermissions()))
+                    user.getRole().getPermissions().forEach(permission -> {
                         stringJoiner.add(permission.getName());
                     });
-            });
 
         return stringJoiner.toString();
     }

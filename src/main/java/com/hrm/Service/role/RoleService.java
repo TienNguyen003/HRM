@@ -1,10 +1,12 @@
 package com.hrm.Service.role;
 
 import com.hrm.Entity.PageCustom;
+import com.hrm.Entity.role.Role;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.role.RoleMapper;
 import com.hrm.dto.request.role.RoleRequest;
+import com.hrm.dto.request.role.RoleUpdateRequest;
 import com.hrm.dto.response.role.RoleResponse;
 import com.hrm.repository.role.PermissionRepository;
 import com.hrm.repository.role.RoleRepository;
@@ -38,6 +40,13 @@ public class RoleService {
         return roleMapper.toRoleResponse(role);
     }
 
+    public List<RoleResponse> getAll(){
+        return roleRepository.findAll()
+                .stream()
+                .map(roleMapper::toRoleResponse)
+                .toList();
+    }
+
     public List<RoleResponse> searchAll(String name, int pageNumber, int pageSize){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return roleRepository.findByName(name, pageable)
@@ -58,7 +67,19 @@ public class RoleService {
     }
 
     public RoleResponse getRole(String name){
-        return roleMapper.toRoleResponse(roleRepository.findById(name).orElseThrow(() -> new RuntimeException("Role not found")));
+        return roleMapper.toRoleResponse(roleRepository.findById(name)
+                .orElseThrow(() -> new RuntimeException("Role not found")));
+    }
+
+    public RoleResponse updateRole(RoleUpdateRequest request, String name){
+        Role role = roleRepository.findById(name)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        roleMapper.updateRole(role, request);
+
+        var permissions = permissionRepository.findAllById(request.getPermissions());
+        role.setPermissions(new HashSet<>(permissions));
+
+        return roleMapper.toRoleResponse(roleRepository.save(role));
     }
 
     public void delete(String name){

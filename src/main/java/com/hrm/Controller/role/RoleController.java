@@ -1,6 +1,7 @@
 package com.hrm.Controller.role;
 
 import com.hrm.Service.role.RoleService;
+import com.hrm.dto.request.role.RoleUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.request.role.RoleRequest;
 import com.hrm.dto.response.role.RoleResponse;
@@ -37,6 +38,13 @@ public class RoleController {
                 .build();
     }
 
+    @GetMapping("/get")
+    ApiResponse<List<RoleResponse>> getAll(){
+        return ApiResponse.<List<RoleResponse>>builder()
+                .result(roleService.getAll())
+                .build();
+    }
+
     @GetMapping("/role")
     ApiResponse<RoleResponse> getRole(@RequestParam(name = "name", required = false) String name){
         return ApiResponse.<RoleResponse>builder()
@@ -44,9 +52,18 @@ public class RoleController {
                 .build();
     }
 
-    @DeleteMapping("/{roleName}")
-    ApiResponse<Void> delete(@PathVariable String roleName){
-        roleService.delete(roleName);
-        return ApiResponse.<Void>builder().build();
+    @PutMapping()
+    ApiResponse<RoleResponse> updateRole(@RequestBody RoleUpdateRequest request, @RequestParam String name){
+        return ApiResponse.<RoleResponse>builder()
+                .result(roleService.updateRole(request, name))
+                .build();
+    }
+
+    @DeleteMapping()
+    ApiResponse<String> delete(@RequestParam(name = "name", required = false) String name){
+        roleService.delete(name);
+        return ApiResponse.<String>builder()
+                .result("Role has been deleted")
+                .build();
     }
 }

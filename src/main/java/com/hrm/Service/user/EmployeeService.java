@@ -1,10 +1,15 @@
 package com.hrm.Service.user;
 
+import com.hrm.Entity.office.Department;
 import com.hrm.Entity.user.Employee;
+import com.hrm.Exception.AppException;
+import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.EmployeeMapper;
 import com.hrm.dto.request.user.EmployeeRequest;
 import com.hrm.dto.response.user.EmployeeRespone;
+import com.hrm.repository.office.DepartmentRepository;
 import com.hrm.repository.user.EmployeeRepository;
+import com.hrm.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,10 +25,19 @@ import java.util.List;
 public class EmployeeService {
     EmployeeMapper employeeMapper;
     EmployeeRepository employeeRepository;
+    DepartmentRepository departmentRepository;
+    UserRepository userRepository;
 
     // thêm danh sách
-    public EmployeeRespone createB(EmployeeRequest request) {
+    public EmployeeRespone createB(EmployeeRequest request, String username) {
+        if(userRepository.existsByUsername(username))
+            throw new AppException(ErrorCode.USER_EXISTED);
+
         Employee employee = employeeMapper.toEmployee(request);
+        Department department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("No department not found"));
+
+        employee.setDepartment(department);
 
         return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
     }

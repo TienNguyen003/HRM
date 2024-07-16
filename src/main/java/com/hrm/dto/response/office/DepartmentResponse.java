@@ -1,5 +1,6 @@
 package com.hrm.dto.response.office;
 
+import com.hrm.Entity.office.OfficeI;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -15,4 +16,5 @@ public class DepartmentResponse {
     String shortName;
     String belongTo;
     int status;
+    OfficeI officeI;
 }

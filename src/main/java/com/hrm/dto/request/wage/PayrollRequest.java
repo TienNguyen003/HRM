@@ -16,6 +16,6 @@ public class PayrollRequest {
     String totalSalary;
     int status = 0;
     String qrPay;
-    String departmentId;
+    int departmentId;
     int employeeId;
 }

@@ -17,9 +17,11 @@ public class EmployeeRequest {
     String phone_number;
     String gender;
     String image;
-    Date birth_date;
-    Date hire_date;
+    String birth_date;
+    String hire_date;
     int shift_id;
     int vacationTime;
-    String departmentId;
+    int hourOff;
+    int vacationHours;
+    int departmentId;
 }

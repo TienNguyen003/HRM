@@ -40,7 +40,7 @@ public class DepartmentService {
     }
 
     // cập nhật
-    public DepartmentResponse update(String id, DepartmentRequest request){
+    public DepartmentResponse update(int id, DepartmentRequest request){
 
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Department not found"));
@@ -51,14 +51,13 @@ public class DepartmentService {
     }
 
     // lấy ra tất cả
-    public List<DepartmentResponse> getAll(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return departmentRepository.findAll(pageable)
+    public List<DepartmentResponse> getAll(){
+        return departmentRepository.findAll()
                 .stream().map(departmentMapper::toDepartmentResponse).toList();
     }
 
     // lấy theo id
-    public DepartmentResponse getById(String id){
+    public DepartmentResponse getById(int id){
         return departmentMapper.toDepartmentResponse(departmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Department not found")));
     }
@@ -71,7 +70,7 @@ public class DepartmentService {
     }
 
     // xóa
-    public void delete(String id){
+    public void delete(int id){
         departmentRepository.deleteById(id);
     }
 }

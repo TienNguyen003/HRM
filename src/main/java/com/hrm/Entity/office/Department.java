@@ -13,7 +13,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Department {
     @Id
-    String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    int id;
     String name;
     String shortName;
     String belongTo;

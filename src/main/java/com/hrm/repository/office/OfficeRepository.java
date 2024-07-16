@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 public interface OfficeRepository extends JpaRepository<OfficeI, Integer> {
     boolean existsByName(String name);
 
-    Page<OfficeI> findAll(Pageable pageable);
-
     @Query("SELECT al FROM OfficeI al WHERE " +
             "(:name IS NULL OR al.name LIKE %:name%) AND " +
             "(:status IS NULL OR al.status = :status)")
