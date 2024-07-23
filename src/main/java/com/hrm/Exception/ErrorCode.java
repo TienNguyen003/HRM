@@ -6,22 +6,43 @@ import org.springframework.http.HttpStatusCode;
 
 @Getter
 public enum ErrorCode {
-	UNCATEGORIZED_EXCEPTION(404, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
-	INVALID(404, "Invalid message key", HttpStatus.BAD_REQUEST),
-	USERNAME_INVALID(500, "Username must be at least 6 characters", HttpStatus.BAD_REQUEST),
-	PASSWORD_INVALID(501, "Password must be at least 8 characters", HttpStatus.BAD_REQUEST),
-	USER_EXISTED(502, "User existed", HttpStatus.BAD_REQUEST),
-	ROLE_EXISTED(502, "Role existed", HttpStatus.BAD_REQUEST),
-	DEPARTMENT_EXISTED(502, "Department existed", HttpStatus.BAD_REQUEST),
-	OFFICE_EXISTED(502, "Office existed", HttpStatus.BAD_REQUEST),
-	BANK_EXISTED(502, "Bank existed", HttpStatus.NOT_FOUND),
-	UNAUTHENTICATED(503, "Unauthenticated", HttpStatus.UNAUTHORIZED),
-	USER_NOT_EXISTED(504, "Tên đăng nhập không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
-	PASSWORD_INCORRECT(504, "Mật khẩu không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
+	UNCATEGORIZED_EXCEPTION(504, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
+	INVALID(504, "Invalid message key", HttpStatus.BAD_REQUEST),
+	UNAUTHENTICATED(504, "Unauthenticated", HttpStatus.UNAUTHORIZED),
 	UNAUTHORIZED(505, "You don't have permission", HttpStatus.FORBIDDEN),
-	DayOff_EXISTED(502, "Day of existed", HttpStatus.BAD_REQUEST),
-	WageCate_EXISTED(502, "This salary category of existed", HttpStatus.BAD_REQUEST),
-	Advance_Not_Edit(502, "Information cannot be edited", HttpStatus.BAD_REQUEST);
+
+	// user name
+	USERNAME_INVALID(500, "Tên đăng nhập phải có ít nhất 6 kí tự.", HttpStatus.BAD_REQUEST),
+	USER_NOT_EXISTED(500, "Tên đăng nhập không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
+	USER_EXISTED(502, "Tên đăng nhập đã tồn tại.", HttpStatus.BAD_REQUEST),
+
+	// password
+	PASSWORD_INVALID(500, "Mâ khẩu phải có ít nhất 6 kí tự", HttpStatus.BAD_REQUEST),
+	PASSWORD_INCORRECT(500, "Mật khẩu không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
+
+	// nhân viên
+	EMPLOYEE_NOT_EXISTED(504, "Nhân viên không tồn tại.", HttpStatus.NOT_FOUND),
+
+	// quyền
+	ROLE_EXISTED(502, "Quyền đã tồn tại.", HttpStatus.BAD_REQUEST),
+
+	// phòng ban
+	DEPARTMENT_EXISTED(502, "Phòng đã tồn tại.", HttpStatus.BAD_REQUEST),
+	DEPARTMENT_NOT_EXISTED(504, "Phòng không tồn tại.", HttpStatus.BAD_REQUEST),
+
+	// văn phòng
+	OFFICE_EXISTED(502, "Văn phòng đã tồn tại.", HttpStatus.BAD_REQUEST),
+
+	// ngân hàng
+	BANK_EXISTED(502, "Ngân hàng đã tồn tại.", HttpStatus.NOT_FOUND),
+
+	//ngày nghỉ
+	DAYOFF_EXISTED(502, "Ngày nghỉ đã tồn tại.", HttpStatus.BAD_REQUEST),
+	DAYOFF_NOT_EXISTED(504, "Ngày nghỉ không tồn tại.", HttpStatus.BAD_REQUEST),
+
+	//lương
+	WageCate_EXISTED(502, "Danh mục lương đã tồn tại.", HttpStatus.BAD_REQUEST),
+	Advance_Not_Edit(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST);
 
 	ErrorCode(int code, String message, HttpStatusCode statusCode) {
 		this.code = code;

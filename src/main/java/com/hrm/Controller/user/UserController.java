@@ -37,10 +37,16 @@ public class UserController {
 											 @RequestParam(name = "username", required = false) String username,
 											 @RequestParam(name = "department", required = false) String department,
 											 @RequestParam(name = "role", required = false) String role) {
-		List<UserResponse> users = userService.getUsers(name, username, department, role, pageNumber, 30);
 		return ApiResponse.<List<UserResponse>>builder()
-				.result(users)
-				.page(userService.getPagination(pageNumber, users.stream().count()))
+				.result(userService.getUsers(name, username, department, role, pageNumber, 30))
+				.page(userService.getPagination(pageNumber, name, username, department, role))
+				.build();
+	}
+
+	@GetMapping("/getAll")
+	ApiResponse<List<UserResponse>> getUsers() {
+		return ApiResponse.<List<UserResponse>>builder()
+				.result(userService.getAll())
 				.build();
 	}
 

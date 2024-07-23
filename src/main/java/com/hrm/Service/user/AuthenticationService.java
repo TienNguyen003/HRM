@@ -4,9 +4,9 @@ import com.hrm.Entity.token.InvalidateToken;
 import com.hrm.Entity.user.User;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
-import com.hrm.dto.request.user.AuthenticationRequest;
+import com.hrm.dto.request.token.AuthenticationRequest;
 import com.hrm.dto.request.token.IntrospectRequest;
-import com.hrm.dto.request.user.LogoutRequest;
+import com.hrm.dto.request.token.LogoutRequest;
 import com.hrm.dto.request.token.RefreshRequest;
 import com.hrm.dto.response.token.AuthenticationResponse;
 import com.hrm.dto.response.token.IntrospectResponse;
@@ -73,19 +73,19 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authentication(AuthenticationRequest authenticationRequest){
-        var user = userRepository.findByUsername(authenticationRequest.getUsername())
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            var user = userRepository.findByUsername(authenticationRequest.getUsername())
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        boolean authenicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+            boolean authenicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
 
-        if(!authenicated) throw new AppException(ErrorCode.PASSWORD_INCORRECT);
+            if(!authenicated) throw new AppException(ErrorCode.PASSWORD_INCORRECT);
 
-        var token = generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(token)
-                .authentication(true)
-                .build();
+            var token = generateToken(user);
+            return AuthenticationResponse.builder()
+                    .token(token)
+                    .authentication(true)
+                    .build();
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
@@ -105,7 +105,6 @@ public class AuthenticationService {
         JWSVerifier jwsVerifier = new MACVerifier(SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
-
 
         Date expT = (isRefresh)
                 ? new Date(signedJWT.getJWTClaimsSet().getIssueTime()
@@ -150,7 +149,7 @@ public class AuthenticationService {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwsClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
-                .issuer("ecomerce.com")
+                .issuer("hrm.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(EXP_DURARION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
@@ -171,7 +170,7 @@ public class AuthenticationService {
 
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
-                stringJoiner.add("ROLE_"+user.getRole().getName());
+                stringJoiner.add("ROLE_" + user.getRole().getName());
                 if (!CollectionUtils.isEmpty(user.getRole().getPermissions()))
                     user.getRole().getPermissions().forEach(permission -> {
                         stringJoiner.add(permission.getName());

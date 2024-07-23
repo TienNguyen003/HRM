@@ -15,10 +15,4 @@ public interface RoleRepository extends JpaRepository<Role, String> {
             "(:name IS NULL OR r.name LIKE %:name%)")
     Page<Role> findByName
             (String name, Pageable pageable);
-
-    @Query("SELECT COUNT(*) AS totalItems FROM Role")
-    Long totalItems();
-
-    @Query("SELECT CEIL(CAST(COUNT(*) AS float) / 30.0) AS totalPages FROM Role")
-    Long totalPages();
 }

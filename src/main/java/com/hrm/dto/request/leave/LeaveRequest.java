@@ -19,7 +19,7 @@ public class LeaveRequest {
     String name;
 
     @NotNull(message = "Vui lòng chọn")
-    String dayOff;
+    int dayOff;
     String startTime;
     String endTime;
     String totalTime;
@@ -27,5 +27,5 @@ public class LeaveRequest {
     String reason;
     int employeeId;
     int status = 0;
-    LocalDateTime creationTime = LocalDateTime.now();
+    String creationTime = String.valueOf(LocalDateTime.now());
 }

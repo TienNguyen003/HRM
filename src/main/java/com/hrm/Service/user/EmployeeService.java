@@ -5,6 +5,7 @@ import com.hrm.Entity.user.Employee;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.EmployeeMapper;
+import com.hrm.dto.request.user.EmployeeDismissalRequest;
 import com.hrm.dto.request.user.EmployeeRequest;
 import com.hrm.dto.response.user.EmployeeRespone;
 import com.hrm.repository.office.DepartmentRepository;
@@ -35,7 +36,7 @@ public class EmployeeService {
 
         Employee employee = employeeMapper.toEmployee(request);
         Department department = departmentRepository.findById(request.getDepartmentId())
-                .orElseThrow(() -> new RuntimeException("No department not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
 
         employee.setDepartment(department);
 
@@ -43,11 +44,21 @@ public class EmployeeService {
     }
 
     // cập nhật
-    public EmployeeRespone updateB(int bankId, EmployeeRequest request) {
-        Employee employee = employeeRepository.findById(bankId)
-                .orElseThrow(() -> new RuntimeException("This bank not found"));
+    public EmployeeRespone updateB(int employeeId, EmployeeRequest request) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
         employeeMapper.updateEmployee(employee, request);
+
+        return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
+    }
+
+    // cập nhật ngay sa thai
+    public EmployeeRespone updateDismissal (int employeeId, EmployeeDismissalRequest request) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("This employee not found"));
+
+        employeeMapper.updateEmployeeDismissal(employee, request);
 
         return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
     }
@@ -62,16 +73,8 @@ public class EmployeeService {
     // lấy theo id
     public EmployeeRespone getById(int id) {
         return employeeMapper.toEmployeeRespone(employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("This employee not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED)));
     }
-
-    // tìm kiếm
-//    public List<EmployeeRespone> searchAllB
-//    (int pageNumber, int pageSize, String name, String nameDay, Integer status, Integer priority) {
-//        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-//        return employeeRepository.findBankByNameAndNameBank(name, status, priority, nameDay, pageable)
-//                .stream().map(employeeMapper::toBankRespone).toList();
-//    }
 
     // xóa
     public void deleteB(int id) {

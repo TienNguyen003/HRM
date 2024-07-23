@@ -22,10 +22,4 @@ public interface UserRepository extends JpaRepository<User, String>{
 			"(:name IS NULL OR u.employee.name LIKE %:name%)")
 	Page<User> findByName
 			(String name, String username, String department, String role, Pageable pageable);
-
-	@Query("SELECT COUNT(*) AS totalItems FROM User")
-	Long totalItems();
-
-	@Query("SELECT CEIL(CAST(COUNT(*) AS float) / 30.0) AS totalPages FROM User")
-	Long totalPages();
 }

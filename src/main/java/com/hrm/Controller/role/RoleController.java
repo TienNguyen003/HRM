@@ -31,10 +31,9 @@ public class RoleController {
     @GetMapping()
     ApiResponse<List<RoleResponse>> searchAll(@RequestParam int pageNumber,
                                               @RequestParam(name = "name", required = false) String name){
-        List<RoleResponse> roles = roleService.searchAll(name, pageNumber, 30);
         return ApiResponse.<List<RoleResponse>>builder()
-                .result(roles)
-                .page(roleService.getPagination(pageNumber, roles.stream().count()))
+                .result(roleService.searchAll(name, pageNumber, 30))
+                .page(roleService.getPagination(pageNumber, name))
                 .build();
     }
 

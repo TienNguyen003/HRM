@@ -1,9 +1,7 @@
 package com.hrm.Entity.day_off;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.hrm.Entity.user.Employee;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -20,14 +18,17 @@ public class ApplicationLeave {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
-    String name;
-    String dayOff;
     String startTime;
     String endTime;
     String totalTime;
     String approved;
     String reason;
-    int employeeId;
     int status;
-    LocalDateTime creationTime;
+    String creationTime;
+
+    @ManyToOne
+    DayOffCategories dayOffCategories;
+
+    @ManyToOne
+    Employee employee;
 }

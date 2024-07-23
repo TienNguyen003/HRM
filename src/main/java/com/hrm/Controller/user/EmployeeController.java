@@ -1,6 +1,7 @@
 package com.hrm.Controller.user;
 
 import com.hrm.Service.user.EmployeeService;
+import com.hrm.dto.request.user.EmployeeDismissalRequest;
 import com.hrm.dto.request.user.EmployeeRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.user.EmployeeRespone;
@@ -46,6 +47,13 @@ public class EmployeeController {
 	ApiResponse<EmployeeRespone> update(@RequestParam int id, @RequestBody EmployeeRequest request) {
 		return ApiResponse.<EmployeeRespone>builder()
 				.result(employeeService.updateB(id, request))
+				.build();
+	}
+
+	@PutMapping("/dismissal")
+	ApiResponse<EmployeeRespone> updateDismissal(@RequestParam int id, @RequestBody EmployeeDismissalRequest request) {
+		return ApiResponse.<EmployeeRespone>builder()
+				.result(employeeService.updateDismissal(id, request))
 				.build();
 	}
 

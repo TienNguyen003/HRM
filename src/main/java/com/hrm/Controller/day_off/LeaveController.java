@@ -37,13 +37,6 @@ public class LeaveController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<LeaveRespone>> getAll(@RequestParam int pageNumber){
-        return ApiResponse.<List<LeaveRespone>>builder()
-                .result(leaveService.getAll(pageNumber, 30))
-                .build();
-    }
-
     @GetMapping("/leave")
     ApiResponse<LeaveRespone> getLeave(@RequestParam int leaveId){
         return ApiResponse.<LeaveRespone>builder()
@@ -51,13 +44,14 @@ public class LeaveController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping()
     ApiResponse<List<LeaveRespone>> searchAll(@RequestParam("pageNumber") int pageNumber ,
                                         @RequestParam(name = "name", required = false) String name,
                                         @RequestParam(name = "status", required = false)  Integer status,
-                                        @RequestParam(name = "dayOff", required = false) String dayOff){
+                                        @RequestParam(name = "dayOff", required = false) Integer dayOff){
         return ApiResponse.<List<LeaveRespone>>builder()
                 .result(leaveService.searchAll(pageNumber, 30, name, dayOff, status))
+                .page(leaveService.getPagination(pageNumber, 30, name, dayOff, status))
                 .build();
     }
 

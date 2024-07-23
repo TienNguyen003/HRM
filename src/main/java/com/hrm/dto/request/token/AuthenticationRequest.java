@@ -1,4 +1,4 @@
-package com.hrm.dto.request.user;
+package com.hrm.dto.request.token;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,6 +8,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogoutRequest {
-    String token;
+public class AuthenticationRequest {
+    String username;
+    String password;
+
 }

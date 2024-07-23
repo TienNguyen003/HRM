@@ -27,7 +27,7 @@ public class WageCateService {
     // thêm danh sách
     public WageCateRespone create(WageCateRequest request){
         if(wageCateRepository.existsByName(request.getName()))
-            throw new AppException(ErrorCode.DayOff_EXISTED);
+            throw new AppException(ErrorCode.DAYOFF_EXISTED);
 
         WageCategories wageCategories = wageCateMapper.toWageCate(request);
         return wageCateMapper.toWageCateRespone(wageCateRepository.save(wageCategories));

@@ -26,7 +26,7 @@ public class HolidayService {
     // thêm 1 ngày nghỉ vào dnah sách
     public HolidayResponse createH(HolidayRequest request){
         if(holidayRepository.existsByName(request.getName()))
-            throw new AppException(ErrorCode.DayOff_EXISTED);
+            throw new AppException(ErrorCode.DAYOFF_EXISTED);
 
         Holiday holiday = holidayMapper.toHoliday(request);
 
@@ -37,7 +37,7 @@ public class HolidayService {
     public HolidayResponse updateH(int holidayId, HolidayRequest request){
 
         Holiday holiday = holidayRepository.findById(holidayId)
-                .orElseThrow(() -> new RuntimeException("Day off not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_EXISTED));
 
         holidayMapper.updateHoliday(holiday, request);
 
@@ -54,7 +54,7 @@ public class HolidayService {
     // lấy theo id
     public HolidayResponse getH(int datOffId){
         return holidayMapper.toHolidayRespone(holidayRepository.findById(datOffId)
-                .orElseThrow(() -> new RuntimeException("Holiday not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_EXISTED)));
     }
 
     // tìm kiếm

@@ -1,7 +1,6 @@
 package com.hrm.Service.user;
 
 import com.hrm.Entity.PageCustom;
-import com.hrm.Entity.role.Role;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.user.User;
 import com.hrm.Exception.AppException;
@@ -16,9 +15,9 @@ import com.hrm.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,20 +52,24 @@ public class UserService {
 		return userMapper.toUserResponse(userRepository.save(user));
 	}
 
-	@PreAuthorize("hasRole('ADMIN')")
+	public List<UserResponse> getAll(){
+		return userRepository.findAll()
+				.stream().map(userMapper::toUserResponse).toList();
+	}
+
 	public List<UserResponse> getUsers(String name, String username, String department, String role, int pageNumber, int pageSize){
 		Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
 		return userRepository.findByName(name, username, department, role, pageable)
 				.stream().map(userMapper::toUserResponse).toList();
 	}
 
-	public PageCustom getPagination(int pageNumber, long count){
-		String totalItems = String.valueOf(roleRepository.totalItems());
-		String totalPages = String.valueOf(roleRepository.totalPages());
+	public PageCustom getPagination(int pageNumber, String name, String username, String department, String role){
+		Pageable pageable = PageRequest.of(pageNumber - 1, 30);
+		Page<User> page = userRepository.findByName(name, username, department, role, pageable);
 		return PageCustom.builder()
-				.totalPages(totalPages)
-				.totalItems(totalItems)
-				.totalItemsPerPage(String.valueOf(count))
+				.totalPages(String.valueOf(page.getTotalPages()))
+				.totalItems(String.valueOf(page.getTotalElements()))
+				.totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
 				.currentPage(String.valueOf(pageNumber))
 				.build();
 	}

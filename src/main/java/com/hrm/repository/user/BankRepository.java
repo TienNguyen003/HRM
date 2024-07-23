@@ -9,9 +9,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BankRepository extends JpaRepository<Bank, Integer> {
-    boolean existsByNumberBank(String numberBank);
-    boolean existsByNameBank(String nameBank);
-    Page<Bank> findAll(Pageable pageable);
+    @Query("SELECT COUNT(*) > 0 FROM Bank WHERE nameBank = :nameBank AND numberBank = :numberBank")
+    boolean existsByNameAndAccount(String nameBank, String numberBank);
 
     @Query("SELECT b FROM Bank b WHERE" +
             "(:name IS NULL OR b.employee.name LIKE %:name%) AND" +

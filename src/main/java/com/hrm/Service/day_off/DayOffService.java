@@ -26,7 +26,7 @@ public class DayOffService {
     // thêm 1 ngày nghỉ vào danh sách
     public DayOffResponse createDayOff(DayOffRequest request){
         if(dayOffRepository.existsByNameDay(request.getNameDay()))
-            throw new AppException(ErrorCode.DayOff_EXISTED);
+            throw new AppException(ErrorCode.DAYOFF_EXISTED);
 
         DayOffCategories dayOffCategories = dayOffMapper.toDayOff(request);
 
@@ -37,7 +37,7 @@ public class DayOffService {
     public DayOffResponse updateDayOff(int dayOffId, DayOffRequest request){
 
         DayOffCategories dayOffCategories = dayOffRepository.findById(dayOffId)
-                .orElseThrow(() -> new RuntimeException("Day off not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_EXISTED));
 
         dayOffMapper.updateDayOff(dayOffCategories, request);
 
@@ -45,9 +45,8 @@ public class DayOffService {
     }
 
     // lấy ra tất cả
-    public List<DayOffResponse> getAllDayOff(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return dayOffRepository.findAll(pageable)
+    public List<DayOffResponse> getAllDayOff(){
+        return dayOffRepository.findAll()
                 .stream().map(dayOffMapper::toDayOffRespone).toList();
     }
 

@@ -13,6 +13,7 @@ import com.hrm.repository.role.RoleRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,13 +56,13 @@ public class RoleService {
                 .toList();
     }
 
-    public PageCustom getPagination(int pageNumber, long count){
-        String totalItems = String.valueOf(roleRepository.totalItems());
-        String totalPages = String.valueOf(roleRepository.totalPages());
+    public PageCustom getPagination(int pageNumber, String name){
+        Pageable pageable = PageRequest.of(pageNumber - 1, 2);
+        Page<Role> page = roleRepository.findByName(name, pageable);
         return PageCustom.builder()
-                .totalPages(totalPages)
-                .totalItems(totalItems)
-                .totalItemsPerPage(String.valueOf(count))
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
                 .currentPage(String.valueOf(pageNumber))
                 .build();
     }
