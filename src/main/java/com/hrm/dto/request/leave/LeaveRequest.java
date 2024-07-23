@@ -15,10 +15,6 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LeaveRequest {
-    @NotNull(message = "Tên không được để trống")
-    String name;
-
-    @NotNull(message = "Vui lòng chọn")
     int dayOff;
     String startTime;
     String endTime;

@@ -39,6 +39,9 @@ public class LeaveService {
         Employee employee = employeeRepository.findById(leaveRequest.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
+        employee.setVacationHours(employee.getVacationHours() - Integer.parseInt(leaveRequest.getTotalTime()));
+        employee.setHourOff(employee.getHourOff() + Integer.parseInt(leaveRequest.getTotalTime()));
+
         ApplicationLeave applicationLeave = leaveMapper.toLeave(leaveRequest);
         applicationLeave.setEmployee(employee);
         applicationLeave.setDayOffCategories(dayOffCategories);

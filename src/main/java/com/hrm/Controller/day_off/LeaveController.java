@@ -24,7 +24,7 @@ public class LeaveController {
     LeaveService leaveService;
 
     @PostMapping
-    ApiResponse<LeaveRespone> create(@RequestBody @Valid LeaveRequest leaveRequest){
+    ApiResponse<LeaveRespone> create(@RequestBody LeaveRequest leaveRequest){
         return ApiResponse.<LeaveRespone>builder()
                 .result(leaveService.createLeave(leaveRequest))
                 .build();
