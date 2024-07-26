@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LeaveRepository extends JpaRepository<ApplicationLeave, Integer> {
-    Page<ApplicationLeave> findAll(Pageable pageable);
 
     @Query("SELECT al FROM ApplicationLeave al WHERE " +
             "(:name IS NULL OR al.employee.name LIKE %:name%) AND " +

@@ -25,25 +25,12 @@ public class SabLogsController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<SabbaticalLogsResponse>> getAll(@RequestParam int pageNumber){
-        return ApiResponse.<List<SabbaticalLogsResponse>>builder()
-                .result(sabLogsService.getAllSab(pageNumber, 30))
-                .build();
-    }
-
-    @GetMapping("/sab")
-    ApiResponse<List<SabbaticalLogsResponse>> getByEmpId(@RequestParam int pageNumber, @RequestParam String id){
-        return ApiResponse.<List<SabbaticalLogsResponse>>builder()
-                .result(sabLogsService.getByEmpId(id, pageNumber, 30))
-                .build();
-    }
-
-    @GetMapping("/search")
+    @GetMapping()
     ApiResponse<List<SabbaticalLogsResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name){
         return ApiResponse.<List<SabbaticalLogsResponse>>builder()
                 .result(sabLogsService.searchAllSab(pageNumber, 30, name))
+                .page(sabLogsService.getPagination(pageNumber, 30, name))
                 .build();
     }
 }

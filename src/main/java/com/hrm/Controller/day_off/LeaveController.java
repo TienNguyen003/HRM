@@ -1,11 +1,10 @@
 package com.hrm.Controller.day_off;
 
 import com.hrm.Service.day_off.LeaveService;
-import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.request.leave.LeaveRequest;
 import com.hrm.dto.request.leave.LeaveUpdateRequest;
+import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.day_off.LeaveRespone;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,9 +30,16 @@ public class LeaveController {
     }
 
     @PutMapping
-    ApiResponse<LeaveRespone> update(@RequestParam int leaveId, @RequestBody LeaveUpdateRequest leaveRequest){
+    ApiResponse<LeaveRespone> update(@RequestParam int leaveId, @RequestBody LeaveRequest request){
         return ApiResponse.<LeaveRespone>builder()
-                .result(leaveService.updateLeave(leaveId, leaveRequest))
+                .result(leaveService.updateLeave(leaveId, request))
+                .build();
+    }
+
+    @PutMapping("/status")
+    ApiResponse<LeaveRespone> updateStt(@RequestParam int leaveId, @RequestBody LeaveUpdateRequest request){
+        return ApiResponse.<LeaveRespone>builder()
+                .result(leaveService.updateStatus(leaveId, request))
                 .build();
     }
 

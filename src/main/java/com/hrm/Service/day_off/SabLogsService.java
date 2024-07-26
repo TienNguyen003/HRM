@@ -1,15 +1,19 @@
 package com.hrm.Service.day_off;
 
+import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.day_off.SabbaticalLeaveLogs;
+import com.hrm.Entity.user.Employee;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.day_off.SabbaticalLogsMapper;
 import com.hrm.dto.request.dayOff.SabbaticalLogsRequest;
 import com.hrm.dto.response.day_off.SabbaticalLogsResponse;
 import com.hrm.repository.day_off.SabLogsRepository;
+import com.hrm.repository.user.EmployeeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,27 +26,18 @@ import java.util.List;
 public class SabLogsService {
     SabLogsRepository sabLogsRepository;
     SabbaticalLogsMapper sabbaticalLogsMapper;
+    EmployeeRepository employeeRepository;
 
     // thêm
     public SabbaticalLogsResponse create(SabbaticalLogsRequest request){
 
         SabbaticalLeaveLogs sabbaticalLeaveLogs = sabbaticalLogsMapper.toSabLogs(request);
 
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+        sabbaticalLeaveLogs.setEmployee(employee);
+
         return sabbaticalLogsMapper.toSabLogsResponse(sabLogsRepository.save(sabbaticalLeaveLogs));
-    }
-
-    // lấy ra tất cả
-    public List<SabbaticalLogsResponse> getAllSab(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return sabLogsRepository.findAll(pageable)
-                .stream().map(sabbaticalLogsMapper::toSabLogsResponse).toList();
-    }
-
-    // lấy theo id
-    public List<SabbaticalLogsResponse> getByEmpId(String employeeId, int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return sabLogsRepository.findByEmpId(employeeId, pageable)
-                .stream().map(sabbaticalLogsMapper::toSabLogsResponse).toList();
     }
 
     // tìm kiếm
@@ -50,5 +45,16 @@ public class SabLogsService {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return sabLogsRepository.findByNameContaining(name, pageable)
                 .stream().map(sabbaticalLogsMapper::toSabLogsResponse).toList();
+    }
+
+    public PageCustom getPagination(int pageNumber, int pageSize, String name){
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<SabbaticalLeaveLogs> page = sabLogsRepository.findByNameContaining(name, pageable);
+        return PageCustom.builder()
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
+                .currentPage(String.valueOf(pageNumber))
+                .build();
     }
 }

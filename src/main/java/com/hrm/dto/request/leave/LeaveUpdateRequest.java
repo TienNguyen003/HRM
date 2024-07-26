@@ -13,14 +13,8 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LeaveUpdateRequest {
-    @NotNull(message = "Vui lòng chọn")
-    String dayOff;
-    String startTime;
-    String endTime;
-    String totalTime;
-    String approved;
-    String reason;
+    int status;
+    String nameApproval;
+    int time;
     int employeeId;
-    int status = 1;
-    LocalDateTime creationTime = LocalDateTime.now();
 }

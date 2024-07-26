@@ -9,11 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SabLogsRepository extends JpaRepository<SabbaticalLeaveLogs, Integer> {
-    @Query("SELECT al FROM SabbaticalLeaveLogs al WHERE " +
-            "(:id IS NULL OR al.employee.id = :id)")
-    Page<SabbaticalLeaveLogs> findByEmpId(String id, Pageable pageable);
-
-    Page<SabbaticalLeaveLogs> findAll(Pageable pageable);
 
     @Query("SELECT al FROM SabbaticalLeaveLogs al WHERE " +
             "(:name IS NULL OR al.employee.name LIKE %:name%)")

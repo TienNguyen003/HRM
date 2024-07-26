@@ -14,6 +14,6 @@ import java.time.LocalDateTime;
 public class SabbaticalLogsRequest {
     String content;
     int fluctuatesTime;
-    LocalDateTime timeUpdate = LocalDateTime.now();
+    LocalDateTime updateTime = LocalDateTime.now();
     int employeeId;
 }

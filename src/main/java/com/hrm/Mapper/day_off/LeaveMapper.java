@@ -13,5 +13,5 @@ public interface LeaveMapper {
 
     LeaveRespone toLeaveResponse(ApplicationLeave applicationLeave);
 
-    void updateLeave(@MappingTarget ApplicationLeave applicationLeave, LeaveUpdateRequest leaveUpdateRequest);
+    void updateLeaveRq(@MappingTarget ApplicationLeave applicationLeave, LeaveRequest request);
 }

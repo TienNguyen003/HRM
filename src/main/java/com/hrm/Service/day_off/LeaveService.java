@@ -21,6 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -39,9 +42,6 @@ public class LeaveService {
         Employee employee = employeeRepository.findById(leaveRequest.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
-        employee.setVacationHours(employee.getVacationHours() - Integer.parseInt(leaveRequest.getTotalTime()));
-        employee.setHourOff(employee.getHourOff() + Integer.parseInt(leaveRequest.getTotalTime()));
-
         ApplicationLeave applicationLeave = leaveMapper.toLeave(leaveRequest);
         applicationLeave.setEmployee(employee);
         applicationLeave.setDayOffCategories(dayOffCategories);
@@ -50,15 +50,35 @@ public class LeaveService {
     }
 
     // cập nhật đơn nghỉ
-    public LeaveRespone updateLeave(int id, LeaveUpdateRequest leaveUpdateRequest){
+    public LeaveRespone updateLeave(int id, LeaveRequest request){
         ApplicationLeave applicationLeave = leaveRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_EXISTED));
-        Employee employee = employeeRepository.findById(leaveUpdateRequest.getEmployeeId())
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED));
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+        DayOffCategories dayOffCategories = dayOffRepository.findById(request.getDayOff())
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED));
 
-        employee.setVacationTime(employee.getVacationTime() - Integer.parseInt(leaveUpdateRequest.getTotalTime()));
+        leaveMapper.updateLeaveRq(applicationLeave, request);
+        applicationLeave.setDayOffCategories(dayOffCategories);
+        applicationLeave.setEmployee(employee);
+
+        return leaveMapper.toLeaveResponse(leaveRepository.save(applicationLeave));
+    }
+
+    // cap nhat trang thai don
+    public LeaveRespone updateStatus(int leaveId, LeaveUpdateRequest request){
+        ApplicationLeave applicationLeave = leaveRepository.findById(leaveId)
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED));
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+        applicationLeave.setStatus(request.getStatus());
+        applicationLeave.setApproved(request.getNameApproval());
+
+        if(request.getStatus() == 1){
+            employee.setVacationHours(employee.getVacationHours() - request.getTime());
+            employee.setHourOff(employee.getHourOff() + request.getTime());
+        }
         employeeRepository.save(employee);
-        leaveMapper.updateLeave(applicationLeave, leaveUpdateRequest);
 
         return leaveMapper.toLeaveResponse(leaveRepository.save(applicationLeave));
     }
@@ -66,7 +86,7 @@ public class LeaveService {
     // lấy theo id đơn
     public LeaveRespone getLeave(int leaveId){
         return leaveMapper.toLeaveResponse(leaveRepository.findById(leaveId)
-                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_EXISTED)));
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED)));
     }
 
     public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer dayOff, Integer status){
