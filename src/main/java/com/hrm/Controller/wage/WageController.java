@@ -25,13 +25,6 @@ public class WageController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<WageRespone>> getAll(@RequestParam int pageNumber){
-        return ApiResponse.<List<WageRespone>>builder()
-                .result(wageService.getAllWage(pageNumber, 30))
-                .build();
-    }
-
     @GetMapping("/wage")
     ApiResponse<WageRespone> getWage(@RequestParam int wageId){
         return ApiResponse.<WageRespone>builder()
@@ -39,12 +32,14 @@ public class WageController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<WageRespone>> search(@RequestParam("pageNumber") int pageNumber ,
-                                              @RequestParam(name = "name", required = false) String name,
-                                              @RequestParam(name = "wageCategories", required = false) String wageCategories){
+                                          @RequestParam(name = "name", required = false) String name,
+                                          @RequestParam(name = "wageCategories", required = false) Integer wageCategories,
+                                          @RequestParam(name = "type", required = false) String type){
         return ApiResponse.<List<WageRespone>>builder()
-                .result(wageService.searchAll(pageNumber, 30, name, wageCategories))
+                .result(wageService.searchAll(pageNumber, 30, name, wageCategories, type))
+                .page(wageService.getPagination(pageNumber, 30, name, wageCategories, type))
                 .build();
     }
 

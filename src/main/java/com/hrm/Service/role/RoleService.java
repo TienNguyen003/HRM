@@ -57,7 +57,7 @@ public class RoleService {
     }
 
     public PageCustom getPagination(int pageNumber, String name){
-        Pageable pageable = PageRequest.of(pageNumber - 1, 2);
+        Pageable pageable = PageRequest.of(pageNumber - 1, 30);
         Page<Role> page = roleRepository.findByName(name, pageable);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
@@ -69,12 +69,12 @@ public class RoleService {
 
     public RoleResponse getRole(String name){
         return roleMapper.toRoleResponse(roleRepository.findById(name)
-                .orElseThrow(() -> new RuntimeException("Role not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED)));
     }
 
     public RoleResponse updateRole(RoleUpdateRequest request, String name){
         Role role = roleRepository.findById(name)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
         roleMapper.updateRole(role, request);
 
         var permissions = permissionRepository.findAllById(request.getPermissions());

@@ -53,7 +53,7 @@ public class DayOffService {
     // lấy theo id
     public DayOffResponse getDayOff(int datOffId){
         return dayOffMapper.toDayOffRespone(dayOffRepository.findById(datOffId)
-                .orElseThrow(() -> new RuntimeException("Day off not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED)));
     }
 
     // tìm kiếm

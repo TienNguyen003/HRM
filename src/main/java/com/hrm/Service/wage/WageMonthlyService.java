@@ -3,6 +3,8 @@ package com.hrm.Service.wage;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Wage;
 import com.hrm.Entity.wage.WageMonthly;
+import com.hrm.Exception.AppException;
+import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.WageMapper;
 import com.hrm.Mapper.wage.WageMonthlyMapper;
 import com.hrm.dto.request.wage.WageMonthlyRequest;
@@ -32,7 +34,7 @@ public class WageMonthlyService {
     // thêm danh sách
     public WageMonthlyRespone create(WageMonthlyRequest request){
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("No employee not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
         WageMonthly wageMonthly = wageMonthlyMapper.toWageMonthly(request);
 
@@ -44,7 +46,7 @@ public class WageMonthlyService {
     // cập nhật
     public WageMonthlyRespone update(int wageMonthId, WageMonthlyRequest request){
         WageMonthly wage = wageMonthlyRepository.findById(wageMonthId)
-                .orElseThrow(() -> new RuntimeException("This salary not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
 
         wageMonthlyMapper.updateWage(wage, request);
 

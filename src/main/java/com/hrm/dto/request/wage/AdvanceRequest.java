@@ -16,4 +16,5 @@ public class AdvanceRequest {
     String money;
     int status = 0;
     int employeeId;
+    String note;
 }

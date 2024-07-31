@@ -31,7 +31,7 @@ public class DepartmentService {
         if(departmentRepository.existsByName(request.getName()))
             throw new AppException(ErrorCode.DEPARTMENT_EXISTED);
         OfficeI officeI = officeRepository.findById(request.getOfficeId())
-                .orElseThrow(() -> new RuntimeException("Office not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
 
         Department department = departmentMapper.toDepartment(request);
         department.setOfficeI(officeI);
@@ -43,7 +43,7 @@ public class DepartmentService {
     public DepartmentResponse update(int id, DepartmentRequest request){
 
         Department department = departmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Department not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
 
         departmentMapper.updateDepartment(department, request);
 
@@ -59,7 +59,7 @@ public class DepartmentService {
     // lấy theo id
     public DepartmentResponse getById(int id){
         return departmentMapper.toDepartmentResponse(departmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Department not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED)));
     }
 
     // tìm kiếm

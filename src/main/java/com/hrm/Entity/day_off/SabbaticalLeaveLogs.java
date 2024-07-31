@@ -21,6 +21,7 @@ public class SabbaticalLeaveLogs {
     LocalDateTime updateTime;
     int fluctuatesTime;
     String content;
+    int remaining;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")

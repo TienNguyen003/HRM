@@ -19,5 +19,6 @@ public class AdvanceRespone {
     String money;
     String approvedBy;
     int status;
+    String note;
     Employee employee;
 }

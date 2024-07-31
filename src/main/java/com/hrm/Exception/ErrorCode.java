@@ -13,7 +13,7 @@ public enum ErrorCode {
 
 	// user name
 	USERNAME_INVALID(500, "Tên đăng nhập phải có ít nhất 6 kí tự.", HttpStatus.BAD_REQUEST),
-	USER_NOT_EXISTED(500, "Tên đăng nhập không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
+	USER_NOT_EXISTED(504, "Tên đăng nhập không chính xác.", HttpStatus.NOT_FOUND),
 	USER_EXISTED(502, "Tên đăng nhập đã tồn tại.", HttpStatus.BAD_REQUEST),
 
 	// password
@@ -25,6 +25,7 @@ public enum ErrorCode {
 
 	// quyền
 	ROLE_EXISTED(502, "Quyền đã tồn tại.", HttpStatus.BAD_REQUEST),
+	ROLE_NOT_EXISTED(504, "Quyền không tồn tại.", HttpStatus.BAD_REQUEST),
 
 	// phòng ban
 	DEPARTMENT_EXISTED(502, "Phòng đã tồn tại.", HttpStatus.BAD_REQUEST),
@@ -32,17 +33,28 @@ public enum ErrorCode {
 
 	// văn phòng
 	OFFICE_EXISTED(502, "Văn phòng đã tồn tại.", HttpStatus.BAD_REQUEST),
+	OFFICE_NOT_EXISTED(504, "Văn phòng không tồn tại.", HttpStatus.BAD_REQUEST),
 
 	// ngân hàng
 	BANK_EXISTED(502, "Ngân hàng đã tồn tại.", HttpStatus.NOT_FOUND),
+	BANK_NOT_EXISTED(504, "Ngân hàng không tồn tại.", HttpStatus.NOT_FOUND),
+
+	// hợp đồng
+	CONTRACT_NOT_EXISTED(504, "Hợp đồng không tồn tại", HttpStatus.NOT_FOUND),
 
 	//ngày nghỉ
 	DAYOFF_EXISTED(502, "Ngày nghỉ đã tồn tại.", HttpStatus.BAD_REQUEST),
 	DAYOFF_NOT_EXISTED(504, "Ngày nghỉ không tồn tại.", HttpStatus.BAD_REQUEST),
+	DAYCATE_NOT_EXISTED(504, "Danh mục ngày nghỉ không tồn tại.", HttpStatus.BAD_REQUEST),
 
 	//lương
-	WageCate_EXISTED(502, "Danh mục lương đã tồn tại.", HttpStatus.BAD_REQUEST),
-	Advance_Not_Edit(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST);
+	WAGECATE_EXISTED(502, "Danh mục lương đã tồn tại.", HttpStatus.BAD_REQUEST),
+	WAGECATE_NOT_EXISTED(504, "Danh mục lương không tồn tại.", HttpStatus.BAD_REQUEST),
+	WAGE_NOT_EXISTED(502, "Lương không tồn tại.", HttpStatus.BAD_REQUEST),
+
+	// ứng lương
+	ADVANCE_NOT_EXISTED(504, "Phiếu ứng lương không tồn tại.", HttpStatus.BAD_REQUEST),
+	ADVANCE_NOT_EDIT(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST);
 
 	ErrorCode(int code, String message, HttpStatusCode statusCode) {
 		this.code = code;

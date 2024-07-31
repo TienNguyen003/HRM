@@ -26,13 +26,6 @@ public class AdvanceController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<AdvanceRespone>> getAll(@RequestParam int pageNumber){
-        return ApiResponse.<List<AdvanceRespone>>builder()
-                .result(advanceService.getAll(pageNumber, 30))
-                .build();
-    }
-
     @GetMapping("/advance")
     ApiResponse<AdvanceRespone> getAdvance(@RequestParam int advaceId){
         return ApiResponse.<AdvanceRespone>builder()
@@ -40,12 +33,13 @@ public class AdvanceController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<AdvanceRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                               @RequestParam(name = "name", required = false) String name,
-                                                 @RequestParam(name = "status", required = false) String status){
+                                                 @RequestParam(name = "status", required = false) Integer status){
         return ApiResponse.<List<AdvanceRespone>>builder()
                 .result(advanceService.search(pageNumber, 30, name, status))
+                .page(advanceService.getPagination(pageNumber, 30, name, status))
                 .build();
     }
 
@@ -56,7 +50,7 @@ public class AdvanceController {
                 .build();
     }
 
-    @PutMapping("/edit")
+    @PutMapping("/approvals")
     ApiResponse<AdvanceRespone> updateStt(@RequestParam int advaceId, @RequestBody AdvanceUpdateSttRequest request){
         return ApiResponse.<AdvanceRespone>builder()
                 .result(advanceService.updateStt(advaceId, request))

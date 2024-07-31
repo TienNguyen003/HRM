@@ -36,7 +36,7 @@ public class WageCateService {
     // cập nhật
     public WageCateRespone update(int wageCateId, WageCateRequest request){
         WageCategories wageCategories = wageCateRepository.findById(wageCateId)
-                .orElseThrow(() -> new RuntimeException("This salary category not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.WAGECATE_EXISTED));
 
         wageCateMapper.updateDayOff(wageCategories, request);
 
@@ -51,10 +51,9 @@ public class WageCateService {
     }
 
     // lấy theo id
-    @PostAuthorize("returnObject.username == authentication.name")
     public WageCateRespone getWageCate(int wageCateId){
         return wageCateMapper.toWageCateRespone(wageCateRepository.findById(wageCateId)
-                .orElseThrow(() -> new RuntimeException("This salary category not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.WAGECATE_EXISTED)));
     }
 
     // tìm kiếm

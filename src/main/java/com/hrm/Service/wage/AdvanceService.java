@@ -1,5 +1,7 @@
 package com.hrm.Service.wage;
 
+import com.hrm.Entity.PageCustom;
+import com.hrm.Entity.role.Role;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Advance;
 import com.hrm.Exception.AppException;
@@ -14,6 +16,7 @@ import com.hrm.repository.wage.AdvanceRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,11 +37,10 @@ public class AdvanceService {
 
     // thêm danh sách
     public AdvanceRespone create(AdvanceRequest request){
-
         Advance advance = advanceMapper.toAdvance(request);
 
         advance.setEmployee(employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("No employee not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED)));
 
         return advanceMapper.toAdvanceRespone(advanceRepository.save(advance));
     }
@@ -46,24 +48,20 @@ public class AdvanceService {
     // cập nhật
     public AdvanceRespone update(int advanceId, AdvanceRequest request){
         Advance advance = advanceRepository.findById(advanceId)
-                .orElseThrow(() -> new RuntimeException("This advance not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED));
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
-        if(advance.getStatus() != 0)
-            throw new AppException(ErrorCode.Advance_Not_Edit);
-
+        advance.setEmployee(employee);
         advanceMapper.updateAdvance(advance, request);
 
         return advanceMapper.toAdvanceRespone(advanceRepository.save(advance));
     }
-
     // cập nhật status
-    @PreAuthorize("hasRole('ADMIN')")
     public AdvanceRespone updateStt(int advanceId, AdvanceUpdateSttRequest request){
         Advance advance = advanceRepository.findById(advanceId)
-                .orElseThrow(() -> new RuntimeException("This advance not found"));
-
+                .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED));
         advanceMapper.updateAdvanceStt(advance, request);
-
         return advanceMapper.toAdvanceRespone(advanceRepository.save(advance));
     }
 
@@ -75,23 +73,28 @@ public class AdvanceService {
     }
 
     // lấy theo id
-    @PreAuthorize("hasRole('ADMIN') || #username == authentication.name")
     public AdvanceRespone getAdvance(int advanceId){
         Advance advance = advanceRepository.findById(advanceId)
-                .orElseThrow(() -> new RuntimeException("This advance not found"));
-
-        int employee_id = advance.getEmployee().getId();
-
-        String username = userRepository.findByEmployeeId(employee_id).getUsername();
+                .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED));
 
         return advanceMapper.toAdvanceRespone(advance);
     }
 
     // tìm kiếm
-    public List<AdvanceRespone> search(int pageNumber, int pageSize, String name, String status){
+    public List<AdvanceRespone> search(int pageNumber, int pageSize, String name, Integer status){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return advanceRepository.findByNameAndStatus(name, status, pageable)
                 .stream().map(advanceMapper::toAdvanceRespone).toList();
+    }
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer status){
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<Advance> page = advanceRepository.findByNameAndStatus(name, status, pageable);
+        return PageCustom.builder()
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
+                .currentPage(String.valueOf(pageNumber))
+                .build();
     }
 
     // xóa

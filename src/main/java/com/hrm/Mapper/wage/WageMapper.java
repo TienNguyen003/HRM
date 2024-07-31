@@ -4,7 +4,6 @@ import com.hrm.Entity.wage.Wage;
 import com.hrm.dto.request.wage.WageRequest;
 import com.hrm.dto.response.wage.WageRespone;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")

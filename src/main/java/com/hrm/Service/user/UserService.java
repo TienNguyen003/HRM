@@ -39,9 +39,9 @@ public class UserService {
 			throw new AppException(ErrorCode.USER_EXISTED);
 
 		Employee employee = employeeRepository.findById(request.getEmployeeId())
-				.orElseThrow(() -> new RuntimeException("No employee not found"));
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRoleName())
-				.orElseThrow(() -> new RuntimeException("No role not found"));
+				.orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 		User user = userMapper.toUser(request);
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
@@ -75,24 +75,24 @@ public class UserService {
 
 	public UserResponse getUser(String id) {
 		return userMapper.toUserResponse(userRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("User not found")));
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
 	}
 	
 	public UserResponse updateUser(String userId, UserUpdateRequest request) {
-		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
 		userMapper.updateUser(user, request);
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
 		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRole())
-				.orElseThrow(() -> new RuntimeException("No role not found"));
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		user.setRole(role);
 		
 		return userMapper.toUserResponse(userRepository.save(user));
 	}
 	
 	public void deleteUser(String id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("No user not found"));
+		User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 		userRepository.deleteById(id);
 		employeeRepository.deleteById(user.getEmployee().getId());
 	}

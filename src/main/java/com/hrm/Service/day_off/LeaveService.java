@@ -56,7 +56,7 @@ public class LeaveService {
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
         DayOffCategories dayOffCategories = dayOffRepository.findById(request.getDayOff())
-                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.DAYCATE_NOT_EXISTED));
 
         leaveMapper.updateLeaveRq(applicationLeave, request);
         applicationLeave.setDayOffCategories(dayOffCategories);

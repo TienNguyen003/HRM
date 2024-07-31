@@ -16,6 +16,7 @@ public class SabbaticalLogsResponse {
     int id;
     String content;
     int fluctuatesTime;
+    int remaining;
     LocalDateTime updateTime;
     Employee employee;
 }

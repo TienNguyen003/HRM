@@ -26,7 +26,7 @@ public class OfficeService {
     // thêm
     public OfficeRespone create(OfficeRequest request){
         if(officeRepository.existsByName(request.getName()))
-            throw new AppException(ErrorCode.DEPARTMENT_EXISTED);
+            throw new AppException(ErrorCode.OFFICE_EXISTED);
 
         OfficeI dayOffCategories = officeMapper.toOfficeI(request);
 
@@ -37,7 +37,7 @@ public class OfficeService {
     public OfficeRespone update(int id, OfficeRequest request){
 
         OfficeI department = officeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Office not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
 
         officeMapper.updateOffice(department, request);
 
@@ -53,7 +53,7 @@ public class OfficeService {
     // lấy theo id
     public OfficeRespone getById(int id){
         return officeMapper.toOfficeRespone(officeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Office not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED)));
     }
 
     // tìm kiếm

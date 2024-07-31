@@ -13,5 +13,5 @@ public interface AdvanceRepository extends JpaRepository<Advance, Integer> {
             "(:status IS NULL OR a.status = :status) AND" +
             "(:name IS NULL OR a.employee.name LIKE %:name%)")
     Page<Advance> findByNameAndStatus
-            (String name, String status, Pageable pageable);
+            (String name, Integer status, Pageable pageable);
 }

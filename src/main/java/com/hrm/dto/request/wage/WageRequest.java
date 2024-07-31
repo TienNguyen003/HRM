@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WageRequest {
     String time;
-    String wageCategories;
+    int wageCategoriesId;
     String salary;
     int employeeId;
 }

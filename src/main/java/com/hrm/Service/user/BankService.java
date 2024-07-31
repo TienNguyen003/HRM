@@ -33,7 +33,7 @@ public class BankService {
         if (bankRepository.existsByNameAndAccount(request.getNameBank(), request.getNumberBank()))
             throw new AppException(ErrorCode.BANK_EXISTED);
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("No employee not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
         Bank bank = bankMapper.toBank(request);
         bank.setEmployee(employee);
 
@@ -43,7 +43,7 @@ public class BankService {
     // cập nhật
     public BankRespone updateB(int bankId, BankRequest request) {
         Bank bank = bankRepository.findById(bankId)
-                .orElseThrow(() -> new RuntimeException("This bank not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.BANK_NOT_EXISTED));
         if (bankRepository.existsByNameAndAccount(request.getNameBank(), request.getNumberBank()))
             throw new AppException(ErrorCode.BANK_EXISTED);
 
@@ -62,7 +62,7 @@ public class BankService {
     // lấy theo id
     public BankRespone getById(int id) {
         return bankMapper.toBankRespone(bankRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("This bank not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.BANK_NOT_EXISTED)));
     }
 
     // tìm kiếm

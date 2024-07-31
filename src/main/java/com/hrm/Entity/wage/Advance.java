@@ -23,6 +23,7 @@ public class Advance {
     String money;
     String approvedBy;
     int status;
+    String note;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")

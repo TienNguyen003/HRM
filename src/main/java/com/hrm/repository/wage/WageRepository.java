@@ -13,7 +13,8 @@ public interface WageRepository extends JpaRepository<Wage, Integer> {
 
     @Query("SELECT w FROM Wage w WHERE" +
             "(:name IS NULL OR w.employee.name LIKE %:name%) AND" +
+            "(:type IS NULL OR w.wageCategories.salaryType = :type) AND" +
             "(:wageCategories IS NULL OR w.wageCategories = :wageCategories)")
-    Page<Wage> findByNameContainingAndWageCategories
-            (String name, String wageCategories, Pageable pageable);
+    Page<Wage> findByNameAndWage
+            (String name, Integer wageCategories, String type, Pageable pageable);
 }

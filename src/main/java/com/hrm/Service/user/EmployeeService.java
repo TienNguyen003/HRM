@@ -56,7 +56,7 @@ public class EmployeeService {
     // cập nhật ngay sa thai
     public EmployeeRespone updateDismissal (int employeeId, EmployeeDismissalRequest request) {
         Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new RuntimeException("This employee not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
         employeeMapper.updateEmployeeDismissal(employee, request);
 

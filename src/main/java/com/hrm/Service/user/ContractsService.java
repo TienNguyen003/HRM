@@ -3,6 +3,8 @@ package com.hrm.Service.user;
 import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.user.Contracts;
 import com.hrm.Entity.user.Employee;
+import com.hrm.Exception.AppException;
+import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.ContractsMapper;
 import com.hrm.dto.request.user.ContractsRequest;
 import com.hrm.dto.response.user.ContractsRespone;
@@ -29,7 +31,7 @@ public class ContractsService {
     // thêm danh sách
     public ContractsRespone createB(ContractsRequest request) {
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("No employee not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
         Contracts contracts = contractsMapper.toContracts(request);
         contracts.setEmployee(employee);
 
@@ -39,7 +41,7 @@ public class ContractsService {
     // cập nhật
     public ContractsRespone updateB(int contractsId, ContractsRequest request) {
         Contracts contracts = contractsRepository.findById(contractsId)
-                .orElseThrow(() -> new RuntimeException("This contracts not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CONTRACT_NOT_EXISTED));
 
         contractsMapper.updateContracts(contracts, request);
 
@@ -49,7 +51,7 @@ public class ContractsService {
     // lấy theo id
     public ContractsRespone getById(int contractsId) {
         return contractsMapper.toContractsRespone(contractsRepository.findById(contractsId)
-                .orElseThrow(() -> new RuntimeException("This contracts not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.CONTRACT_NOT_EXISTED)));
     }
 
     // tìm kiếm

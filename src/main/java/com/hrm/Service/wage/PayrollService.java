@@ -3,6 +3,8 @@ package com.hrm.Service.wage;
 import com.hrm.Entity.office.Department;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Payroll;
+import com.hrm.Exception.AppException;
+import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.PayRollMapper;
 import com.hrm.dto.request.wage.PayrollRequest;
 import com.hrm.dto.response.wage.PayrollRespone;
@@ -30,9 +32,9 @@ public class PayrollService {
     // thêm danh sách
     public PayrollRespone create(PayrollRequest request){
         Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new RuntimeException("No employee not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
         Department department = departmentRepository.findById(request.getDepartmentId())
-                .orElseThrow(() -> new RuntimeException("Department not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
 
         Payroll payroll = payRollMapper.toPayRoll(request);
 
@@ -45,7 +47,7 @@ public class PayrollService {
     // cập nhật
     public PayrollRespone update(int payrollId, PayrollRequest request){
         Payroll payroll = payrollRepository.findById(payrollId)
-                .orElseThrow(() -> new RuntimeException("This salary not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
 
         payRollMapper.updatePayRoll(payroll, request);
 
@@ -62,7 +64,7 @@ public class PayrollService {
     // lấy theo id
     public PayrollRespone getPayroll(int wageIdEmployee){
         return payRollMapper.toPayRollRespone(payrollRepository.findById(wageIdEmployee)
-                .orElseThrow(() -> new RuntimeException("This salary  not found")));
+                .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED)));
     }
 
     // tìm kiếm
