@@ -1,4 +1,4 @@
-package com.hrm.dto.request.wage;
+package com.hrm.dto.request.wage.salaryStaticValue;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,9 +9,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WageMonthlyRequest {
-    String time;
-    String wageCategories;
+public class WageRequest {
+    int wageCategoriesId;
     String salary;
     int employeeId;
 }

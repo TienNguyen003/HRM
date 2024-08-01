@@ -1,4 +1,4 @@
-package com.hrm.dto.request.wage;
+package com.hrm.dto.request.wage.salaryDynamicValues;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class WageRequest {
+public class WageMonthlyRequest {
     String time;
     int wageCategoriesId;
     String salary;

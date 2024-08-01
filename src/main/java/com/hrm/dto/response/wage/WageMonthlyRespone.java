@@ -1,6 +1,7 @@
 package com.hrm.dto.response.wage;
 
 import com.hrm.Entity.user.Employee;
+import com.hrm.Entity.wage.WageCategories;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 public class WageMonthlyRespone {
     int id;
     String time;
-    String wageCategories;
     String salary;
+    WageCategories wageCategories;
     Employee employee;
 }

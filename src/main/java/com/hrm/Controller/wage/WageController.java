@@ -1,7 +1,8 @@
 package com.hrm.Controller.wage;
 
 import com.hrm.Service.wage.WageService;
-import com.hrm.dto.request.wage.WageRequest;
+import com.hrm.dto.request.wage.salaryStaticValue.WageRequest;
+import com.hrm.dto.request.wage.salaryStaticValue.WageUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.WageRespone;
 import lombok.AccessLevel;
@@ -19,16 +20,16 @@ public class WageController {
     WageService wageService;
 
     @PostMapping
-    ApiResponse<WageRespone> create(@RequestBody WageRequest request){
-        return ApiResponse.<WageRespone>builder()
+    ApiResponse<List<WageRespone>> create(@RequestBody List<WageRequest> request){
+        return ApiResponse.<List<WageRespone>>builder()
                 .result(wageService.create(request))
                 .build();
     }
 
     @GetMapping("/wage")
-    ApiResponse<WageRespone> getWage(@RequestParam int wageId){
-        return ApiResponse.<WageRespone>builder()
-                .result(wageService.getWage(wageId))
+    ApiResponse<List<WageRespone>> getWage(@RequestParam int employeeId){
+        return ApiResponse.<List<WageRespone>>builder()
+                .result(wageService.getWage(employeeId))
                 .build();
     }
 
@@ -44,9 +45,9 @@ public class WageController {
     }
 
     @PutMapping
-    ApiResponse<WageRespone> update(@RequestParam int wageId, @RequestBody WageRequest request){
-        return ApiResponse.<WageRespone>builder()
-                .result(wageService.update(wageId, request))
+    ApiResponse<List<WageRespone>> update(@RequestBody List<WageUpdateRequest> request){
+        return ApiResponse.<List<WageRespone>>builder()
+                .result(wageService.update(request))
                 .build();
     }
 

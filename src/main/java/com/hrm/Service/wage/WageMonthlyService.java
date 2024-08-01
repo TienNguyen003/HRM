@@ -1,22 +1,19 @@
 package com.hrm.Service.wage;
 
+import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.user.Employee;
-import com.hrm.Entity.wage.Wage;
 import com.hrm.Entity.wage.WageMonthly;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
-import com.hrm.Mapper.wage.WageMapper;
 import com.hrm.Mapper.wage.WageMonthlyMapper;
-import com.hrm.dto.request.wage.WageMonthlyRequest;
-import com.hrm.dto.request.wage.WageRequest;
+import com.hrm.dto.request.wage.salaryDynamicValues.WageMonthlyRequest;
 import com.hrm.dto.response.wage.WageMonthlyRespone;
-import com.hrm.dto.response.wage.WageRespone;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.wage.WageMonthlyRepository;
-import com.hrm.repository.wage.WageRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,13 +50,6 @@ public class WageMonthlyService {
         return wageMonthlyMapper.toWageMonthlyRespone(wageMonthlyRepository.save(wage));
     }
 
-    // lấy ra tất cả
-    public List<WageMonthlyRespone> getAllWage(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return wageMonthlyRepository.findAll(pageable)
-                .stream().map(wageMonthlyMapper::toWageMonthlyRespone).toList();
-    }
-
     // lấy theo id
     public List<WageMonthlyRespone> getWage(int wageIdEmployee){
         return wageMonthlyRepository.findByEmployeeId(wageIdEmployee)
@@ -67,10 +57,20 @@ public class WageMonthlyService {
     }
 
     // tìm kiếm
-    public List<WageMonthlyRespone> searchAll(int pageNumber, int pageSize, String name, String time, String wageCategories){
+    public List<WageMonthlyRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return wageMonthlyRepository.findByTimeContainingAndWageCategories(name, time, wageCategories, pageable)
+        return wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, pageable)
                 .stream().map(wageMonthlyMapper::toWageMonthlyRespone).toList();
+    }
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type){
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<WageMonthly> page = wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, pageable);
+        return PageCustom.builder()
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
+                .currentPage(String.valueOf(pageNumber))
+                .build();
     }
 
     // xóa

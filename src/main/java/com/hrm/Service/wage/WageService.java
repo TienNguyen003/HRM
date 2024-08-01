@@ -1,14 +1,14 @@
 package com.hrm.Service.wage;
 
 import com.hrm.Entity.PageCustom;
-import com.hrm.Entity.role.Role;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Wage;
 import com.hrm.Entity.wage.WageCategories;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.WageMapper;
-import com.hrm.dto.request.wage.WageRequest;
+import com.hrm.dto.request.wage.salaryStaticValue.WageRequest;
+import com.hrm.dto.request.wage.salaryStaticValue.WageUpdateRequest;
 import com.hrm.dto.response.wage.WageRespone;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.wage.WageCateRepository;
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,36 +34,46 @@ public class WageService {
     WageCateRepository wageCateRepository;
 
     // thêm danh sách
-    public WageRespone create(WageRequest request){
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
-        WageCategories wageCategories = wageCateRepository.findById(request.getWageCategoriesId())
-                .orElseThrow(() -> new AppException(ErrorCode.WAGECATE_NOT_EXISTED));
+    public List<WageRespone> create(List<WageRequest> requests){
+        List<Wage> wages = requests.stream().map(request -> {
+            Employee employee = employeeRepository.findById(request.getEmployeeId())
+                    .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+            WageCategories wageCategories = wageCateRepository.findById(request.getWageCategoriesId())
+                    .orElseThrow(() -> new AppException(ErrorCode.WAGECATE_NOT_EXISTED));
 
-        Wage wage = wageMapper.toWage(request);
+            Wage wage = wageMapper.toWage(request);
+            wage.setWageCategories(wageCategories);
+            wage.setEmployee(employee);
+            return wage;
+        }).collect(Collectors.toList());
 
-        wage.setWageCategories(wageCategories);
-        wage.setEmployee(employee);
+        List<Wage> savedWages = wageRepository.saveAll(wages);
 
-        wageMapper.toWageRespone(wageRepository.save(wage));
-
-        return wageMapper.toWageRespone(wageRepository.save(wage));
+        return savedWages.stream()
+                .map(wageMapper::toWageRespone)
+                .collect(Collectors.toList());
     }
 
     // cập nhật
-    public WageRespone update(int wageId, WageRequest request){
-        Wage wage = wageRepository.findById(wageId)
-                .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
+    public List<WageRespone> update(List<WageUpdateRequest> requests){
+        List<Wage> wages = requests.stream().map(request -> {
+            Wage wage = wageRepository.findById(request.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
 
-        wageMapper.updateWage(wage, request);
+            wage.setSalary(request.getSalary());
+            return wage;
+        }).toList();
 
-        return wageMapper.toWageRespone(wageRepository.save(wage));
+        List<Wage> savedWages = wageRepository.saveAll(wages);
+        return savedWages.stream()
+                .map(wageMapper::toWageRespone)
+                .collect(Collectors.toList());
     }
 
     // lấy theo id
-    public WageRespone getWage(int wageId){
-        return wageMapper.toWageRespone(wageRepository.findById(wageId)
-                .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED)));
+    public List<WageRespone> getWage(Integer employeeId){
+        return wageRepository.findByEmployee(employeeId)
+                .stream().map(wageMapper::toWageRespone).toList();
     }
 
     // tìm kiếm

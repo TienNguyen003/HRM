@@ -17,8 +17,10 @@ public class WageMonthly {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String time;
-    String wageCategories;
     String salary;
+
+    @ManyToOne
+    WageCategories wageCategories;
 
     @ManyToOne
     @JoinColumn(name = "employee_id")

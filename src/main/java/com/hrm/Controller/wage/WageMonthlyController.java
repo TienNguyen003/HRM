@@ -1,7 +1,7 @@
 package com.hrm.Controller.wage;
 
 import com.hrm.Service.wage.WageMonthlyService;
-import com.hrm.dto.request.wage.WageMonthlyRequest;
+import com.hrm.dto.request.wage.salaryDynamicValues.WageMonthlyRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.WageMonthlyRespone;
 import lombok.AccessLevel;
@@ -25,13 +25,6 @@ public class WageMonthlyController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<WageMonthlyRespone>> getAll(@RequestParam int pageNumber){
-        return ApiResponse.<List<WageMonthlyRespone>>builder()
-                .result(wageService.getAllWage(pageNumber, 30))
-                .build();
-    }
-
     @GetMapping("/wage")
     ApiResponse<List<WageMonthlyRespone>> getWage(@RequestParam int wageIdEmployee){
         return ApiResponse.<List<WageMonthlyRespone>>builder()
@@ -39,14 +32,15 @@ public class WageMonthlyController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<WageMonthlyRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                               @RequestParam(name = "name", required = false) String name,
                                                  @RequestParam(name = "time", required = false) String time,
-                                              @RequestParam(name = "wageCategories", required = false) String wageCategories){
-        System.out.println(name);
+                                              @RequestParam(name = "wageCategories", required = false) Integer wageCategories,
+                                                 @RequestParam(name = "type", required = false) String type){
         return ApiResponse.<List<WageMonthlyRespone>>builder()
-                .result(wageService.searchAll(pageNumber, 30, name, time, wageCategories))
+                .result(wageService.searchAll(pageNumber, 30, name, time, wageCategories, type))
+                .page(wageService.getPagination(pageNumber, 30, name, time, wageCategories, type))
                 .build();
     }
 

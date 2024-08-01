@@ -25,10 +25,10 @@ public class WageCateController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<WageCateRespone>> getAll(@RequestParam int pageNumber){
+    @GetMapping("/type")
+    ApiResponse<List<WageCateRespone>> getAll(@RequestParam(name = "type", required = false) String type){
         return ApiResponse.<List<WageCateRespone>>builder()
-                .result(wageCateService.getAllWageCate(pageNumber, 30))
+                .result(wageCateService.getType(type))
                 .build();
     }
 
@@ -39,20 +39,11 @@ public class WageCateController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<WageCateRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
                                               @RequestParam(name = "symbol", required = false) String symbol,
                                              @RequestParam(name = "salaryType", required = false)  String salaryType){
-        if (name != null && name.isEmpty()) {
-            name = null;
-        }
-        if (symbol != null && symbol.isEmpty()) {
-            symbol = null;
-        }
-        if (salaryType != null && salaryType.isEmpty()) {
-            salaryType = null;
-        }
         return ApiResponse.<List<WageCateRespone>>builder()
                 .result(wageCateService.searchAll(pageNumber, 30, name, symbol, salaryType))
                 .build();

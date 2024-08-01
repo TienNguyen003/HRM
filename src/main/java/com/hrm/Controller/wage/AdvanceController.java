@@ -1,8 +1,8 @@
 package com.hrm.Controller.wage;
 
 import com.hrm.Service.wage.AdvanceService;
-import com.hrm.dto.request.wage.AdvanceRequest;
-import com.hrm.dto.request.wage.AdvanceUpdateSttRequest;
+import com.hrm.dto.request.wage.advance.AdvanceRequest;
+import com.hrm.dto.request.wage.advance.AdvanceUpdateSttRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.AdvanceRespone;
 import lombok.AccessLevel;

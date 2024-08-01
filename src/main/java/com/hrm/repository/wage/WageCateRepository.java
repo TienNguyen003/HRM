@@ -7,11 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface WageCateRepository extends JpaRepository<WageCategories, Integer> {
     boolean existsByName(String name);
 
-    Page<WageCategories> findAll(Pageable pageable);
+    @Query("SELECT al FROM WageCategories al WHERE " +
+            "(:salaryType IS NULL OR al.salaryType = :salaryType)")
+    List<WageCategories> findBySalaryType(String salaryType);
 
     @Query("SELECT al FROM WageCategories al WHERE " +
             "(:name IS NULL OR al.name LIKE %:name%) AND " +

@@ -1,4 +1,4 @@
-package com.hrm.dto.request.wage;
+package com.hrm.dto.request.wage.advance;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,10 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AdvanceRequest {
-    LocalDateTime requestTime = LocalDateTime.now();
-    String money;
-    int status = 0;
-    int employeeId;
-    String note;
+public class AdvanceUpdateSttRequest {
+    LocalDateTime approvalTime = LocalDateTime.now();;
+    String approvedBy;
+    int status;
 }

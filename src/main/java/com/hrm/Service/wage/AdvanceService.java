@@ -1,14 +1,13 @@
 package com.hrm.Service.wage;
 
 import com.hrm.Entity.PageCustom;
-import com.hrm.Entity.role.Role;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Advance;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.AdvanceMapper;
-import com.hrm.dto.request.wage.AdvanceRequest;
-import com.hrm.dto.request.wage.AdvanceUpdateSttRequest;
+import com.hrm.dto.request.wage.advance.AdvanceRequest;
+import com.hrm.dto.request.wage.advance.AdvanceUpdateSttRequest;
 import com.hrm.dto.response.wage.AdvanceRespone;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.user.UserRepository;
@@ -19,9 +18,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

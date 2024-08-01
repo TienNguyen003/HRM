@@ -1,8 +1,8 @@
 package com.hrm.Mapper.wage;
 
 import com.hrm.Entity.wage.Advance;
-import com.hrm.dto.request.wage.AdvanceRequest;
-import com.hrm.dto.request.wage.AdvanceUpdateSttRequest;
+import com.hrm.dto.request.wage.advance.AdvanceRequest;
+import com.hrm.dto.request.wage.advance.AdvanceUpdateSttRequest;
 import com.hrm.dto.response.wage.AdvanceRespone;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;

@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,9 +43,8 @@ public class WageCateService {
     }
 
     // lấy ra tất cả
-    public List<WageCateRespone> getAllWageCate(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return wageCateRepository.findAll(pageable)
+    public List<WageCateRespone> getType(String type){
+        return wageCateRepository.findBySalaryType(type)
                 .stream().map(wageCateMapper::toWageCateRespone).toList();
     }
 
