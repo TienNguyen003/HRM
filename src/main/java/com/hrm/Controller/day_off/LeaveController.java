@@ -50,7 +50,7 @@ public class LeaveController {
                 .build();
     }
 
-    @GetMapping()
+    @GetMapping
     ApiResponse<List<LeaveRespone>> searchAll(@RequestParam("pageNumber") int pageNumber ,
                                         @RequestParam(name = "name", required = false) String name,
                                         @RequestParam(name = "status", required = false)  Integer status,

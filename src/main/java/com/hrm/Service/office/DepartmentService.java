@@ -1,5 +1,6 @@
 package com.hrm.Service.office;
 
+import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.office.Department;
 import com.hrm.Entity.office.OfficeI;
 import com.hrm.Exception.AppException;
@@ -12,6 +13,7 @@ import com.hrm.repository.office.OfficeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class DepartmentService {
 
     // thêm
     public DepartmentResponse create(DepartmentRequest request){
-        if(departmentRepository.existsByName(request.getName()))
+        if(departmentRepository.existsByNameAndId(request.getName(), request.getOfficeId()) )
             throw new AppException(ErrorCode.DEPARTMENT_EXISTED);
         OfficeI officeI = officeRepository.findById(request.getOfficeId())
                 .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
@@ -41,10 +43,14 @@ public class DepartmentService {
 
     // cập nhật
     public DepartmentResponse update(int id, DepartmentRequest request){
-
+        if(departmentRepository.existsByNameAndId(request.getName(), request.getOfficeId()) )
+            throw new AppException(ErrorCode.DEPARTMENT_EXISTED);
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
+        OfficeI officeI = officeRepository.findById(request.getOfficeId())
+                .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
 
+        department.setOfficeI(officeI);
         departmentMapper.updateDepartment(department, request);
 
         return departmentMapper.toDepartmentResponse(departmentRepository.save(department));
@@ -65,8 +71,18 @@ public class DepartmentService {
     // tìm kiếm
     public List<DepartmentResponse> searchAll(int pageNumber, int pageSize, String name, String shortName, Integer status){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return departmentRepository.findByNameContainingAndStatus(name, shortName, status, pageable)
+        return departmentRepository.findByNameAndStatus(name, shortName, status, pageable)
                 .stream().map(departmentMapper::toDepartmentResponse).toList();
+    }
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, String shortName, Integer status){
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<Department> page = departmentRepository.findByNameAndStatus(name, shortName, status, pageable);
+        return PageCustom.builder()
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
+                .currentPage(String.valueOf(pageNumber))
+                .build();
     }
 
     // xóa

@@ -1,17 +1,15 @@
-package com.hrm.dto.request.user;
+package com.hrm.dto.request.user.employee;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserUpdateRequest {
-	String password;
-
-	String role;
+public class EmployeeDismissalRequest {
+    String hire_date;
+    String dismissal_date;
 }

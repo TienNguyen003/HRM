@@ -1,11 +1,10 @@
 package com.hrm.Controller.user;
 
 import com.hrm.Service.user.EmployeeService;
-import com.hrm.dto.request.user.EmployeeDismissalRequest;
-import com.hrm.dto.request.user.EmployeeRequest;
+import com.hrm.dto.request.user.employee.EmployeeDismissalRequest;
+import com.hrm.dto.request.user.employee.EmployeeRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.user.EmployeeRespone;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -57,6 +56,7 @@ public class EmployeeController {
 				.build();
 	}
 
+	@DeleteMapping
 	ApiResponse<String> delete (@RequestParam int id){
 		employeeService.deleteB(id);
 		return ApiResponse.<String>builder()

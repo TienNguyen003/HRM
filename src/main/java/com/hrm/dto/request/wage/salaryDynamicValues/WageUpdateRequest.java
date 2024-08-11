@@ -1,4 +1,4 @@
-package com.hrm.dto.request.office;
+package com.hrm.dto.request.wage.salaryDynamicValues;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,10 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DepartmentRequest {
-    String name;
-    String shortName;
-    String belongTo;
-    int status = 1;
-    int officeId;
+public class WageUpdateRequest {
+    int id;
+    String salary;
 }

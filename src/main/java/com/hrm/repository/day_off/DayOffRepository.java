@@ -11,10 +11,8 @@ import org.springframework.stereotype.Repository;
 public interface DayOffRepository extends JpaRepository<DayOffCategories, Integer> {
     boolean existsByNameDay(String name);
 
-    Page<DayOffCategories> findAll(Pageable pageable);
-
     @Query("SELECT al FROM DayOffCategories al WHERE " +
             "(:nameDay IS NULL OR al.nameDay LIKE %:nameDay%) AND " +
             "(:status IS NULL OR al.status = :status)")
-    Page<DayOffCategories> findByNameDayContainingAndStatus(String nameDay, Integer status, Pageable pageable);
+    Page<DayOffCategories> findByNameAndStatus(String nameDay, Integer status, Pageable pageable);
 }

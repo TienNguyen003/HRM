@@ -2,6 +2,7 @@ package com.hrm.Controller.wage;
 
 import com.hrm.Service.wage.WageMonthlyService;
 import com.hrm.dto.request.wage.salaryDynamicValues.WageMonthlyRequest;
+import com.hrm.dto.request.wage.salaryDynamicValues.WageUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.WageMonthlyRespone;
 import lombok.AccessLevel;
@@ -19,16 +20,16 @@ public class WageMonthlyController {
     WageMonthlyService wageService;
 
     @PostMapping
-    ApiResponse<WageMonthlyRespone> create(@RequestBody WageMonthlyRequest request){
-        return ApiResponse.<WageMonthlyRespone>builder()
+    ApiResponse<List<WageMonthlyRespone>> create(@RequestBody List<WageMonthlyRequest> request){
+        return ApiResponse.<List<WageMonthlyRespone>>builder()
                 .result(wageService.create(request))
                 .build();
     }
 
     @GetMapping("/wage")
-    ApiResponse<List<WageMonthlyRespone>> getWage(@RequestParam int wageIdEmployee){
+    ApiResponse<List<WageMonthlyRespone>> getWage(@RequestParam int employeeId, @RequestParam String time){
         return ApiResponse.<List<WageMonthlyRespone>>builder()
-                .result(wageService.getWage(wageIdEmployee))
+                .result(wageService.getWage(employeeId, time))
                 .build();
     }
 
@@ -45,9 +46,9 @@ public class WageMonthlyController {
     }
 
     @PutMapping
-    ApiResponse<WageMonthlyRespone> update(@RequestParam int wageId, @RequestBody WageMonthlyRequest request){
-        return ApiResponse.<WageMonthlyRespone>builder()
-                .result(wageService.update(wageId, request))
+    ApiResponse<List<WageMonthlyRespone>> update(@RequestBody List<WageUpdateRequest> request){
+        return ApiResponse.<List<WageMonthlyRespone>>builder()
+                .result(wageService.update(request))
                 .build();
     }
 

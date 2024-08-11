@@ -1,5 +1,7 @@
 package com.hrm.Service.wage;
 
+import com.hrm.Entity.PageCustom;
+import com.hrm.Entity.wage.Wage;
 import com.hrm.Entity.wage.WageCategories;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
@@ -10,6 +12,7 @@ import com.hrm.repository.wage.WageCateRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -57,8 +60,18 @@ public class WageCateService {
     // tìm kiếm
     public List<WageCateRespone> searchAll(int pageNumber, int pageSize, String name, String symbol, String salaryType){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return wageCateRepository.findByNameContainingAndSymbolContainingAndSalaryType(name, symbol, salaryType, pageable)
+        return wageCateRepository.findByNameSymbolType(name, symbol, salaryType, pageable)
                 .stream().map(wageCateMapper::toWageCateRespone).toList();
+    }
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, String symbol, String salaryType) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, 30);
+        Page<WageCategories> page = wageCateRepository.findByNameSymbolType(name, symbol, salaryType, pageable);
+        return PageCustom.builder()
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
+                .currentPage(String.valueOf(pageNumber))
+                .build();
     }
 
     // xóa

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.prefix}structures")
+    @RequestMapping("${api.prefix}structures")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DepartmentController {
@@ -25,13 +25,6 @@ public class DepartmentController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<DepartmentResponse>> getAll(){
-        return ApiResponse.<List<DepartmentResponse>>builder()
-                .result(departmentService.getAll())
-                .build();
-    }
-
     @GetMapping("/department")
     ApiResponse<DepartmentResponse> getD(@RequestParam int departmentId){
         return ApiResponse.<DepartmentResponse>builder()
@@ -39,13 +32,21 @@ public class DepartmentController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<DepartmentResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
                                                  @RequestParam(name = "shortName", required = false) String shortName,
                                              @RequestParam(name = "status", required = false)  Integer status){
         return ApiResponse.<List<DepartmentResponse>>builder()
                 .result(departmentService.searchAll(pageNumber, 30, name, shortName,status))
+                .page(departmentService.getPagination(pageNumber, 30, name, shortName,status))
+                .build();
+    }
+
+    @GetMapping("/struc")
+    ApiResponse<List<DepartmentResponse>> getAll(){
+        return ApiResponse.<List<DepartmentResponse>>builder()
+                .result(departmentService.getAll())
                 .build();
     }
 

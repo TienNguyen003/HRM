@@ -1,9 +1,10 @@
 package com.hrm.Controller.user;
 
 import com.hrm.Service.user.UserService;
+import com.hrm.dto.request.user.user.UserCreationRequest;
+import com.hrm.dto.request.user.user.UserRsPass;
+import com.hrm.dto.request.user.user.UserUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
-import com.hrm.dto.request.user.UserCreationRequest;
-import com.hrm.dto.request.user.UserUpdateRequest;
 import com.hrm.dto.response.user.UserResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -36,10 +37,11 @@ public class UserController {
 											 @RequestParam(name = "name", required = false) String name,
 											 @RequestParam(name = "username", required = false) String username,
 											 @RequestParam(name = "department", required = false) String department,
+											 @RequestParam(name = "office", required = false) String office,
 											 @RequestParam(name = "role", required = false) String role) {
 		return ApiResponse.<List<UserResponse>>builder()
-				.result(userService.getUsers(name, username, department, role, pageNumber, 30))
-				.page(userService.getPagination(pageNumber, name, username, department, role))
+				.result(userService.getUsers(name, username, department, office, role, pageNumber, 30))
+				.page(userService.getPagination(pageNumber, name, username, department, office, role))
 				.build();
 	}
 
@@ -63,12 +65,26 @@ public class UserController {
 				.result(userService.getInfo())
 				.build();
 	}
+
+	@GetMapping("/update-pass")
+	ApiResponse<String> updatePass(@RequestParam String userId, @RequestParam String new_pass) {
+		return ApiResponse.<String>builder()
+				.result(userService.updatePass(userId, new_pass))
+				.build();
+	}
+
+	@PutMapping("/rs-pass")
+	ApiResponse<String> resetPass( @RequestBody UserRsPass request) {
+		return ApiResponse.<String>builder()
+				.result(userService.rsPass(request))
+				.build();
+	}
 	
 	@PutMapping()
 	UserResponse updateUsser(@RequestParam String userId, @RequestBody UserUpdateRequest request) {
 		return userService.updateUser(userId, request);
 	}
-	
+
 	@DeleteMapping()
 	ApiResponse<String> deleteUser(@RequestParam String userId) {
 		userService.deleteUser(userId);

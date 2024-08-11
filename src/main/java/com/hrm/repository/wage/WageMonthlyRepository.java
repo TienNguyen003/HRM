@@ -15,9 +15,19 @@ public interface WageMonthlyRepository extends JpaRepository<WageMonthly, Intege
             "(:type IS NULL OR w.wageCategories.salaryType = :type) AND" +
             "(:wageCategories IS NULL OR w.wageCategories.id = :wageCategories) AND"+
             "(:time IS NULL OR w.time LIKE %:time%) AND" +
-            "(:name IS NULL OR w.employee.name LIKE %:name%)")
+            "(:name IS NULL OR w.employee.name LIKE %:name%)" +
+            "order by time, w.employee.id")
     Page<WageMonthly> findByTimeWage
             (String name, String time, Integer wageCategories, String type, Pageable pageable);
 
-    List<WageMonthly> findByEmployeeId(int employeeId);
+    @Query("SELECT w FROM WageMonthly w WHERE" +
+            "(:time IS NULL OR w.time LIKE %:time%) AND" +
+            "(:employeeId IS NULL OR w.employee.id = :employeeId)")
+    List<WageMonthly> findByEmployeeId(int employeeId, String time);
+
+    @Query("SELECT w FROM WageMonthly w WHERE" +
+            "(:wageCategories IS NULL OR w.wageCategories.id = :wageCategories) AND" +
+            "(:time IS NULL OR w.time = :time) AND" +
+            "(:employeeId IS NULL OR w.employee.id = :employeeId)")
+    WageMonthly existsByEmployeeCate(Integer employeeId, Integer wageCategories, String time);
 }

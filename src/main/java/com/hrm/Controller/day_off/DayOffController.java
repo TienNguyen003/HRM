@@ -45,6 +45,7 @@ public class DayOffController {
                                              @RequestParam(name = "status", required = false)  Integer status){
         return ApiResponse.<List<DayOffResponse>>builder()
                 .result(dayOffService.searchAll(pageNumber, 30, nameDay, status))
+                .page(dayOffService.getPagination(pageNumber, 30, nameDay, status))
                 .build();
     }
 

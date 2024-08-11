@@ -5,8 +5,8 @@ import com.hrm.Entity.user.Employee;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.EmployeeMapper;
-import com.hrm.dto.request.user.EmployeeDismissalRequest;
-import com.hrm.dto.request.user.EmployeeRequest;
+import com.hrm.dto.request.user.employee.EmployeeDismissalRequest;
+import com.hrm.dto.request.user.employee.EmployeeRequest;
 import com.hrm.dto.response.user.EmployeeRespone;
 import com.hrm.repository.office.DepartmentRepository;
 import com.hrm.repository.user.EmployeeRepository;
@@ -32,7 +32,7 @@ public class EmployeeService {
     // thêm danh sách
     public EmployeeRespone createB(EmployeeRequest request, String username) {
         if(userRepository.existsByUsername(username))
-            throw new AppException(ErrorCode.USER_EXISTED);
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
 
         Employee employee = employeeMapper.toEmployee(request);
         Department department = departmentRepository.findById(request.getDepartmentId())

@@ -1,9 +1,7 @@
-package com.hrm.dto.request.user;
+package com.hrm.dto.request.user.employee;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 @Getter
 @Setter

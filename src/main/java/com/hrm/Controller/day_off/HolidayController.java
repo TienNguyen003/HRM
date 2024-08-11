@@ -25,13 +25,6 @@ public class HolidayController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<HolidayResponse>> getAll(@RequestParam int pageNumber){
-        return ApiResponse.<List<HolidayResponse>>builder()
-                .result(holidayService.getAllH(pageNumber, 30))
-                .build();
-    }
-
     @GetMapping("/day")
     ApiResponse<HolidayResponse> getH(@RequestParam int holidayId){
         return ApiResponse.<HolidayResponse>builder()
@@ -39,11 +32,19 @@ public class HolidayController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<HolidayResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name){
         return ApiResponse.<List<HolidayResponse>>builder()
                 .result(holidayService.searchAll(pageNumber, 30, name))
+                .page(holidayService.getPagination(pageNumber, 30, name))
+                .build();
+    }
+
+    @GetMapping("/time")
+    ApiResponse<Integer> getTime(@RequestParam("time") String time){
+        return ApiResponse.<Integer>builder()
+                .result(holidayService.getTime(time))
                 .build();
     }
 

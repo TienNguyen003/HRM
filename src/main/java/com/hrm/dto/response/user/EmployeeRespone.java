@@ -26,5 +26,6 @@ public class EmployeeRespone {
     int vacationTime;
     int hourOff;
     int vacationHours;
+    int timekeeping;
     Department department;
 }

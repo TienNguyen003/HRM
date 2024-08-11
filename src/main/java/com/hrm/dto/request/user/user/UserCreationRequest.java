@@ -1,4 +1,4 @@
-package com.hrm.dto.request.user;
+package com.hrm.dto.request.user.user;
 
 import jakarta.validation.constraints.Size;
 import lombok.*;

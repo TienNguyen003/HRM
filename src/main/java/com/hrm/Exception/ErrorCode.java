@@ -13,12 +13,13 @@ public enum ErrorCode {
 
 	// user name
 	USERNAME_INVALID(500, "Tên đăng nhập phải có ít nhất 6 kí tự.", HttpStatus.BAD_REQUEST),
-	USER_NOT_EXISTED(504, "Tên đăng nhập không chính xác.", HttpStatus.NOT_FOUND),
-	USER_EXISTED(502, "Tên đăng nhập đã tồn tại.", HttpStatus.BAD_REQUEST),
+	USERNAME_NOT_EXISTED(504, "Tên đăng nhập không chính xác.", HttpStatus.NOT_FOUND),
+	USERNAME_EXISTED(502, "Tên đăng nhập đã tồn tại.", HttpStatus.BAD_REQUEST),
 
 	// password
-	PASSWORD_INVALID(500, "Mâ khẩu phải có ít nhất 6 kí tự", HttpStatus.BAD_REQUEST),
+	PASSWORD_INVALID(500, "Mật khẩu phải có ít nhất 6 kí tự", HttpStatus.BAD_REQUEST),
 	PASSWORD_INCORRECT(500, "Mật khẩu không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
+	OLD_PASS_INCORRECT(500, "Mật khẩu cũ không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
 
 	// nhân viên
 	EMPLOYEE_NOT_EXISTED(504, "Nhân viên không tồn tại.", HttpStatus.NOT_FOUND),

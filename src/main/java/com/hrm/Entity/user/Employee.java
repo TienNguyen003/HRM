@@ -30,6 +30,7 @@ public class Employee {
     int vacationTime;
     int hourOff;
     int vacationHours;
+    int timekeeping;
 
     @ManyToOne
     Department department;

@@ -1,6 +1,8 @@
 package com.hrm.Service.day_off;
 
+import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.day_off.DayOffCategories;
+import com.hrm.Entity.day_off.Holiday;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.day_off.DayOffMapper;
@@ -10,6 +12,7 @@ import com.hrm.repository.day_off.DayOffRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,7 +47,6 @@ public class DayOffService {
         return dayOffMapper.toDayOffRespone(dayOffRepository.save(dayOffCategories));
     }
 
-    // lấy ra tất cả
     public List<DayOffResponse> getAllDayOff(){
         return dayOffRepository.findAll()
                 .stream().map(dayOffMapper::toDayOffRespone).toList();
@@ -59,8 +61,18 @@ public class DayOffService {
     // tìm kiếm
     public List<DayOffResponse> searchAll(int pageNumber, int pageSize, String name, Integer status){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return dayOffRepository.findByNameDayContainingAndStatus(name, status, pageable)
+        return dayOffRepository.findByNameAndStatus(name, status, pageable)
                 .stream().map(dayOffMapper::toDayOffRespone).toList();
+    }
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer status){
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<DayOffCategories> page = dayOffRepository.findByNameAndStatus(name, status, pageable);
+        return PageCustom.builder()
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
+                .currentPage(String.valueOf(pageNumber))
+                .build();
     }
 
     // xóa ngày nghỉ

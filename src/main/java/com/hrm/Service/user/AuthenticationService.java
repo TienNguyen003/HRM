@@ -74,7 +74,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse authentication(AuthenticationRequest authenticationRequest){
             var user = userRepository.findByUsername(authenticationRequest.getUsername())
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                    .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
 
             PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
             boolean authenicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());

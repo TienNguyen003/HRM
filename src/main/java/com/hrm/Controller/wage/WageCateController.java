@@ -46,6 +46,7 @@ public class WageCateController {
                                              @RequestParam(name = "salaryType", required = false)  String salaryType){
         return ApiResponse.<List<WageCateRespone>>builder()
                 .result(wageCateService.searchAll(pageNumber, 30, name, symbol, salaryType))
+                .page(wageCateService.getPagination(pageNumber, 30, name, symbol, salaryType))
                 .build();
     }
 

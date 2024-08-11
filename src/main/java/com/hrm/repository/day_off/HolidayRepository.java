@@ -11,9 +11,11 @@ import org.springframework.stereotype.Repository;
 public interface HolidayRepository extends JpaRepository<Holiday, Integer> {
     boolean existsByName(String name);
 
-    Page<Holiday> findAll(Pageable pageable);
-
     @Query("SELECT al FROM Holiday al WHERE " +
             "(:name IS NULL OR al.name LIKE %:name%)")
     Page<Holiday> findByName(String name, Pageable pageable);
+
+    @Query("SELECT sum(al.totalTime) FROM Holiday al WHERE " +
+            "(:time IS NULL OR al.startTime LIKE %:time%)")
+    Integer getToltalTime(String time);
 }

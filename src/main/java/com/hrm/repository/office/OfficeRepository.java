@@ -12,5 +12,5 @@ public interface OfficeRepository extends JpaRepository<OfficeI, Integer> {
     @Query("SELECT al FROM OfficeI al WHERE " +
             "(:name IS NULL OR al.name LIKE %:name%) AND " +
             "(:status IS NULL OR al.status = :status)")
-    Page<OfficeI> findByNameContainingAndStatus(String name, Integer status, Pageable pageable);
+    Page<OfficeI> findByNameAndStatus(String name, Integer status, Pageable pageable);
 }

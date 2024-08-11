@@ -2,13 +2,16 @@ package com.hrm.Service.wage;
 
 import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.user.Employee;
+import com.hrm.Entity.wage.WageCategories;
 import com.hrm.Entity.wage.WageMonthly;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.WageMonthlyMapper;
 import com.hrm.dto.request.wage.salaryDynamicValues.WageMonthlyRequest;
+import com.hrm.dto.request.wage.salaryDynamicValues.WageUpdateRequest;
 import com.hrm.dto.response.wage.WageMonthlyRespone;
 import com.hrm.repository.user.EmployeeRepository;
+import com.hrm.repository.wage.WageCateRepository;
 import com.hrm.repository.wage.WageMonthlyRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +21,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,42 +32,65 @@ public class WageMonthlyService {
     WageMonthlyRepository wageMonthlyRepository;
     WageMonthlyMapper wageMonthlyMapper;
     EmployeeRepository employeeRepository;
+    WageCateRepository wageCateRepository;
 
     // thêm danh sách
-    public WageMonthlyRespone create(WageMonthlyRequest request){
-        Employee employee = employeeRepository.findById(request.getEmployeeId())
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+    public List<WageMonthlyRespone> create(List<WageMonthlyRequest> requests) {
+        List<WageMonthly> wagesToSave = new ArrayList<>();
 
-        WageMonthly wageMonthly = wageMonthlyMapper.toWageMonthly(request);
+        for (WageMonthlyRequest request : requests) {
+            Employee employee = employeeRepository.findById(request.getEmployeeId())
+                    .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+            WageCategories wageCategories = wageCateRepository.findById(request.getWageCategoriesId())
+                    .orElseThrow(() -> new AppException(ErrorCode.WAGECATE_NOT_EXISTED));
 
-        wageMonthly.setEmployee(employee);
+            WageMonthly monthly = wageMonthlyRepository.existsByEmployeeCate(request.getEmployeeId(), request.getWageCategoriesId(), request.getTime());
 
-        return wageMonthlyMapper.toWageMonthlyRespone(wageMonthlyRepository.save(wageMonthly));
+            if (wageMonthlyRepository.existsByEmployeeCate(request.getEmployeeId(), request.getWageCategoriesId(), request.getTime()) == null) {
+                WageMonthly wage = wageMonthlyMapper.toWageMonthly(request);
+                wage.setWageCategories(wageCategories);
+                wage.setEmployee(employee);
+                wagesToSave.add(wage);
+            }
+        }
+
+        List<WageMonthly> savedWages = wageMonthlyRepository.saveAll(wagesToSave);
+
+        return savedWages.stream()
+                .map(wageMonthlyMapper::toWageMonthlyRespone)
+                .collect(Collectors.toList());
     }
 
     // cập nhật
-    public WageMonthlyRespone update(int wageMonthId, WageMonthlyRequest request){
-        WageMonthly wage = wageMonthlyRepository.findById(wageMonthId)
-                .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
+    public List<WageMonthlyRespone> update(List<WageUpdateRequest> requests) {
+        List<WageMonthly> wages = requests.stream().map(request -> {
+            WageMonthly wage = wageMonthlyRepository.findById(request.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
 
-        wageMonthlyMapper.updateWage(wage, request);
+            wage.setSalary(request.getSalary());
+            return wage;
+        }).toList();
 
-        return wageMonthlyMapper.toWageMonthlyRespone(wageMonthlyRepository.save(wage));
+        List<WageMonthly> savedWages = wageMonthlyRepository.saveAll(wages);
+        return savedWages.stream()
+                .map(wageMonthlyMapper::toWageMonthlyRespone)
+                .collect(Collectors.toList());
     }
 
     // lấy theo id
-    public List<WageMonthlyRespone> getWage(int wageIdEmployee){
-        return wageMonthlyRepository.findByEmployeeId(wageIdEmployee)
+    public List<WageMonthlyRespone> getWage(int wageIdEmployee, String time) {
+        return wageMonthlyRepository.findByEmployeeId(wageIdEmployee, time)
                 .stream().map(wageMonthlyMapper::toWageMonthlyRespone).toList();
     }
 
     // tìm kiếm
-    public List<WageMonthlyRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type){
+    public List<WageMonthlyRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, pageable)
                 .stream().map(wageMonthlyMapper::toWageMonthlyRespone).toList();
     }
-    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type){
+
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         Page<WageMonthly> page = wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, pageable);
         return PageCustom.builder()
@@ -74,7 +102,7 @@ public class WageMonthlyService {
     }
 
     // xóa
-    public void deleteWage(int wageId){
+    public void deleteWage(int wageId) {
         wageMonthlyRepository.deleteById(wageId);
     }
 

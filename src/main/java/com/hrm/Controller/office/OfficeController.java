@@ -25,13 +25,6 @@ public class OfficeController {
                 .build();
     }
 
-    @GetMapping()
-    ApiResponse<List<OfficeRespone>> getAll(){
-        return ApiResponse.<List<OfficeRespone>>builder()
-                .result(officeService.getAll())
-                .build();
-    }
-
     @GetMapping("/office")
     ApiResponse<OfficeRespone> getD(@RequestParam int officeId){
         return ApiResponse.<OfficeRespone>builder()
@@ -39,12 +32,20 @@ public class OfficeController {
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<OfficeRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
                                              @RequestParam(name = "status", required = false)  Integer status){
         return ApiResponse.<List<OfficeRespone>>builder()
                 .result(officeService.searchAll(pageNumber, 30, name,status))
+                .page(officeService.getPagination(pageNumber, 30, name,status))
+                .build();
+    }
+
+    @GetMapping("/ofc")
+    ApiResponse<List<OfficeRespone>> getAll(){
+        return ApiResponse.<List<OfficeRespone>>builder()
+                .result(officeService.getAll())
                 .build();
     }
 

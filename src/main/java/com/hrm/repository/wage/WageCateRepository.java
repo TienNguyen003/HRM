@@ -20,7 +20,7 @@ public interface WageCateRepository extends JpaRepository<WageCategories, Intege
     @Query("SELECT al FROM WageCategories al WHERE " +
             "(:name IS NULL OR al.name LIKE %:name%) AND " +
             "(:symbol IS NULL OR al.symbol LIKE %:symbol%) AND " +
-            "(:salaryType IS NULL OR al.salaryType = :salaryType)")
-    Page<WageCategories> findByNameContainingAndSymbolContainingAndSalaryType
+            "(:salaryType IS NULL OR al.salaryType LIKE %:salaryType%)")
+    Page<WageCategories> findByNameSymbolType
             (String name, String symbol, String salaryType, Pageable pageable);
 }
