@@ -7,6 +7,7 @@ import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.UserMapper;
 import com.hrm.Service.EmailService;
+import com.hrm.dto.request.user.user.UserChangePassRequest;
 import com.hrm.dto.request.user.user.UserCreationRequest;
 import com.hrm.dto.request.user.user.UserRsPass;
 import com.hrm.dto.request.user.user.UserUpdateRequest;
@@ -115,6 +116,19 @@ public class UserService {
 		emailService.requestPasswordReset(user.getId(), request.getEmail(), request.getNew_pass());
 
 		return "Please check your email";
+	}
+
+	public String changePass(UserChangePassRequest request) {
+		User user = userRepository.findById(request.getId())
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+		if(!passwordEncoder.matches(request.getOld_pass(), user.getPassword()))
+			throw new AppException(ErrorCode.OLD_PASS_INCORRECT);
+		if(passwordEncoder.matches(request.getNew_pass(), user.getPassword()))
+			throw new AppException(ErrorCode.PASSWORD_NO_MATCH);
+		user.setPassword(passwordEncoder.encode(request.getNew_pass()));
+		userRepository.save(user);
+
+		return "Change success";
 	}
 
 	public String updatePass(String userId, String new_pass) {

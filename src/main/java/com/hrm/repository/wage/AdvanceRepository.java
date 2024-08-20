@@ -14,4 +14,9 @@ public interface AdvanceRepository extends JpaRepository<Advance, Integer> {
             "(:name IS NULL OR a.employee.name LIKE %:name%)")
     Page<Advance> findByNameAndStatus
             (String name, Integer status, Pageable pageable);
+
+    @Query("SELECT SUM(money) FROM Advance a WHERE" +
+            "(:status IS NULL OR a.status = :status) AND" +
+            "(:id IS NULL OR a.employee.id = :id)")
+    int money(Integer id, Integer status);
 }

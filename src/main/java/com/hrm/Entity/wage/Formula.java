@@ -1,22 +1,22 @@
-package com.hrm.dto.response.wage;
+package com.hrm.Entity.wage;
 
-import com.hrm.Entity.office.Department;
 import com.hrm.Entity.user.Employee;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PayrollRespone {
+public class Formula {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
-    String time;
-    String salary;
-    String advance;
-    String totalSalary;
+    String name;
+    String salaryFormula;
     int status;
-    Employee employee;
 }

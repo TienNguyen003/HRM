@@ -10,7 +10,6 @@ import com.hrm.dto.request.wage.advance.AdvanceRequest;
 import com.hrm.dto.request.wage.advance.AdvanceUpdateSttRequest;
 import com.hrm.dto.response.wage.AdvanceRespone;
 import com.hrm.repository.user.EmployeeRepository;
-import com.hrm.repository.user.UserRepository;
 import com.hrm.repository.wage.AdvanceRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdvanceService {
     AdvanceRepository advanceRepository;
-    UserRepository userRepository;
     EmployeeRepository employeeRepository;
     AdvanceMapper advanceMapper;
 
@@ -66,6 +64,10 @@ public class AdvanceService {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return advanceRepository.findAll(pageable)
                 .stream().map(advanceMapper::toAdvanceRespone).toList();
+    }
+
+    public Integer getMoney(int id, int status){
+        return advanceRepository.money(id, status);
     }
 
     // lấy theo id

@@ -1,17 +1,16 @@
-package com.hrm.dto.request.office;
+package com.hrm.dto.response.wage;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OfficeRequest {
+public class FormulaResponse {
+    int id;
     String name;
-    String address;
-    String email;
-    String phone;
+    String salaryFormula;
+    int status;
 }

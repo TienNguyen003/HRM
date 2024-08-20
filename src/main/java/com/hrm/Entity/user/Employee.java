@@ -1,11 +1,10 @@
 package com.hrm.Entity.user;
 
 import com.hrm.Entity.office.Department;
+import com.hrm.Entity.wage.Formula;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Date;
 
 @Entity
 @Getter
@@ -31,7 +30,11 @@ public class Employee {
     int hourOff;
     int vacationHours;
     int timekeeping;
+    int lateness;
 
     @ManyToOne
     Department department;
+
+    @ManyToOne
+    Formula formula;
 }

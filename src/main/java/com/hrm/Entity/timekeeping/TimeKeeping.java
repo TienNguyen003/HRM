@@ -1,6 +1,6 @@
-package com.hrm.Entity.wage;
+package com.hrm.Entity.timekeeping;
 
-import com.hrm.Entity.office.Department;
+import com.hrm.Entity.day_off.DayOffCategories;
 import com.hrm.Entity.user.Employee;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,16 +13,14 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Payroll {
+public class TimeKeeping {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String time;
-    String salary;
-    String advance;
-    String totalSalary;
-    int status;
+    String date;
+    String reason;
 
-    @OneToOne
+    @ManyToOne
     Employee employee;
 }

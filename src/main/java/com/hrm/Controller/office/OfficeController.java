@@ -56,6 +56,13 @@ public class OfficeController {
                 .build();
     }
 
+    @PutMapping("/stt")
+    ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status){
+        return ApiResponse.<String>builder()
+                .result(officeService.updateStt(id, status))
+                .build();
+    }
+
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int officeId){
         officeService.delete(officeId);

@@ -1,7 +1,8 @@
 package com.hrm.Controller.day_off;
 
 import com.hrm.Service.day_off.DayOffService;
-import com.hrm.dto.request.dayOff.DayOffRequest;
+import com.hrm.dto.request.dayOff.dayoff.DayOffRequest;
+import com.hrm.dto.request.dayOff.dayoff.DayOffUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.day_off.DayOffResponse;
 import lombok.AccessLevel;
@@ -50,9 +51,16 @@ public class DayOffController {
     }
 
     @PutMapping
-    ApiResponse<DayOffResponse> update(@RequestParam int dayOffId, @RequestBody DayOffRequest request){
+    ApiResponse<DayOffResponse> update(@RequestParam int dayOffId, @RequestBody DayOffUpdateRequest request){
         return ApiResponse.<DayOffResponse>builder()
                 .result(dayOffService.updateDayOff(dayOffId, request))
+                .build();
+    }
+
+    @PutMapping("/stt")
+    ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status){
+        return ApiResponse.<String>builder()
+                .result(dayOffService.updateStt(id, status))
                 .build();
     }
 

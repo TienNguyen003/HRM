@@ -1,5 +1,6 @@
-package com.hrm.dto.request.wage;
+package com.hrm.dto.response.timekeeping;
 
+import com.hrm.Entity.user.Employee;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,11 +10,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PayrollRequest {
+public class TimeKeepingRespone {
+    int id;
     String time;
-    String salary;
-    String advance;
-    String totalSalary;
-    int status = 0;
-    int employeeId;
+    String date;
+    String reason;
+    Employee employee;
 }

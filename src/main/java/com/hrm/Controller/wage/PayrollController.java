@@ -25,26 +25,28 @@ public class PayrollController {
                 .build();
     }
 
-    @GetMapping
-    ApiResponse<List<PayrollRespone>> getAll(@RequestParam int pageNumber){
+    @GetMapping("/get-all")
+    ApiResponse<List<PayrollRespone>> getAll(){
         return ApiResponse.<List<PayrollRespone>>builder()
-                .result(payrollService.getAllPayroll(pageNumber, 30))
+                .result(payrollService.getAllPayroll())
                 .build();
     }
 
     @GetMapping("/wage")
-    ApiResponse<PayrollRespone> getWage(@RequestParam int payrollIdEmployee){
+    ApiResponse<PayrollRespone> getWage(@RequestParam int id){
         return ApiResponse.<PayrollRespone>builder()
-                .result(payrollService.getPayroll(payrollIdEmployee))
+                .result(payrollService.getPayroll(id))
                 .build();
     }
 
-    @GetMapping("/search")
+    @GetMapping
     ApiResponse<List<PayrollRespone>> search(@RequestParam("pageNumber") int pageNumber ,
-                                              @RequestParam(name = "name", required = false) String name,
-                                                 @RequestParam(name = "time", required = false) String time){
+                                             @RequestParam(name = "name", required = false) String name,
+                                             @RequestParam(name = "status", required = false) Integer status,
+                                             @RequestParam(name = "time", required = false) String time){
         return ApiResponse.<List<PayrollRespone>>builder()
-                .result(payrollService.searchAll(pageNumber, 30, name, time))
+                .result(payrollService.searchAll(pageNumber, 30, name, time, status))
+                .page(payrollService.getPagination(pageNumber, 30, name, time, status))
                 .build();
     }
 

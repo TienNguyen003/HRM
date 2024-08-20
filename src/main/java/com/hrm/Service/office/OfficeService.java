@@ -38,7 +38,6 @@ public class OfficeService {
 
     // cập nhật
     public OfficeRespone update(int id, OfficeRequest request){
-
         OfficeI department = officeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
 
@@ -47,9 +46,19 @@ public class OfficeService {
         return officeMapper.toOfficeRespone(officeRepository.save(department));
     }
 
+    public String updateStt(int id, int status){
+        OfficeI department = officeRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
+
+        department.setStatus(status);
+        officeMapper.toOfficeRespone(officeRepository.save(department));
+
+        return "Update success";
+    }
+
     // lấy ra tất cả
     public List<OfficeRespone> getAll(){
-        return officeRepository.findAll()
+        return officeRepository.getOffices()
                 .stream().map(officeMapper::toOfficeRespone).toList();
     }
 

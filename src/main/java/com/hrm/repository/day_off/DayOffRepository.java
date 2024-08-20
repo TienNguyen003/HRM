@@ -7,12 +7,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface DayOffRepository extends JpaRepository<DayOffCategories, Integer> {
     boolean existsByNameDay(String name);
 
-    @Query("SELECT al FROM DayOffCategories al WHERE " +
-            "(:nameDay IS NULL OR al.nameDay LIKE %:nameDay%) AND " +
-            "(:status IS NULL OR al.status = :status)")
+    @Query("SELECT d FROM DayOffCategories d WHERE d.status = 1")
+    List<DayOffCategories> getAllDayOff();
+
+    @Query("SELECT d FROM DayOffCategories d WHERE " +
+            "(:nameDay IS NULL OR d.nameDay LIKE %:nameDay%) AND " +
+            "(:status IS NULL OR d.status = :status)")
     Page<DayOffCategories> findByNameAndStatus(String nameDay, Integer status, Pageable pageable);
 }

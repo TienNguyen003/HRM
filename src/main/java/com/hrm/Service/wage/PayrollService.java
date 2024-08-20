@@ -1,6 +1,8 @@
 package com.hrm.Service.wage;
 
+import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.office.Department;
+import com.hrm.Entity.office.OfficeI;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Payroll;
 import com.hrm.Exception.AppException;
@@ -14,6 +16,7 @@ import com.hrm.repository.wage.PayrollRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,19 +30,15 @@ public class PayrollService {
     PayrollRepository payrollRepository;
     PayRollMapper payRollMapper;
     EmployeeRepository employeeRepository;
-    DepartmentRepository departmentRepository;
 
     // thêm danh sách
     public PayrollRespone create(PayrollRequest request){
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
-        Department department = departmentRepository.findById(request.getDepartmentId())
-                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
 
         Payroll payroll = payRollMapper.toPayRoll(request);
 
         payroll.setEmployee(employee);
-        payroll.setDepartment(department);
 
         return payRollMapper.toPayRollRespone(payrollRepository.save(payroll));
     }
@@ -55,9 +54,8 @@ public class PayrollService {
     }
 
     // lấy ra tất cả
-    public List<PayrollRespone> getAllPayroll(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return payrollRepository.findAll(pageable)
+    public List<PayrollRespone> getAllPayroll(){
+        return payrollRepository.findAll()
                 .stream().map(payRollMapper::toPayRollRespone).toList();
     }
 
@@ -68,10 +66,20 @@ public class PayrollService {
     }
 
     // tìm kiếm
-    public List<PayrollRespone> searchAll(int pageNumber, int pageSize, String name, String time){
+    public List<PayrollRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer status){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return payrollRepository.findByNameAndTime(name, time, pageable)
+        return payrollRepository.findByNameAndTime(name, time, status, pageable)
                 .stream().map(payRollMapper::toPayRollRespone).toList();
+    }
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer status){
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<Payroll> page = payrollRepository.findByNameAndTime(name, time, status, pageable);
+        return PageCustom.builder()
+                .totalPages(String.valueOf(page.getTotalPages()))
+                .totalItems(String.valueOf(page.getTotalElements()))
+                .totalItemsPerPage(String.valueOf(page.getNumberOfElements()))
+                .currentPage(String.valueOf(pageNumber))
+                .build();
     }
 
     // xóa

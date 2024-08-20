@@ -56,9 +56,19 @@ public class DepartmentService {
         return departmentMapper.toDepartmentResponse(departmentRepository.save(department));
     }
 
+    public String updateStt(int id, int status){
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
+
+        department.setStatus(status);
+        departmentMapper.toDepartmentResponse(departmentRepository.save(department));
+
+        return "Update success";
+    }
+
     // lấy ra tất cả
     public List<DepartmentResponse> getAll(){
-        return departmentRepository.findAll()
+        return departmentRepository.getAllDepartment()
                 .stream().map(departmentMapper::toDepartmentResponse).toList();
     }
 

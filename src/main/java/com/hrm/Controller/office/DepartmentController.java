@@ -57,6 +57,13 @@ public class DepartmentController {
                 .build();
     }
 
+    @PutMapping("/stt")
+    ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status){
+        return ApiResponse.<String>builder()
+                .result(departmentService.updateStt(id, status))
+                .build();
+    }
+
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int departmentId){
         departmentService.delete(departmentId);

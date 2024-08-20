@@ -6,7 +6,8 @@ import com.hrm.Entity.user.Employee;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.BankMapper;
-import com.hrm.dto.request.user.BankRequest;
+import com.hrm.dto.request.user.bank.BankRequest;
+import com.hrm.dto.request.user.bank.BankUpdateRequest;
 import com.hrm.dto.response.user.BankRespone;
 import com.hrm.repository.user.BankRepository;
 import com.hrm.repository.user.EmployeeRepository;
@@ -41,15 +42,24 @@ public class BankService {
     }
 
     // cập nhật
-    public BankRespone updateB(int bankId, BankRequest request) {
+    public BankRespone updateB(int bankId, BankUpdateRequest request) {
         Bank bank = bankRepository.findById(bankId)
                 .orElseThrow(() -> new AppException(ErrorCode.BANK_NOT_EXISTED));
         if (bankRepository.existsByNameAndAccount(request.getNameBank(), request.getNumberBank()))
             throw new AppException(ErrorCode.BANK_EXISTED);
 
-        bankMapper.updateBank(bank, request);
+        bankMapper.updateBankUp(bank, request);
 
         return bankMapper.toBankRespone(bankRepository.save(bank));
+    }
+
+    public String updateStt(int bankId, int status) {
+        Bank bank = bankRepository.findById(bankId)
+                .orElseThrow(() -> new AppException(ErrorCode.BANK_NOT_EXISTED));
+
+        bank.setStatus(status);
+        bankMapper.toBankRespone(bankRepository.save(bank));
+        return "Update success";
     }
 
     // lấy ra tất cả

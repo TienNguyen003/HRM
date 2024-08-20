@@ -1,11 +1,9 @@
 package com.hrm.Controller.user;
 
-import com.hrm.Service.user.BankService;
 import com.hrm.Service.user.ContractsService;
-import com.hrm.dto.request.user.BankRequest;
-import com.hrm.dto.request.user.ContractsRequest;
+import com.hrm.dto.request.user.contract.ContractsRequest;
+import com.hrm.dto.request.user.contract.ContractsUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
-import com.hrm.dto.response.user.BankRespone;
 import com.hrm.dto.response.user.ContractsRespone;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -48,8 +46,16 @@ public class ContractsController {
     }
 
     @PutMapping
-    ApiResponse<String> update(@RequestParam int contractsId, @RequestBody ContractsRequest request) {
+    ApiResponse<String> update(@RequestParam int contractsId, @RequestBody ContractsUpdateRequest request) {
         contractsService.updateB(contractsId, request);
+        return ApiResponse.<String>builder()
+                .result("Update success")
+                .build();
+    }
+
+    @PutMapping("/stt")
+    ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status) {
+        contractsService.updateStt(id, status);
         return ApiResponse.<String>builder()
                 .result("Update success")
                 .build();

@@ -1,4 +1,4 @@
-package com.hrm.dto.request.dayOff;
+package com.hrm.dto.request.dayOff.dayoff;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,9 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DayOffRequest {
+public class DayOffUpdateRequest {
     String nameDay;
     int timeDay;
     LocalDateTime timeUpdate = LocalDateTime.now();
-    int status = 1;
 }

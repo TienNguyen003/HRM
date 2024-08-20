@@ -1,7 +1,8 @@
 package com.hrm.Controller.user;
 
 import com.hrm.Service.user.BankService;
-import com.hrm.dto.request.user.BankRequest;
+import com.hrm.dto.request.user.bank.BankRequest;
+import com.hrm.dto.request.user.bank.BankUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.user.BankRespone;
 import lombok.AccessLevel;
@@ -47,8 +48,16 @@ public class BankController {
     }
 
     @PutMapping
-    ApiResponse<String> update(@RequestParam int id, @RequestBody BankRequest request) {
+    ApiResponse<String> update(@RequestParam int id, @RequestBody BankUpdateRequest request) {
         bankService.updateB(id, request);
+        return ApiResponse.<String>builder()
+                .result("Update success")
+                .build();
+    }
+
+    @PutMapping("/stt")
+    ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status) {
+        bankService.updateStt(id, status);
         return ApiResponse.<String>builder()
                 .result("Update success")
                 .build();

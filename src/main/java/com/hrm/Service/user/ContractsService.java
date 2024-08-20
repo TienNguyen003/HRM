@@ -6,7 +6,8 @@ import com.hrm.Entity.user.Employee;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.ContractsMapper;
-import com.hrm.dto.request.user.ContractsRequest;
+import com.hrm.dto.request.user.contract.ContractsRequest;
+import com.hrm.dto.request.user.contract.ContractsUpdateRequest;
 import com.hrm.dto.response.user.ContractsRespone;
 import com.hrm.repository.user.ContractsRepository;
 import com.hrm.repository.user.EmployeeRepository;
@@ -39,13 +40,23 @@ public class ContractsService {
     }
 
     // cập nhật
-    public ContractsRespone updateB(int contractsId, ContractsRequest request) {
+    public ContractsRespone updateB(int contractsId, ContractsUpdateRequest request) {
         Contracts contracts = contractsRepository.findById(contractsId)
                 .orElseThrow(() -> new AppException(ErrorCode.CONTRACT_NOT_EXISTED));
 
-        contractsMapper.updateContracts(contracts, request);
+        contractsMapper.updateContractsUp(contracts, request);
 
         return contractsMapper.toContractsRespone(contractsRepository.save(contracts));
+    }
+
+    public String updateStt(int id, int status) {
+        Contracts contracts = contractsRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.CONTRACT_NOT_EXISTED));
+
+        contracts.setStatus(status);
+        contractsMapper.toContractsRespone(contractsRepository.save(contracts));
+
+        return "Update success";
     }
 
     // lấy theo id

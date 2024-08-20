@@ -14,11 +14,13 @@ public enum ErrorCode {
 	// user name
 	USERNAME_INVALID(500, "Tên đăng nhập phải có ít nhất 6 kí tự.", HttpStatus.BAD_REQUEST),
 	USERNAME_NOT_EXISTED(504, "Tên đăng nhập không chính xác.", HttpStatus.NOT_FOUND),
+	USER_NOT_EXISTED(504, "Tài khoản không chính xác.", HttpStatus.NOT_FOUND),
 	USERNAME_EXISTED(502, "Tên đăng nhập đã tồn tại.", HttpStatus.BAD_REQUEST),
 
 	// password
 	PASSWORD_INVALID(500, "Mật khẩu phải có ít nhất 6 kí tự", HttpStatus.BAD_REQUEST),
 	PASSWORD_INCORRECT(500, "Mật khẩu không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
+	PASSWORD_NO_MATCH(500, "Mật khẩu mới không được trùng mật khẩu cũ.", HttpStatus.NOT_FOUND),
 	OLD_PASS_INCORRECT(500, "Mật khẩu cũ không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
 
 	// nhân viên
@@ -55,7 +57,14 @@ public enum ErrorCode {
 
 	// ứng lương
 	ADVANCE_NOT_EXISTED(504, "Phiếu ứng lương không tồn tại.", HttpStatus.BAD_REQUEST),
-	ADVANCE_NOT_EDIT(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST);
+	ADVANCE_NOT_EDIT(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST),
+
+	// công thức lương
+	FORMULA_NOT_EXISTED(504, "Công thức không tồn tại.", HttpStatus.BAD_REQUEST),
+
+	//chấm công
+	TIME_NOT_EXISTED(504, "Không tồn tại.", HttpStatus.BAD_REQUEST),
+	TIME_EXISTED(504, "Bạn đã điểm danh rồi.", HttpStatus.BAD_REQUEST);
 
 	ErrorCode(int code, String message, HttpStatusCode statusCode) {
 		this.code = code;

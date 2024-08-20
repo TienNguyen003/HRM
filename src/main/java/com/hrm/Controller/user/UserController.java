@@ -1,6 +1,7 @@
 package com.hrm.Controller.user;
 
 import com.hrm.Service.user.UserService;
+import com.hrm.dto.request.user.user.UserChangePassRequest;
 import com.hrm.dto.request.user.user.UserCreationRequest;
 import com.hrm.dto.request.user.user.UserRsPass;
 import com.hrm.dto.request.user.user.UserUpdateRequest;
@@ -79,13 +80,20 @@ public class UserController {
 				.result(userService.rsPass(request))
 				.build();
 	}
+
+	@PutMapping("/change-pass")
+	ApiResponse<String> changePass( @RequestBody UserChangePassRequest request) {
+		return ApiResponse.<String>builder()
+				.result(userService.changePass(request))
+				.build();
+	}
 	
-	@PutMapping()
+	@PutMapping
 	UserResponse updateUsser(@RequestParam String userId, @RequestBody UserUpdateRequest request) {
 		return userService.updateUser(userId, request);
 	}
 
-	@DeleteMapping()
+	@DeleteMapping
 	ApiResponse<String> deleteUser(@RequestParam String userId) {
 		userService.deleteUser(userId);
 		return ApiResponse.<String>builder()

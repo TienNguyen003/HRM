@@ -1,4 +1,4 @@
-package com.hrm.dto.request.user;
+package com.hrm.dto.request.user.user;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ContractsRequest {
-    String urlFile;
-    int status = 1;
-    int employeeId;
+public class UserChangePassRequest {
+    String id;
+    String new_pass;
+    String old_pass;
 }

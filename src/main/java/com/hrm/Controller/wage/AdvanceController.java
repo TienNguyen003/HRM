@@ -43,6 +43,14 @@ public class AdvanceController {
                 .build();
     }
 
+    @GetMapping("/money")
+    ApiResponse<Integer> getMoney(@RequestParam(name = "id", required = false) Integer id,
+                                  @RequestParam(name = "status", required = false) Integer status){
+        return ApiResponse.<Integer>builder()
+                .result(advanceService.getMoney(id, status))
+                .build();
+    }
+
     @PutMapping
     ApiResponse<AdvanceRespone> update(@RequestParam int advaceId, @RequestBody AdvanceRequest request){
         return ApiResponse.<AdvanceRespone>builder()

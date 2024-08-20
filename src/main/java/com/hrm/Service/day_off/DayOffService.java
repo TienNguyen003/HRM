@@ -2,11 +2,11 @@ package com.hrm.Service.day_off;
 
 import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.day_off.DayOffCategories;
-import com.hrm.Entity.day_off.Holiday;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.day_off.DayOffMapper;
-import com.hrm.dto.request.dayOff.DayOffRequest;
+import com.hrm.dto.request.dayOff.dayoff.DayOffRequest;
+import com.hrm.dto.request.dayOff.dayoff.DayOffUpdateRequest;
 import com.hrm.dto.response.day_off.DayOffResponse;
 import com.hrm.repository.day_off.DayOffRepository;
 import lombok.AccessLevel;
@@ -37,18 +37,27 @@ public class DayOffService {
     }
 
     // cập nhật
-    public DayOffResponse updateDayOff(int dayOffId, DayOffRequest request){
-
+    public DayOffResponse updateDayOff(int dayOffId, DayOffUpdateRequest request){
         DayOffCategories dayOffCategories = dayOffRepository.findById(dayOffId)
                 .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_EXISTED));
 
-        dayOffMapper.updateDayOff(dayOffCategories, request);
+        dayOffMapper.updateDayOffUp(dayOffCategories, request);
 
         return dayOffMapper.toDayOffRespone(dayOffRepository.save(dayOffCategories));
     }
 
+    public String updateStt(int dayOffId, int status){
+        DayOffCategories dayOffCategories = dayOffRepository.findById(dayOffId)
+                .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_EXISTED));
+
+        dayOffCategories.setStatus(status);
+        dayOffMapper.toDayOffRespone(dayOffRepository.save(dayOffCategories));
+
+        return "Update success";
+    }
+
     public List<DayOffResponse> getAllDayOff(){
-        return dayOffRepository.findAll()
+        return dayOffRepository.getAllDayOff()
                 .stream().map(dayOffMapper::toDayOffRespone).toList();
     }
 

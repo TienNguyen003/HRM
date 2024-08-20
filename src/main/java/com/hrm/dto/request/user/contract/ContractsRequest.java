@@ -1,17 +1,15 @@
-package com.hrm.dto.request.office;
+package com.hrm.dto.request.user.contract;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OfficeRequest {
-    String name;
-    String address;
-    String email;
-    String phone;
+public class ContractsRequest {
+    String urlFile;
+    int status = 1;
+    int employeeId;
 }

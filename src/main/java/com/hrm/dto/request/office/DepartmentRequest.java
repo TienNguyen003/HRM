@@ -13,6 +13,5 @@ public class DepartmentRequest {
     String name;
     String shortName;
     String belongTo;
-    int status = 1;
     int officeId;
 }
