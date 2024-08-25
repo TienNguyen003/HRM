@@ -19,6 +19,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service
@@ -66,8 +71,26 @@ public class AdvanceService {
                 .stream().map(advanceMapper::toAdvanceRespone).toList();
     }
 
-    public Integer getMoney(int id, int status){
-        return advanceRepository.money(id, status);
+    public Integer getMoney(int id, int status, String requestTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/yyyy");
+        LocalDateTime startRequestTime = null;
+        LocalDateTime endRequestTime = null;
+
+        try {
+            // Chuyển đổi chuỗi thành YearMonth
+            YearMonth yearMonth = YearMonth.parse(requestTime, formatter);
+
+            // Lấy ngày đầu tháng
+            LocalDate firstDayOfMonth = yearMonth.atDay(1);
+            startRequestTime = firstDayOfMonth.atStartOfDay();
+
+            // Lấy ngày cuối tháng
+            LocalDate lastDayOfMonth = yearMonth.atEndOfMonth();
+            endRequestTime = lastDayOfMonth.atStartOfDay();
+        } catch (DateTimeParseException e) {
+            System.out.println("Ngày tháng không hợp lệ. Vui lòng nhập theo định dạng M/yyyy.");
+        }
+        return advanceRepository.money(id, status, startRequestTime, endRequestTime);
     }
 
     // lấy theo id

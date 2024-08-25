@@ -11,9 +11,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PayrollRequest {
     String time;
-    String salary;
     String advance;
     String totalSalary;
     int status = 0;
     int employeeId;
+    int bankId;
 }

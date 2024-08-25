@@ -45,9 +45,10 @@ public class AdvanceController {
 
     @GetMapping("/money")
     ApiResponse<Integer> getMoney(@RequestParam(name = "id", required = false) Integer id,
+                                  @RequestParam(name = "time", required = false) String time,
                                   @RequestParam(name = "status", required = false) Integer status){
         return ApiResponse.<Integer>builder()
-                .result(advanceService.getMoney(id, status))
+                .result(advanceService.getMoney(id, status, time))
                 .build();
     }
 

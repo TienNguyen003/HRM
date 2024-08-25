@@ -75,6 +75,12 @@ public class BankService {
                 .orElseThrow(() -> new AppException(ErrorCode.BANK_NOT_EXISTED)));
     }
 
+    // lấy theo id nhan vien
+    public List<BankRespone> getByEmployeeId(int id) {
+        return bankRepository.findBankByEmployeeId(id)
+                .stream().map(bankMapper::toBankRespone).toList();
+    }
+
     // tìm kiếm
     public List<BankRespone> searchAllB
     (int pageNumber, int pageSize, String name, String nameDay, Integer status, Integer priority) {

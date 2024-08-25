@@ -1,6 +1,6 @@
 package com.hrm.Entity.wage;
 
-import com.hrm.Entity.office.Department;
+import com.hrm.Entity.user.Bank;
 import com.hrm.Entity.user.Employee;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,11 +18,13 @@ public class Payroll {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String time;
-    String salary;
     String advance;
     String totalSalary;
     int status;
 
-    @OneToOne
+    @ManyToOne
     Employee employee;
+
+    @ManyToOne
+    Bank bank;
 }

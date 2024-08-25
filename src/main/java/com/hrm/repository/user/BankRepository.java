@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface BankRepository extends JpaRepository<Bank, Integer> {
     @Query("SELECT COUNT(*) > 0 FROM Bank WHERE nameBank = :nameBank AND numberBank = :numberBank")
@@ -19,4 +21,10 @@ public interface BankRepository extends JpaRepository<Bank, Integer> {
             "(:nameBank IS NULL OR b.nameBank LIKE %:nameBank%)")
     Page<Bank> findBankByNameAndNameBank
             (String name, Integer status, Integer priority, String nameBank, Pageable pageable);
+
+    @Query("SELECT b FROM Bank b WHERE" +
+            "(b.status = 1) AND" +
+            "(:id IS NULL OR b.employee.id = :id)")
+    List<Bank> findBankByEmployeeId
+            (Integer id);
 }

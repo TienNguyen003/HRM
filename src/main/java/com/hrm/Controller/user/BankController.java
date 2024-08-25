@@ -47,6 +47,13 @@ public class BankController {
                 .build();
     }
 
+    @GetMapping("/employee")
+    ApiResponse<List<BankRespone>> getByEmployeeId(@RequestParam("id") int id) {
+        return ApiResponse.<List<BankRespone>>builder()
+                .result(bankService.getByEmployeeId(id))
+                .build();
+    }
+
     @PutMapping
     ApiResponse<String> update(@RequestParam int id, @RequestBody BankUpdateRequest request) {
         bankService.updateB(id, request);

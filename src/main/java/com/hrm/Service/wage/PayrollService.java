@@ -1,8 +1,7 @@
 package com.hrm.Service.wage;
 
 import com.hrm.Entity.PageCustom;
-import com.hrm.Entity.office.Department;
-import com.hrm.Entity.office.OfficeI;
+import com.hrm.Entity.user.Bank;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Payroll;
 import com.hrm.Exception.AppException;
@@ -10,7 +9,7 @@ import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.PayRollMapper;
 import com.hrm.dto.request.wage.PayrollRequest;
 import com.hrm.dto.response.wage.PayrollRespone;
-import com.hrm.repository.office.DepartmentRepository;
+import com.hrm.repository.user.BankRepository;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.wage.PayrollRepository;
 import lombok.AccessLevel;
@@ -30,14 +29,19 @@ public class PayrollService {
     PayrollRepository payrollRepository;
     PayRollMapper payRollMapper;
     EmployeeRepository employeeRepository;
+    BankRepository bankRepository;
 
     // thêm danh sách
     public PayrollRespone create(PayrollRequest request){
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+        Bank bank = bankRepository.findById(request.getBankId())
+                .orElseThrow(() -> new AppException(ErrorCode.BANK_NOT_EXISTED));
+        if(payrollRepository.existsByEmployeeAndTime(request.getEmployeeId(), request.getTime()))
+            throw new AppException(ErrorCode.PAYROLL_EMPLOYEE_EXISTED);
 
         Payroll payroll = payRollMapper.toPayRoll(request);
-
+        payroll.setBank(bank);
         payroll.setEmployee(employee);
 
         return payRollMapper.toPayRollRespone(payrollRepository.save(payroll));

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PayrollRepository extends JpaRepository<Payroll, Integer> {
+    @Query("SELECT COUNT(p) > 0 FROM Payroll p WHERE p.employee.id = :employeeId AND p.time = :time")
+    boolean existsByEmployeeAndTime(Integer employeeId, String time);
+
     @Query("SELECT p FROM Payroll p WHERE" +
             "(:time IS NULL OR p.time LIKE :time%) AND" +
             "(:status IS NULL OR p.status = :status) AND" +

@@ -55,6 +55,9 @@ public enum ErrorCode {
 	WAGECATE_NOT_EXISTED(504, "Danh mục lương không tồn tại.", HttpStatus.BAD_REQUEST),
 	WAGE_NOT_EXISTED(502, "Lương không tồn tại.", HttpStatus.BAD_REQUEST),
 
+	// luong theo thang
+	PAYROLL_EMPLOYEE_EXISTED(502, "Nhân viên đã có bảng lương tháng.", HttpStatus.BAD_REQUEST),
+
 	// ứng lương
 	ADVANCE_NOT_EXISTED(504, "Phiếu ứng lương không tồn tại.", HttpStatus.BAD_REQUEST),
 	ADVANCE_NOT_EDIT(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST),
