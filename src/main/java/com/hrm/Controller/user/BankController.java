@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class BankController {
     BankService bankService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('BANK_ADD')")
     @PostMapping
     ApiResponse<BankRespone> create(@RequestBody BankRequest request) {
         return ApiResponse.<BankRespone>builder()
@@ -28,6 +30,7 @@ public class BankController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('BANK_VIEW')")
     @GetMapping
     ApiResponse<List<BankRespone>> getAll(@RequestParam("pageNumber") int pageNumber,
                                           @RequestParam(name = "name", required = false) String name,
@@ -54,6 +57,7 @@ public class BankController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('BANK_EDIT')")
     @PutMapping
     ApiResponse<String> update(@RequestParam int id, @RequestBody BankUpdateRequest request) {
         bankService.updateB(id, request);
@@ -62,6 +66,7 @@ public class BankController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('BANK_EDIT')")
     @PutMapping("/stt")
     ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status) {
         bankService.updateStt(id, status);
@@ -70,6 +75,7 @@ public class BankController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('BANK_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete(@RequestParam int id) {
         bankService.deleteB(id);

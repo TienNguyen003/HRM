@@ -7,6 +7,7 @@ import com.hrm.dto.response.day_off.SabbaticalLogsResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class SabLogsController {
     SabLogsService sabLogsService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('REQ_APPROVALS')")
     @PostMapping
     ApiResponse<SabbaticalLogsResponse> create(@RequestBody SabbaticalLogsRequest request){
         return ApiResponse.<SabbaticalLogsResponse>builder()
@@ -25,6 +27,7 @@ public class SabLogsController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('HIST_VIEW')")
     @GetMapping()
     ApiResponse<List<SabbaticalLogsResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name){

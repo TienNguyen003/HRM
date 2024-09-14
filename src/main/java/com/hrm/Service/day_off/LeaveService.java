@@ -21,9 +21,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -58,11 +55,15 @@ public class LeaveService {
         DayOffCategories dayOffCategories = dayOffRepository.findById(request.getDayOff())
                 .orElseThrow(() -> new AppException(ErrorCode.DAYCATE_NOT_EXISTED));
 
-        leaveMapper.updateLeaveRq(applicationLeave, request);
-        applicationLeave.setDayOffCategories(dayOffCategories);
-        applicationLeave.setEmployee(employee);
+        if(applicationLeave.getStatus() != 0) throw new AppException(ErrorCode.DAYOFF_NOT_EDIT);
+        else {
+            leaveMapper.updateLeaveRq(applicationLeave, request);
+            applicationLeave.setDayOffCategories(dayOffCategories);
+            applicationLeave.setEmployee(employee);
+            leaveRepository.save(applicationLeave);
+        }
 
-        return leaveMapper.toLeaveResponse(leaveRepository.save(applicationLeave));
+        return leaveMapper.toLeaveResponse(applicationLeave);
     }
 
     // cap nhat trang thai don
@@ -71,16 +72,21 @@ public class LeaveService {
                 .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED));
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
-        applicationLeave.setStatus(request.getStatus());
-        applicationLeave.setApproved(request.getNameApproval());
+        if(applicationLeave.getStatus() != 0) throw new AppException(ErrorCode.DAYOFF_NOT_EDIT);
+        else {
+            applicationLeave.setStatus(request.getStatus());
+            applicationLeave.setApproved(request.getNameApproval());
 
-        if(request.getStatus() == 1){
-            employee.setVacationHours(employee.getVacationHours() - request.getTime());
-            employee.setHourOff(employee.getHourOff() + request.getTime());
+            if(request.getStatus() == 1){
+                employee.setVacationHours(employee.getVacationHours() - request.getTime());
+                employee.setHourOff(employee.getHourOff() + request.getTime());
+            }
+            employeeRepository.save(employee);
+            leaveRepository.save(applicationLeave);
         }
-        employeeRepository.save(employee);
 
-        return leaveMapper.toLeaveResponse(leaveRepository.save(applicationLeave));
+
+        return leaveMapper.toLeaveResponse(applicationLeave);
     }
 
     // lấy theo id đơn

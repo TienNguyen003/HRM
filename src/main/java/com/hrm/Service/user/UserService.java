@@ -89,10 +89,19 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
 		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRole())
-				.orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
+				.orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 		user.setRole(role);
 		
 		return userMapper.toUserResponse(userRepository.save(user));
+	}
+
+	public String updateStt(String id, int status) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+		user.setStatus(status);
+		userMapper.toUserResponse(userRepository.save(user));
+		return "Update success";
 	}
 	
 	public void deleteUser(String id) {

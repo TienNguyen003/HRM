@@ -8,6 +8,7 @@ import com.hrm.dto.response.wage.WageRespone;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 public class WageController {
     WageService wageService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('SAFI_ADD')")
     @PostMapping
     ApiResponse<List<WageRespone>> create(@RequestBody List<WageRequest> request) {
         return ApiResponse.<List<WageRespone>>builder()
@@ -33,6 +35,7 @@ public class WageController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SAFI_VIEW')")
     @GetMapping
     ApiResponse<List<WageRespone>> search(@RequestParam("pageNumber") int pageNumber,
                                           @RequestParam(name = "name", required = false) String name,
@@ -44,6 +47,7 @@ public class WageController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SAFI_EDIT')")
     @PutMapping
     ApiResponse<List<WageRespone>> update(@RequestBody List<WageUpdateRequest> request) {
         return ApiResponse.<List<WageRespone>>builder()
@@ -51,6 +55,7 @@ public class WageController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SAFI_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete(@RequestParam int wageId) {
         wageService.deleteWage(wageId);

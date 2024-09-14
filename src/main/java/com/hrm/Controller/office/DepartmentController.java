@@ -7,17 +7,19 @@ import com.hrm.dto.response.office.DepartmentResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-    @RequestMapping("${api.prefix}structures")
+@RequestMapping("${api.prefix}structures")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DepartmentController {
     DepartmentService departmentService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('COMP_ADD')")
     @PostMapping
     ApiResponse<DepartmentResponse> create(@RequestBody DepartmentRequest request){
         return ApiResponse.<DepartmentResponse>builder()
@@ -32,6 +34,7 @@ public class DepartmentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('COMP_VIEW')")
     @GetMapping
     ApiResponse<List<DepartmentResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
@@ -43,6 +46,7 @@ public class DepartmentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('COMP_VIEW')")
     @GetMapping("/struc")
     ApiResponse<List<DepartmentResponse>> getAll(){
         return ApiResponse.<List<DepartmentResponse>>builder()
@@ -50,6 +54,7 @@ public class DepartmentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('COMP_EDIT')")
     @PutMapping
     ApiResponse<DepartmentResponse> update(@RequestParam int departmentId, @RequestBody DepartmentRequest request){
         return ApiResponse.<DepartmentResponse>builder()
@@ -57,6 +62,7 @@ public class DepartmentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('COMP_EDIT')")
     @PutMapping("/stt")
     ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status){
         return ApiResponse.<String>builder()
@@ -64,6 +70,7 @@ public class DepartmentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('COMP_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int departmentId){
         departmentService.delete(departmentId);

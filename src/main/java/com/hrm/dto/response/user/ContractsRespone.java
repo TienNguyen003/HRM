@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 public class ContractsRespone {
     String id;
     String urlFile;
+    String linkFile;
     int status;
     Employee employee;
 }

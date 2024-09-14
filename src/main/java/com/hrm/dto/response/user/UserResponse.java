@@ -17,4 +17,5 @@ public class UserResponse  {
     String username;
     Employee employee;
     RoleResponse role;
+    int status;
 }

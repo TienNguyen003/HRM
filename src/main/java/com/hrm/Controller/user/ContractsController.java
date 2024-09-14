@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class ContractsController {
     ContractsService contractsService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('CONT_ADD')")
     @PostMapping
     ApiResponse<ContractsRespone> create(@RequestBody ContractsRequest request) {
         return ApiResponse.<ContractsRespone>builder()
@@ -28,6 +30,7 @@ public class ContractsController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CONT_VIEW')")
     @GetMapping
     ApiResponse<List<ContractsRespone>> getAll(@RequestParam("pageNumber") int pageNumber,
                                                @RequestParam(name = "name", required = false) String name,
@@ -45,6 +48,7 @@ public class ContractsController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CONT_EDIT')")
     @PutMapping
     ApiResponse<String> update(@RequestParam int contractsId, @RequestBody ContractsUpdateRequest request) {
         contractsService.updateB(contractsId, request);
@@ -53,6 +57,7 @@ public class ContractsController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CONT_EDIT')")
     @PutMapping("/stt")
     ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status) {
         contractsService.updateStt(id, status);
@@ -61,6 +66,7 @@ public class ContractsController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CONT_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete(@RequestParam int id) {
         contractsService.deleteB(id);

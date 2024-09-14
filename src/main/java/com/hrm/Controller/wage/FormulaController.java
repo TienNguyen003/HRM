@@ -7,6 +7,7 @@ import com.hrm.dto.response.wage.FormulaResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class FormulaController {
     FormulaService formulaService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('CALC_ADD')")
     @PostMapping
     ApiResponse<FormulaResponse> create(@RequestBody FormulaRequest request){
         return ApiResponse.<FormulaResponse>builder()
@@ -32,6 +34,15 @@ public class FormulaController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CALC_VIEW')")
+    @GetMapping("/get-all")
+    ApiResponse<List<FormulaResponse>> getAll(){
+        return ApiResponse.<List<FormulaResponse>>builder()
+                .result(formulaService.getAll())
+                .build();
+    }
+
+    @PreAuthorize("@requiredPermission.checkPermission('CALC_VIEW')")
     @GetMapping
     ApiResponse<List<FormulaResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                               @RequestParam(name = "name", required = false) String name,
@@ -42,6 +53,7 @@ public class FormulaController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CALC_EDIT')")
     @PutMapping
     ApiResponse<FormulaResponse> update(@RequestParam int id, @RequestBody FormulaRequest request){
         return ApiResponse.<FormulaResponse>builder()
@@ -49,6 +61,7 @@ public class FormulaController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CALC_EDIT')")
     @PutMapping("/stt")
     ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status){
         return ApiResponse.<String>builder()
@@ -56,6 +69,7 @@ public class FormulaController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CALC_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int id){
         formulaService.delete(id);

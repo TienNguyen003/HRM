@@ -8,6 +8,7 @@ import com.hrm.dto.response.wage.AdvanceRespone;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 public class AdvanceController {
     AdvanceService advanceService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('ADV_ADD')")
     @PostMapping
     ApiResponse<AdvanceRespone> create(@RequestBody AdvanceRequest request){
         return ApiResponse.<AdvanceRespone>builder()
@@ -33,6 +35,7 @@ public class AdvanceController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ADV_VIEW')")
     @GetMapping
     ApiResponse<List<AdvanceRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                               @RequestParam(name = "name", required = false) String name,
@@ -52,6 +55,7 @@ public class AdvanceController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ADV_EDIT')")
     @PutMapping
     ApiResponse<AdvanceRespone> update(@RequestParam int advaceId, @RequestBody AdvanceRequest request){
         return ApiResponse.<AdvanceRespone>builder()
@@ -59,6 +63,7 @@ public class AdvanceController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ADV_APPROVALS')")
     @PutMapping("/approvals")
     ApiResponse<AdvanceRespone> updateStt(@RequestParam int advaceId, @RequestBody AdvanceUpdateSttRequest request){
         return ApiResponse.<AdvanceRespone>builder()
@@ -66,6 +71,7 @@ public class AdvanceController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ADV_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int advaceId){
         advanceService.delete(advaceId);

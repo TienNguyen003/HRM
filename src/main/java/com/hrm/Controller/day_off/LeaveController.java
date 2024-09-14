@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class LeaveController {
     LeaveService leaveService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('REQ_ADD')")
     @PostMapping
     ApiResponse<LeaveRespone> create(@RequestBody LeaveRequest leaveRequest){
         return ApiResponse.<LeaveRespone>builder()
@@ -29,6 +31,7 @@ public class LeaveController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('REQ_EDIT')")
     @PutMapping
     ApiResponse<LeaveRespone> update(@RequestParam int leaveId, @RequestBody LeaveRequest request){
         return ApiResponse.<LeaveRespone>builder()
@@ -36,6 +39,7 @@ public class LeaveController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('REQ_APPROVALS')")
     @PutMapping("/status")
     ApiResponse<LeaveRespone> updateStt(@RequestParam int leaveId, @RequestBody LeaveUpdateRequest request){
         return ApiResponse.<LeaveRespone>builder()
@@ -50,6 +54,7 @@ public class LeaveController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('REQ_VIEW')")
     @GetMapping
     ApiResponse<List<LeaveRespone>> searchAll(@RequestParam("pageNumber") int pageNumber ,
                                         @RequestParam(name = "name", required = false) String name,
@@ -61,6 +66,7 @@ public class LeaveController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('REQ_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int leaveId){
         leaveService.deleteLeave(leaveId);

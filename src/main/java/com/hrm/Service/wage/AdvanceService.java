@@ -51,17 +51,27 @@ public class AdvanceService {
         Employee employee = employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
-        advance.setEmployee(employee);
-        advanceMapper.updateAdvance(advance, request);
+        if(advance.getStatus() != 0) throw new AppException(ErrorCode.ADVANCE_NOT_EDIT);
+        else {
+            advance.setEmployee(employee);
+            advanceMapper.updateAdvance(advance, request);
+            advanceRepository.save(advance);
+        }
 
-        return advanceMapper.toAdvanceRespone(advanceRepository.save(advance));
+        return advanceMapper.toAdvanceRespone(advance);
     }
     // cập nhật status
     public AdvanceRespone updateStt(int advanceId, AdvanceUpdateSttRequest request){
         Advance advance = advanceRepository.findById(advanceId)
                 .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED));
-        advanceMapper.updateAdvanceStt(advance, request);
-        return advanceMapper.toAdvanceRespone(advanceRepository.save(advance));
+
+        if(advance.getStatus() != 0) throw new AppException(ErrorCode.ADVANCE_NOT_EDIT);
+        else {
+            advanceMapper.updateAdvanceStt(advance, request);
+            advanceRepository.save(advance);
+        }
+
+        return advanceMapper.toAdvanceRespone(advance);
     }
 
     // lấy ra tất cả

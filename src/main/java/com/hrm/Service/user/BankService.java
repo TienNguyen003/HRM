@@ -45,7 +45,11 @@ public class BankService {
     public BankRespone updateB(int bankId, BankUpdateRequest request) {
         Bank bank = bankRepository.findById(bankId)
                 .orElseThrow(() -> new AppException(ErrorCode.BANK_NOT_EXISTED));
-        if (bankRepository.existsByNameAndAccount(request.getNameBank(), request.getNumberBank()))
+        Employee employee = employeeRepository.findById(request.getEmployeeId())
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+
+        if(bank.getEmployee().getId() != (request.getEmployeeId())) bank.setEmployee(employee);
+        else if (bankRepository.existsByNameAndAccount(request.getNameBank(), request.getNumberBank()))
             throw new AppException(ErrorCode.BANK_EXISTED);
 
         bankMapper.updateBankUp(bank, request);

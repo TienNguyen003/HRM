@@ -7,6 +7,7 @@ import com.hrm.dto.response.wage.PayrollRespone;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PayrollController {
     PayrollService payrollService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_ADD')")
     @PostMapping
     ApiResponse<PayrollRespone> create(@RequestBody PayrollRequest request){
         return ApiResponse.<PayrollRespone>builder()
@@ -25,6 +27,7 @@ public class PayrollController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_VIEW')")
     @GetMapping("/get-all")
     ApiResponse<List<PayrollRespone>> getAll(){
         return ApiResponse.<List<PayrollRespone>>builder()
@@ -39,6 +42,7 @@ public class PayrollController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_VIEW')")
     @GetMapping
     ApiResponse<List<PayrollRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
@@ -50,6 +54,7 @@ public class PayrollController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_EDIT')")
     @PutMapping
     ApiResponse<PayrollRespone> update(@RequestParam int payrollIdEmployee, @RequestBody PayrollRequest request){
         return ApiResponse.<PayrollRespone>builder()
@@ -57,6 +62,7 @@ public class PayrollController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int payrollIdEmployee){
         payrollService.deletPayroll(payrollIdEmployee);

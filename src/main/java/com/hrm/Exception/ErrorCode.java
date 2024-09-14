@@ -15,6 +15,7 @@ public enum ErrorCode {
 	USERNAME_INVALID(500, "Tên đăng nhập phải có ít nhất 6 kí tự.", HttpStatus.BAD_REQUEST),
 	USERNAME_NOT_EXISTED(504, "Tên đăng nhập không chính xác.", HttpStatus.NOT_FOUND),
 	USER_NOT_EXISTED(504, "Tài khoản không chính xác.", HttpStatus.NOT_FOUND),
+	USER_NOT_ACTIVE(503, "Tài khoản đã bị khóa.", HttpStatus.NOT_FOUND),
 	USERNAME_EXISTED(502, "Tên đăng nhập đã tồn tại.", HttpStatus.BAD_REQUEST),
 
 	// password
@@ -49,6 +50,7 @@ public enum ErrorCode {
 	DAYOFF_EXISTED(502, "Ngày nghỉ đã tồn tại.", HttpStatus.BAD_REQUEST),
 	DAYOFF_NOT_EXISTED(504, "Ngày nghỉ không tồn tại.", HttpStatus.BAD_REQUEST),
 	DAYCATE_NOT_EXISTED(504, "Danh mục ngày nghỉ không tồn tại.", HttpStatus.BAD_REQUEST),
+	DAYOFF_NOT_EDIT(503, "Ngày nghỉ không thể chỉnh sửa.", HttpStatus.BAD_REQUEST),
 
 	//lương
 	WAGECATE_EXISTED(502, "Danh mục lương đã tồn tại.", HttpStatus.BAD_REQUEST),

@@ -12,4 +12,5 @@ public class ContractsRequest {
     String urlFile;
     int status = 1;
     int employeeId;
+    String linkFile;
 }

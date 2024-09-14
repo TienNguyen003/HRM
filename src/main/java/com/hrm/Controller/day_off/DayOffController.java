@@ -8,6 +8,7 @@ import com.hrm.dto.response.day_off.DayOffResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 public class DayOffController {
     DayOffService dayOffService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('LEAV_ADD')")
     @PostMapping
     ApiResponse<DayOffResponse> create(@RequestBody DayOffRequest request){
         return ApiResponse.<DayOffResponse>builder()
@@ -26,6 +28,7 @@ public class DayOffController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('LEAV_VIEW')")
     @GetMapping
     ApiResponse<List<DayOffResponse>> getAll(){
         return ApiResponse.<List<DayOffResponse>>builder()
@@ -40,6 +43,7 @@ public class DayOffController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('LEAV_VIEW')")
     @GetMapping("/search")
     ApiResponse<List<DayOffResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "nameDay", required = false) String nameDay,
@@ -50,6 +54,7 @@ public class DayOffController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('LEAV_EDIT')")
     @PutMapping
     ApiResponse<DayOffResponse> update(@RequestParam int dayOffId, @RequestBody DayOffUpdateRequest request){
         return ApiResponse.<DayOffResponse>builder()
@@ -57,6 +62,7 @@ public class DayOffController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('LEAV_EDIT')")
     @PutMapping("/stt")
     ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status){
         return ApiResponse.<String>builder()
@@ -64,6 +70,7 @@ public class DayOffController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('LEAV_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int dayOffId){
         dayOffService.deleteDayOff(dayOffId);

@@ -7,6 +7,7 @@ import com.hrm.dto.response.wage.WageCateRespone;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class WageCateController {
     WageCateService wageCateService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('CATG_ADD')")
     @PostMapping
     ApiResponse<WageCateRespone> create(@RequestBody WageCateRequest request){
         return ApiResponse.<WageCateRespone>builder()
@@ -25,6 +27,7 @@ public class WageCateController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CATG_VIEW')")
     @GetMapping("/type")
     ApiResponse<List<WageCateRespone>> getAll(@RequestParam(name = "type", required = false) String type){
         return ApiResponse.<List<WageCateRespone>>builder()
@@ -39,6 +42,7 @@ public class WageCateController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CATG_VIEW')")
     @GetMapping
     ApiResponse<List<WageCateRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
@@ -50,6 +54,7 @@ public class WageCateController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CATG_EDIT')")
     @PutMapping
     ApiResponse<WageCateRespone> update(@RequestParam int wageCateId, @RequestBody WageCateRequest request){
         return ApiResponse.<WageCateRespone>builder()
@@ -57,6 +62,7 @@ public class WageCateController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CATG_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int dayOffId){
         wageCateService.deleteWageCate(dayOffId);

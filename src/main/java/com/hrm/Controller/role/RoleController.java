@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class RoleController {
     RoleService roleService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_ADD')")
     @PostMapping
     ApiResponse<RoleResponse> create(@RequestBody RoleRequest request){
         return ApiResponse.<RoleResponse>builder()
@@ -28,6 +30,7 @@ public class RoleController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_VIEW')")
     @GetMapping()
     ApiResponse<List<RoleResponse>> searchAll(@RequestParam int pageNumber,
                                               @RequestParam(name = "name", required = false) String name){
@@ -37,6 +40,7 @@ public class RoleController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_VIEW')")
     @GetMapping("/get")
     ApiResponse<List<RoleResponse>> getAll(){
         return ApiResponse.<List<RoleResponse>>builder()
@@ -51,6 +55,7 @@ public class RoleController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_EDIT')")
     @PutMapping()
     ApiResponse<RoleResponse> updateRole(@RequestBody RoleUpdateRequest request, @RequestParam String name){
         return ApiResponse.<RoleResponse>builder()
@@ -58,6 +63,7 @@ public class RoleController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_DELETE')")
     @DeleteMapping()
     ApiResponse<String> delete(@RequestParam(name = "name", required = false) String name){
         roleService.delete(name);

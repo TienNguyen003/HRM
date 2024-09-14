@@ -10,5 +10,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ContractsUpdateRequest {
     String urlFile;
+    String linkFile;
     int employeeId;
 }

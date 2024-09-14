@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class TimeController {
     TimeService timeService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('ATTD_ADD')")
     @PostMapping
     ApiResponse<TimeKeepingRespone> create(@RequestBody TimeKeepingRequest request){
         return ApiResponse.<TimeKeepingRespone>builder()
@@ -27,6 +29,7 @@ public class TimeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ATTD_VIEW')")
     @GetMapping
     ApiResponse<List<TimeKeepingRespone>> searchAll(@RequestParam int pageNumber,
                                                     @RequestParam(name = "name", required = false) String name,
@@ -53,13 +56,15 @@ public class TimeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ATTD_EDIT')")
     @PutMapping
-    ApiResponse<TimeKeepingRespone> updateRole(@RequestBody TimeKeepingRequest request, @RequestParam int id){
+    ApiResponse<TimeKeepingRespone> updateTimeKeeping(@RequestBody TimeKeepingRequest request, @RequestParam int id){
         return ApiResponse.<TimeKeepingRespone>builder()
                 .result(timeService.updateTime(id, request))
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ATTD_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete(@RequestParam int id){
         timeService.deleteTime(id);

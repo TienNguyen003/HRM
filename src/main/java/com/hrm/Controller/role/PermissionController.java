@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.List;
 public class PermissionController {
     PermissionService permissionService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_ADD')")
     @PostMapping
     ApiResponse<PermissionResponse> create(@RequestBody PermissionRequest permissionRequest){
         return ApiResponse.<PermissionResponse>builder()
@@ -27,6 +29,7 @@ public class PermissionController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_VIEW')")
     @GetMapping
     ApiResponse<List<PermissionResponse>> getAll(){
         return ApiResponse.<List<PermissionResponse>>builder()
@@ -34,6 +37,7 @@ public class PermissionController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_DELETE')")
     @DeleteMapping("/{permissionName}")
     ApiResponse<Void> delete(@PathVariable String permissionName){
         permissionService.delete(permissionName);

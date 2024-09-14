@@ -20,6 +20,7 @@ public class User {
 	String id;
 	String username;
 	String password;
+	int status;
 
 	@OneToOne
 	Employee employee;

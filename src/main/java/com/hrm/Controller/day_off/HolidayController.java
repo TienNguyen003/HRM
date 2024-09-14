@@ -7,6 +7,7 @@ import com.hrm.dto.response.day_off.HolidayResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class HolidayController {
     HolidayService holidayService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('HOLI_ADD')")
     @PostMapping
     ApiResponse<HolidayResponse> create(@RequestBody HolidayRequest request){
         return ApiResponse.<HolidayResponse>builder()
@@ -32,6 +34,7 @@ public class HolidayController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('HOLI_VIEW')")
     @GetMapping
     ApiResponse<List<HolidayResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name){
@@ -48,6 +51,7 @@ public class HolidayController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('HOLI_EDIT')")
     @PutMapping
     ApiResponse<HolidayResponse> update(@RequestParam int holidayId, @RequestBody HolidayRequest request){
         return ApiResponse.<HolidayResponse>builder()
@@ -55,6 +59,7 @@ public class HolidayController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('HOLI_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int holidayId){
         holidayService.deleteH(holidayId);

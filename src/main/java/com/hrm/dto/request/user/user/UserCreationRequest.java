@@ -17,5 +17,6 @@ public class UserCreationRequest {
 	String password;
 
 	int employeeId;
+	int status = 1;
 	String roleName;
 }

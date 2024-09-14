@@ -52,9 +52,8 @@ public class FormulaService {
     }
 
     // lấy ra tất cả
-    public List<FormulaResponse> getAll(int pageNumber, int pageSize){
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return formulaRepository.findAll(pageable)
+    public List<FormulaResponse> getAll(){
+        return formulaRepository.findAll()
                 .stream().map(formulaMapper::toFormulaResponse).toList();
     }
 

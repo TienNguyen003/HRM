@@ -7,6 +7,7 @@ import com.hrm.dto.response.office.OfficeRespone;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class OfficeController {
     OfficeService officeService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_ADD')")
     @PostMapping
     ApiResponse<OfficeRespone> create(@RequestBody OfficeRequest request){
         return ApiResponse.<OfficeRespone>builder()
@@ -32,6 +34,7 @@ public class OfficeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_VIEW')")
     @GetMapping
     ApiResponse<List<OfficeRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
@@ -42,6 +45,7 @@ public class OfficeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_VIEW')")
     @GetMapping("/ofc")
     ApiResponse<List<OfficeRespone>> getAll(){
         return ApiResponse.<List<OfficeRespone>>builder()
@@ -49,6 +53,7 @@ public class OfficeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_EDIT')")
     @PutMapping
     ApiResponse<OfficeRespone> update(@RequestParam int officeId, @RequestBody OfficeRequest request){
         return ApiResponse.<OfficeRespone>builder()
@@ -56,6 +61,7 @@ public class OfficeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_EDIT')")
     @PutMapping("/stt")
     ApiResponse<String> updateStt(@RequestParam int id, @RequestParam int status){
         return ApiResponse.<String>builder()
@@ -63,6 +69,7 @@ public class OfficeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int officeId){
         officeService.delete(officeId);

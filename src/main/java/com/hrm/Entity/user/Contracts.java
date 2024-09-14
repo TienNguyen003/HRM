@@ -16,6 +16,7 @@ public class Contracts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String urlFile;
+    String linkFile;
     int status;
 
     @OneToOne

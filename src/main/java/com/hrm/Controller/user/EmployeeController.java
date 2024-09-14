@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,14 +21,16 @@ import java.util.List;
 @Slf4j
 public class EmployeeController {
 	EmployeeService employeeService;
-	
+
+	@PreAuthorize("@requiredPermission.checkPermission('USER_ADD')")
 	@PostMapping
 	ApiResponse<EmployeeRespone> create(@RequestBody EmployeeRequest request, @RequestParam String username) {
 		return ApiResponse.<EmployeeRespone>builder()
 				.result(employeeService.createB(request, username))
 				.build();
 	}
-	
+
+	@PreAuthorize("@requiredPermission.checkPermission('USER_VIEW')")
 	@GetMapping
 	ApiResponse<List<EmployeeRespone>> getAll(@RequestParam("pageNumber") int pageNumber) {
 		return ApiResponse.<List<EmployeeRespone>>builder()
@@ -41,7 +44,8 @@ public class EmployeeController {
 				.result(employeeService.getById(id))
 				.build();
 	}
-	
+
+	@PreAuthorize("@requiredPermission.checkPermission('USER_EDIT')")
 	@PutMapping
 	ApiResponse<EmployeeRespone> update(@RequestParam int id, @RequestBody EmployeeRequest request) {
 		return ApiResponse.<EmployeeRespone>builder()
@@ -49,6 +53,7 @@ public class EmployeeController {
 				.build();
 	}
 
+	@PreAuthorize("@requiredPermission.checkPermission('USER_EDIT')")
 	@PutMapping("/dismissal")
 	ApiResponse<EmployeeRespone> updateDismissal(@RequestParam int id, @RequestBody EmployeeDismissalRequest request) {
 		return ApiResponse.<EmployeeRespone>builder()
@@ -56,6 +61,7 @@ public class EmployeeController {
 				.build();
 	}
 
+	@PreAuthorize("@requiredPermission.checkPermission('USER_DELETE')")
 	@DeleteMapping
 	ApiResponse<String> delete (@RequestParam int id){
 		employeeService.deleteB(id);
