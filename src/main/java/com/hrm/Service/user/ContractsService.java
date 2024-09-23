@@ -40,13 +40,13 @@ public class ContractsService {
     }
 
     // cập nhật
-    public ContractsRespone updateB(int contractsId, ContractsUpdateRequest request) {
+    public void updateB(int contractsId, ContractsUpdateRequest request) {
         Contracts contracts = contractsRepository.findById(contractsId)
                 .orElseThrow(() -> new AppException(ErrorCode.CONTRACT_NOT_EXISTED));
 
         contractsMapper.updateContractsUp(contracts, request);
 
-        return contractsMapper.toContractsRespone(contractsRepository.save(contracts));
+        contractsRepository.save(contracts);
     }
 
     public String updateStt(int id, int status) {

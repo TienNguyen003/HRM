@@ -5,6 +5,7 @@ import com.hrm.dto.request.wage.advance.AdvanceRequest;
 import com.hrm.dto.request.wage.advance.AdvanceUpdateSttRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.AdvanceRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +23,7 @@ public class AdvanceController {
 
     @PreAuthorize("@requiredPermission.checkPermission('ADV_ADD')")
     @PostMapping
-    ApiResponse<AdvanceRespone> create(@RequestBody AdvanceRequest request){
+    ApiResponse<AdvanceRespone> create(@RequestBody @Valid AdvanceRequest request){
         return ApiResponse.<AdvanceRespone>builder()
                 .result(advanceService.create(request))
                 .build();
@@ -57,7 +58,7 @@ public class AdvanceController {
 
     @PreAuthorize("@requiredPermission.checkPermission('ADV_EDIT')")
     @PutMapping
-    ApiResponse<AdvanceRespone> update(@RequestParam int advaceId, @RequestBody AdvanceRequest request){
+    ApiResponse<AdvanceRespone> update(@RequestParam int advaceId,@RequestBody @Valid AdvanceRequest request){
         return ApiResponse.<AdvanceRespone>builder()
                 .result(advanceService.update(advaceId, request))
                 .build();
@@ -65,7 +66,7 @@ public class AdvanceController {
 
     @PreAuthorize("@requiredPermission.checkPermission('ADV_APPROVALS')")
     @PutMapping("/approvals")
-    ApiResponse<AdvanceRespone> updateStt(@RequestParam int advaceId, @RequestBody AdvanceUpdateSttRequest request){
+    ApiResponse<AdvanceRespone> updateStt(@RequestParam int advaceId,@RequestBody @Valid AdvanceUpdateSttRequest request){
         return ApiResponse.<AdvanceRespone>builder()
                 .result(advanceService.updateStt(advaceId, request))
                 .build();

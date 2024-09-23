@@ -4,6 +4,7 @@ import com.hrm.Service.office.OfficeService;
 import com.hrm.dto.request.office.OfficeRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.office.OfficeRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class OfficeController {
 
     @PreAuthorize("@requiredPermission.checkPermission('OFF_ADD')")
     @PostMapping
-    ApiResponse<OfficeRespone> create(@RequestBody OfficeRequest request){
+    ApiResponse<OfficeRespone> create(@RequestBody @Valid OfficeRequest request){
         return ApiResponse.<OfficeRespone>builder()
                 .result(officeService.create(request))
                 .build();
@@ -55,7 +56,7 @@ public class OfficeController {
 
     @PreAuthorize("@requiredPermission.checkPermission('OFF_EDIT')")
     @PutMapping
-    ApiResponse<OfficeRespone> update(@RequestParam int officeId, @RequestBody OfficeRequest request){
+    ApiResponse<OfficeRespone> update(@RequestParam int officeId,@RequestBody @Valid OfficeRequest request){
         return ApiResponse.<OfficeRespone>builder()
                 .result(officeService.update(officeId, request))
                 .build();

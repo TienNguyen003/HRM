@@ -5,6 +5,7 @@ import com.hrm.dto.request.user.contract.ContractsRequest;
 import com.hrm.dto.request.user.contract.ContractsUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.user.ContractsRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +25,7 @@ public class ContractsController {
 
     @PreAuthorize("@requiredPermission.checkPermission('CONT_ADD')")
     @PostMapping
-    ApiResponse<ContractsRespone> create(@RequestBody ContractsRequest request) {
+    ApiResponse<ContractsRespone> create(@RequestBody @Valid ContractsRequest request) {
         return ApiResponse.<ContractsRespone>builder()
                 .result(contractsService.createB(request))
                 .build();
@@ -50,7 +51,7 @@ public class ContractsController {
 
     @PreAuthorize("@requiredPermission.checkPermission('CONT_EDIT')")
     @PutMapping
-    ApiResponse<String> update(@RequestParam int contractsId, @RequestBody ContractsUpdateRequest request) {
+    ApiResponse<String> update(@RequestParam int contractsId,@RequestBody @Valid ContractsUpdateRequest request) {
         contractsService.updateB(contractsId, request);
         return ApiResponse.<String>builder()
                 .result("Update success")

@@ -23,8 +23,6 @@ public class Employee {
     String gender;
     String image;
     String birth_date;
-    String hire_date;
-    String dismissal_date;
     int shift_id;
     int vacationTime;
     int hourOff;

@@ -17,7 +17,6 @@ public class Department {
     int id;
     String name;
     String shortName;
-    String belongTo;
     int status;
 
     @ManyToOne

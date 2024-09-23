@@ -7,7 +7,10 @@ import com.hrm.Entity.wage.Payroll;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.PayRollMapper;
-import com.hrm.dto.request.wage.PayrollRequest;
+import com.hrm.Service.EmailService;
+import com.hrm.dto.request.wage.payroll.PayrollEmailRequest;
+import com.hrm.dto.request.wage.payroll.PayrollRequest;
+import com.hrm.dto.request.wage.payroll.PayrollSttRequest;
 import com.hrm.dto.response.wage.PayrollRespone;
 import com.hrm.repository.user.BankRepository;
 import com.hrm.repository.user.EmployeeRepository;
@@ -20,12 +23,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PayrollService {
+    EmailService emailService;
     PayrollRepository payrollRepository;
     PayRollMapper payRollMapper;
     EmployeeRepository employeeRepository;
@@ -55,6 +60,33 @@ public class PayrollService {
         payRollMapper.updatePayRoll(payroll, request);
 
         return payRollMapper.toPayRollRespone(payrollRepository.save(payroll));
+    }
+
+    // cập nhật stt
+    public String updateStt(List<PayrollSttRequest> request){
+        List<Payroll> payrolls = new ArrayList<>();
+
+        for (PayrollSttRequest requet : request) {
+            Payroll payroll = payrollRepository.findById(requet.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
+
+            payroll.setStatus(1);
+            payrolls.add(payroll);
+        }
+        payrollRepository.saveAll(payrolls);
+
+        return "Update success";
+    }
+
+    // cập nhật stt
+    public String sendEmail(List<PayrollEmailRequest> request){
+        List<Payroll> payrolls = new ArrayList<>();
+
+        for (PayrollEmailRequest requet : request) {
+            emailService.sendNotificationSalary(requet.getEmail(), requet.getContent(), "Thông báo lương");
+        }
+
+        return "Send success";
     }
 
     // lấy ra tất cả

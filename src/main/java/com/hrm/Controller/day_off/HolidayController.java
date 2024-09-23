@@ -4,6 +4,7 @@ import com.hrm.Service.day_off.HolidayService;
 import com.hrm.dto.request.dayOff.HolidayRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.day_off.HolidayResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class HolidayController {
 
     @PreAuthorize("@requiredPermission.checkPermission('HOLI_ADD')")
     @PostMapping
-    ApiResponse<HolidayResponse> create(@RequestBody HolidayRequest request){
+    ApiResponse<HolidayResponse> create(@RequestBody @Valid HolidayRequest request){
         return ApiResponse.<HolidayResponse>builder()
                 .result(holidayService.createH(request))
                 .build();
@@ -37,7 +38,7 @@ public class HolidayController {
     @PreAuthorize("@requiredPermission.checkPermission('HOLI_VIEW')")
     @GetMapping
     ApiResponse<List<HolidayResponse>> search(@RequestParam("pageNumber") int pageNumber ,
-                                             @RequestParam(name = "name", required = false) String name){
+                                              @RequestParam(name = "name", required = false) String name){
         return ApiResponse.<List<HolidayResponse>>builder()
                 .result(holidayService.searchAll(pageNumber, 30, name))
                 .page(holidayService.getPagination(pageNumber, 30, name))
@@ -53,7 +54,7 @@ public class HolidayController {
 
     @PreAuthorize("@requiredPermission.checkPermission('HOLI_EDIT')")
     @PutMapping
-    ApiResponse<HolidayResponse> update(@RequestParam int holidayId, @RequestBody HolidayRequest request){
+    ApiResponse<HolidayResponse> update(@RequestParam int holidayId,@RequestBody @Valid HolidayRequest request){
         return ApiResponse.<HolidayResponse>builder()
                 .result(holidayService.updateH(holidayId, request))
                 .build();

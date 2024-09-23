@@ -13,6 +13,8 @@ public class ContractsRespone {
     String id;
     String urlFile;
     String linkFile;
-    int status;
+    String hire_date;
+    String dismissal_date;
     Employee employee;
+    int status;
 }

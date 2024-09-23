@@ -5,6 +5,7 @@ import com.hrm.dto.request.user.bank.BankRequest;
 import com.hrm.dto.request.user.bank.BankUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.user.BankRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +25,7 @@ public class BankController {
 
     @PreAuthorize("@requiredPermission.checkPermission('BANK_ADD')")
     @PostMapping
-    ApiResponse<BankRespone> create(@RequestBody BankRequest request) {
+    ApiResponse<BankRespone> create(@RequestBody @Valid BankRequest request) {
         return ApiResponse.<BankRespone>builder()
                 .result(bankService.createB(request))
                 .build();
@@ -59,7 +60,7 @@ public class BankController {
 
     @PreAuthorize("@requiredPermission.checkPermission('BANK_EDIT')")
     @PutMapping
-    ApiResponse<String> update(@RequestParam int id, @RequestBody BankUpdateRequest request) {
+    ApiResponse<String> update(@RequestParam int id,@RequestBody @Valid BankUpdateRequest request) {
         bankService.updateB(id, request);
         return ApiResponse.<String>builder()
                 .result("Update success")

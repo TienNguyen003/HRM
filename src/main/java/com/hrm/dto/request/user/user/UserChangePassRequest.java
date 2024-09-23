@@ -1,5 +1,6 @@
 package com.hrm.dto.request.user.user;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +10,12 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserChangePassRequest {
+    @NotBlank(message = "Trường này không được để trống")
     String id;
+
+    @NotBlank(message = "Mật khẩu mới không được để trống")
     String new_pass;
+
+    @NotBlank(message = "Mật khẩu cũ không được để trống")
     String old_pass;
 }

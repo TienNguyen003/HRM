@@ -17,6 +17,8 @@ public class Contracts {
     int id;
     String urlFile;
     String linkFile;
+    String hire_date;
+    String dismissal_date;
     int status;
 
     @OneToOne

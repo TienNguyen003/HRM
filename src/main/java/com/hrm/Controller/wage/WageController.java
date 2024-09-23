@@ -5,6 +5,7 @@ import com.hrm.dto.request.wage.salaryStaticValue.WageRequest;
 import com.hrm.dto.request.wage.salaryStaticValue.WageUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.WageRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +23,7 @@ public class WageController {
 
     @PreAuthorize("@requiredPermission.checkPermission('SAFI_ADD')")
     @PostMapping
-    ApiResponse<List<WageRespone>> create(@RequestBody List<WageRequest> request) {
+    ApiResponse<List<WageRespone>> create(@RequestBody @Valid List<WageRequest> request) {
         return ApiResponse.<List<WageRespone>>builder()
                 .result(wageService.create(request))
                 .build();
@@ -49,7 +50,7 @@ public class WageController {
 
     @PreAuthorize("@requiredPermission.checkPermission('SAFI_EDIT')")
     @PutMapping
-    ApiResponse<List<WageRespone>> update(@RequestBody List<WageUpdateRequest> request) {
+    ApiResponse<List<WageRespone>> update(@RequestBody @Valid List<WageUpdateRequest> request) {
         return ApiResponse.<List<WageRespone>>builder()
                 .result(wageService.update(request))
                 .build();

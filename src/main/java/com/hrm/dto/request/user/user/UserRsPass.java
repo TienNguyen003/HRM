@@ -1,5 +1,7 @@
 package com.hrm.dto.request.user.user;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +11,13 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRsPass {
+    @NotBlank(message = "Không được để trống")
     String id;
+
+    @NotBlank(message = "Mật khẩu mới không được để trống")
     String new_pass;
+
+    @Email(message = "Email không đúng định")
+    @NotBlank(message = "Email không được để trống")
     String email;
 }

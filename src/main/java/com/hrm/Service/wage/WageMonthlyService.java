@@ -44,8 +44,6 @@ public class WageMonthlyService {
             WageCategories wageCategories = wageCateRepository.findById(request.getWageCategoriesId())
                     .orElseThrow(() -> new AppException(ErrorCode.WAGECATE_NOT_EXISTED));
 
-            WageMonthly monthly = wageMonthlyRepository.existsByEmployeeCate(request.getEmployeeId(), request.getWageCategoriesId(), request.getTime());
-
             if (wageMonthlyRepository.existsByEmployeeCate(request.getEmployeeId(), request.getWageCategoriesId(), request.getTime()) == null) {
                 WageMonthly wage = wageMonthlyMapper.toWageMonthly(request);
                 wage.setWageCategories(wageCategories);

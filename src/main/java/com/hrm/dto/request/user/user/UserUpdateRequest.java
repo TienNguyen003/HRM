@@ -1,5 +1,7 @@
 package com.hrm.dto.request.user.user;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
-	String password;
-	String role;
+	@NotBlank(message = "Quyền không được để trống")
+	@Pattern(regexp = "^[\\p{L}]+(\\s[\\p{L}]+)*$", message = "Quyền chỉ được chứa chữ cái")
+	String roleName;
 }

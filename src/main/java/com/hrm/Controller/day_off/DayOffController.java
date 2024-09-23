@@ -5,6 +5,7 @@ import com.hrm.dto.request.dayOff.dayoff.DayOffRequest;
 import com.hrm.dto.request.dayOff.dayoff.DayOffUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.day_off.DayOffResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +23,7 @@ public class DayOffController {
 
     @PreAuthorize("@requiredPermission.checkPermission('LEAV_ADD')")
     @PostMapping
-    ApiResponse<DayOffResponse> create(@RequestBody DayOffRequest request){
+    ApiResponse<DayOffResponse> create(@RequestBody @Valid DayOffRequest request){
         return ApiResponse.<DayOffResponse>builder()
                 .result(dayOffService.createDayOff(request))
                 .build();
@@ -56,7 +57,7 @@ public class DayOffController {
 
     @PreAuthorize("@requiredPermission.checkPermission('LEAV_EDIT')")
     @PutMapping
-    ApiResponse<DayOffResponse> update(@RequestParam int dayOffId, @RequestBody DayOffUpdateRequest request){
+    ApiResponse<DayOffResponse> update(@RequestParam int dayOffId,@RequestBody @Valid DayOffUpdateRequest request){
         return ApiResponse.<DayOffResponse>builder()
                 .result(dayOffService.updateDayOff(dayOffId, request))
                 .build();

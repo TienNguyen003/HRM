@@ -5,6 +5,7 @@ import com.hrm.dto.request.role.RoleUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.request.role.RoleRequest;
 import com.hrm.dto.response.role.RoleResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +25,7 @@ public class RoleController {
 
     @PreAuthorize("@requiredPermission.checkPermission('PERM_ADD')")
     @PostMapping
-    ApiResponse<RoleResponse> create(@RequestBody RoleRequest request){
+    ApiResponse<RoleResponse> create(@RequestBody @Valid RoleRequest request){
         return ApiResponse.<RoleResponse>builder()
                 .result(roleService.create(request))
                 .build();
@@ -57,7 +58,7 @@ public class RoleController {
 
     @PreAuthorize("@requiredPermission.checkPermission('PERM_EDIT')")
     @PutMapping()
-    ApiResponse<RoleResponse> updateRole(@RequestBody RoleUpdateRequest request, @RequestParam String name){
+    ApiResponse<RoleResponse> updateRole(@RequestBody @Valid RoleUpdateRequest request, @RequestParam String name){
         return ApiResponse.<RoleResponse>builder()
                 .result(roleService.updateRole(request, name))
                 .build();

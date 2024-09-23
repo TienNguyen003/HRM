@@ -20,7 +20,7 @@ public enum ErrorCode {
 
 	// password
 	PASSWORD_INVALID(500, "Mật khẩu phải có ít nhất 6 kí tự", HttpStatus.BAD_REQUEST),
-	PASSWORD_INCORRECT(500, "Mật khẩu không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
+	PASSWORD_NO_INCORRECT(500, "Thông tin không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
 	PASSWORD_NO_MATCH(500, "Mật khẩu mới không được trùng mật khẩu cũ.", HttpStatus.NOT_FOUND),
 	OLD_PASS_INCORRECT(500, "Mật khẩu cũ không chính xác. Vui lòng thử lại.", HttpStatus.NOT_FOUND),
 

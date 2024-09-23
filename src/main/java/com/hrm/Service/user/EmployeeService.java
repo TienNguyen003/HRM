@@ -2,15 +2,16 @@ package com.hrm.Service.user;
 
 import com.hrm.Entity.office.Department;
 import com.hrm.Entity.user.Employee;
+import com.hrm.Entity.wage.Formula;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.EmployeeMapper;
-import com.hrm.dto.request.user.employee.EmployeeDismissalRequest;
 import com.hrm.dto.request.user.employee.EmployeeRequest;
 import com.hrm.dto.response.user.EmployeeRespone;
 import com.hrm.repository.office.DepartmentRepository;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.user.UserRepository;
+import com.hrm.repository.wage.FormulaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,6 +29,7 @@ public class EmployeeService {
     EmployeeRepository employeeRepository;
     DepartmentRepository departmentRepository;
     UserRepository userRepository;
+    FormulaRepository formulaRepository;
 
     // thêm danh sách
     public EmployeeRespone createB(EmployeeRequest request, String username) {
@@ -37,8 +39,11 @@ public class EmployeeService {
         Employee employee = employeeMapper.toEmployee(request);
         Department department = departmentRepository.findById(request.getDepartmentId())
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
+        Formula formula = formulaRepository.findById(request.getFormulaId())
+                .orElseThrow(() -> new AppException(ErrorCode.FORMULA_NOT_EXISTED));
 
         employee.setDepartment(department);
+        employee.setFormula(formula);
 
         return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
     }
@@ -49,16 +54,13 @@ public class EmployeeService {
                 .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 
         employeeMapper.updateEmployee(employee, request);
+        Department department = departmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));
+        Formula formula = formulaRepository.findById(request.getFormulaId())
+                .orElseThrow(() -> new AppException(ErrorCode.FORMULA_NOT_EXISTED));
 
-        return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
-    }
-
-    // cập nhật ngay sa thai
-    public EmployeeRespone updateDismissal (int employeeId, EmployeeDismissalRequest request) {
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
-
-        employeeMapper.updateEmployeeDismissal(employee, request);
+        employee.setDepartment(department);
+        employee.setFormula(formula);
 
         return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
     }

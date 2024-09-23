@@ -5,6 +5,7 @@ import com.hrm.dto.request.leave.LeaveRequest;
 import com.hrm.dto.request.leave.LeaveUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.day_off.LeaveRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,7 +26,7 @@ public class LeaveController {
 
     @PreAuthorize("@requiredPermission.checkPermission('REQ_ADD')")
     @PostMapping
-    ApiResponse<LeaveRespone> create(@RequestBody LeaveRequest leaveRequest){
+    ApiResponse<LeaveRespone> create(@RequestBody @Valid LeaveRequest leaveRequest){
         return ApiResponse.<LeaveRespone>builder()
                 .result(leaveService.createLeave(leaveRequest))
                 .build();
@@ -33,7 +34,7 @@ public class LeaveController {
 
     @PreAuthorize("@requiredPermission.checkPermission('REQ_EDIT')")
     @PutMapping
-    ApiResponse<LeaveRespone> update(@RequestParam int leaveId, @RequestBody LeaveRequest request){
+    ApiResponse<LeaveRespone> update(@RequestParam int leaveId,@RequestBody @Valid LeaveRequest request){
         return ApiResponse.<LeaveRespone>builder()
                 .result(leaveService.updateLeave(leaveId, request))
                 .build();
@@ -41,7 +42,7 @@ public class LeaveController {
 
     @PreAuthorize("@requiredPermission.checkPermission('REQ_APPROVALS')")
     @PutMapping("/status")
-    ApiResponse<LeaveRespone> updateStt(@RequestParam int leaveId, @RequestBody LeaveUpdateRequest request){
+    ApiResponse<LeaveRespone> updateStt(@RequestParam int leaveId,@RequestBody @Valid LeaveUpdateRequest request){
         return ApiResponse.<LeaveRespone>builder()
                 .result(leaveService.updateStatus(leaveId, request))
                 .build();

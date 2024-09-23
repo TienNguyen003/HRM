@@ -4,6 +4,7 @@ import com.hrm.Service.wage.WageCateService;
 import com.hrm.dto.request.wage.WageCateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.WageCateRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class WageCateController {
 
     @PreAuthorize("@requiredPermission.checkPermission('CATG_ADD')")
     @PostMapping
-    ApiResponse<WageCateRespone> create(@RequestBody WageCateRequest request){
+    ApiResponse<WageCateRespone> create(@RequestBody @Valid WageCateRequest request){
         return ApiResponse.<WageCateRespone>builder()
                 .result(wageCateService.create(request))
                 .build();
@@ -56,7 +57,7 @@ public class WageCateController {
 
     @PreAuthorize("@requiredPermission.checkPermission('CATG_EDIT')")
     @PutMapping
-    ApiResponse<WageCateRespone> update(@RequestParam int wageCateId, @RequestBody WageCateRequest request){
+    ApiResponse<WageCateRespone> update(@RequestParam int wageCateId,@RequestBody @Valid WageCateRequest request){
         return ApiResponse.<WageCateRespone>builder()
                 .result(wageCateService.update(wageCateId, request))
                 .build();

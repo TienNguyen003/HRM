@@ -4,6 +4,7 @@ import com.hrm.Service.timekeeping.TimeService;
 import com.hrm.dto.request.timekeeping.TimeKeepingRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.timekeeping.TimeKeepingRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +24,7 @@ public class TimeController {
 
     @PreAuthorize("@requiredPermission.checkPermission('ATTD_ADD')")
     @PostMapping
-    ApiResponse<TimeKeepingRespone> create(@RequestBody TimeKeepingRequest request){
+    ApiResponse<TimeKeepingRespone> create(@RequestBody @Valid TimeKeepingRequest request){
         return ApiResponse.<TimeKeepingRespone>builder()
                 .result(timeService.createTime(request))
                 .build();
@@ -58,7 +59,7 @@ public class TimeController {
 
     @PreAuthorize("@requiredPermission.checkPermission('ATTD_EDIT')")
     @PutMapping
-    ApiResponse<TimeKeepingRespone> updateTimeKeeping(@RequestBody TimeKeepingRequest request, @RequestParam int id){
+    ApiResponse<TimeKeepingRespone> updateTimeKeeping(@RequestBody @Valid TimeKeepingRequest request, @RequestParam int id){
         return ApiResponse.<TimeKeepingRespone>builder()
                 .result(timeService.updateTime(id, request))
                 .build();

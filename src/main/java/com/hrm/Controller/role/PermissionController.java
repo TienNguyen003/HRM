@@ -4,6 +4,7 @@ import com.hrm.Service.role.PermissionService;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.request.role.PermissionRequest;
 import com.hrm.dto.response.role.PermissionResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +24,7 @@ public class PermissionController {
 
     @PreAuthorize("@requiredPermission.checkPermission('PERM_ADD')")
     @PostMapping
-    ApiResponse<PermissionResponse> create(@RequestBody PermissionRequest permissionRequest){
+    ApiResponse<PermissionResponse> create(@RequestBody @Valid PermissionRequest permissionRequest){
         return ApiResponse.<PermissionResponse>builder()
                 .result(permissionService.create(permissionRequest))
                 .build();

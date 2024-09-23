@@ -4,6 +4,7 @@ import com.hrm.Service.wage.FormulaService;
 import com.hrm.dto.request.wage.FormulaRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.FormulaResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class FormulaController {
 
     @PreAuthorize("@requiredPermission.checkPermission('CALC_ADD')")
     @PostMapping
-    ApiResponse<FormulaResponse> create(@RequestBody FormulaRequest request){
+    ApiResponse<FormulaResponse> create(@RequestBody @Valid FormulaRequest request){
         return ApiResponse.<FormulaResponse>builder()
                 .result(formulaService.create(request))
                 .build();
@@ -55,7 +56,7 @@ public class FormulaController {
 
     @PreAuthorize("@requiredPermission.checkPermission('CALC_EDIT')")
     @PutMapping
-    ApiResponse<FormulaResponse> update(@RequestParam int id, @RequestBody FormulaRequest request){
+    ApiResponse<FormulaResponse> update(@RequestParam int id,@RequestBody @Valid FormulaRequest request){
         return ApiResponse.<FormulaResponse>builder()
                 .result(formulaService.update(id, request))
                 .build();

@@ -1,6 +1,7 @@
 package com.hrm.dto.response.user;
 
 import com.hrm.Entity.office.Department;
+import com.hrm.Entity.wage.Formula;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -28,4 +29,5 @@ public class EmployeeRespone {
     int vacationHours;
     int timekeeping;
     Department department;
+    Formula formula;
 }

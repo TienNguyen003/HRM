@@ -5,6 +5,7 @@ import com.hrm.dto.request.wage.salaryDynamicValues.WageMonthlyRequest;
 import com.hrm.dto.request.wage.salaryDynamicValues.WageUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.WageMonthlyRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -14,7 +14,6 @@ public class DepartmentResponse {
     String id;
     String name;
     String shortName;
-    String belongTo;
     int status;
     OfficeI officeI;
 }

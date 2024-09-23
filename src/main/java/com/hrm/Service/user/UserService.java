@@ -86,9 +86,8 @@ public class UserService {
 		User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
 
 		userMapper.updateUser(user, request);
-		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRole())
+		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRoleName())
 				.orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 		user.setRole(role);
 		

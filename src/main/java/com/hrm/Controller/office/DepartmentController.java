@@ -4,6 +4,7 @@ import com.hrm.Service.office.DepartmentService;
 import com.hrm.dto.request.office.DepartmentRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.office.DepartmentResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class DepartmentController {
 
     @PreAuthorize("@requiredPermission.checkPermission('COMP_ADD')")
     @PostMapping
-    ApiResponse<DepartmentResponse> create(@RequestBody DepartmentRequest request){
+    ApiResponse<DepartmentResponse> create(@RequestBody @Valid DepartmentRequest request){
         return ApiResponse.<DepartmentResponse>builder()
                 .result(departmentService.create(request))
                 .build();
@@ -56,7 +57,7 @@ public class DepartmentController {
 
     @PreAuthorize("@requiredPermission.checkPermission('COMP_EDIT')")
     @PutMapping
-    ApiResponse<DepartmentResponse> update(@RequestParam int departmentId, @RequestBody DepartmentRequest request){
+    ApiResponse<DepartmentResponse> update(@RequestParam int departmentId,@RequestBody @Valid DepartmentRequest request){
         return ApiResponse.<DepartmentResponse>builder()
                 .result(departmentService.update(departmentId, request))
                 .build();

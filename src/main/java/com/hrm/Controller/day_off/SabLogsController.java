@@ -4,6 +4,7 @@ import com.hrm.Service.day_off.SabLogsService;
 import com.hrm.dto.request.dayOff.SabbaticalLogsRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.day_off.SabbaticalLogsResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +22,7 @@ public class SabLogsController {
 
     @PreAuthorize("@requiredPermission.checkPermission('REQ_APPROVALS')")
     @PostMapping
-    ApiResponse<SabbaticalLogsResponse> create(@RequestBody SabbaticalLogsRequest request){
+    ApiResponse<SabbaticalLogsResponse> create(@RequestBody @Valid SabbaticalLogsRequest request){
         return ApiResponse.<SabbaticalLogsResponse>builder()
                 .result(sabLogsService.create(request))
                 .build();

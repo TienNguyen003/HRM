@@ -9,6 +9,7 @@ import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.token.AuthenticationResponse;
 import com.hrm.dto.response.token.IntrospectResponse;
 import com.nimbusds.jose.JOSEException;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,7 +28,7 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/token")
-    ApiResponse<AuthenticationResponse> authentication(@RequestBody AuthenticationRequest authenticationRequest){
+    ApiResponse<AuthenticationResponse> authentication(@RequestBody @Valid AuthenticationRequest authenticationRequest){
         var result = authenticationService.authentication(authenticationRequest);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
@@ -35,7 +36,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/introspect")
-    ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest introspectRequest)
+    ApiResponse<IntrospectResponse> introspect(@RequestBody @Valid IntrospectRequest introspectRequest)
             throws ParseException, JOSEException {
         var result = authenticationService.introspectResponse(introspectRequest);
         return ApiResponse.<IntrospectResponse>builder()
@@ -44,7 +45,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
-    ApiResponse<AuthenticationResponse> authentication(@RequestBody RefreshRequest request) throws ParseException, JOSEException {
+    ApiResponse<AuthenticationResponse> authentication(@RequestBody @Valid RefreshRequest request) throws ParseException, JOSEException {
         var result = authenticationService.refreshToken(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
@@ -52,7 +53,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+    ApiResponse<Void> logout(@RequestBody @Valid LogoutRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
         return ApiResponse.<Void>builder().build();
     }

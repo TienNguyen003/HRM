@@ -1,18 +1,21 @@
-package com.hrm.dto.request.wage;
+package com.hrm.dto.request.wage.payroll;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FormulaRequest {
+public class PayrollEmailRequest {
     @NotBlank(message = "Không được để trống")
-    String name;
+    @Email(message = "Email không đúng định dạng")
+    String email;
 
     @NotBlank(message = "Không được để trống")
-    String salaryFormula;
+    String content;
 }

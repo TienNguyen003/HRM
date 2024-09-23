@@ -1,10 +1,10 @@
 package com.hrm.Controller.user;
 
 import com.hrm.Service.user.EmployeeService;
-import com.hrm.dto.request.user.employee.EmployeeDismissalRequest;
 import com.hrm.dto.request.user.employee.EmployeeRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.user.EmployeeRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +24,7 @@ public class EmployeeController {
 
 	@PreAuthorize("@requiredPermission.checkPermission('USER_ADD')")
 	@PostMapping
-	ApiResponse<EmployeeRespone> create(@RequestBody EmployeeRequest request, @RequestParam String username) {
+	ApiResponse<EmployeeRespone> create(@RequestBody @Valid EmployeeRequest request, @RequestParam String username) {
 		return ApiResponse.<EmployeeRespone>builder()
 				.result(employeeService.createB(request, username))
 				.build();
@@ -47,17 +47,9 @@ public class EmployeeController {
 
 	@PreAuthorize("@requiredPermission.checkPermission('USER_EDIT')")
 	@PutMapping
-	ApiResponse<EmployeeRespone> update(@RequestParam int id, @RequestBody EmployeeRequest request) {
+	ApiResponse<EmployeeRespone> update(@RequestParam int id,@RequestBody @Valid EmployeeRequest request) {
 		return ApiResponse.<EmployeeRespone>builder()
 				.result(employeeService.updateB(id, request))
-				.build();
-	}
-
-	@PreAuthorize("@requiredPermission.checkPermission('USER_EDIT')")
-	@PutMapping("/dismissal")
-	ApiResponse<EmployeeRespone> updateDismissal(@RequestParam int id, @RequestBody EmployeeDismissalRequest request) {
-		return ApiResponse.<EmployeeRespone>builder()
-				.result(employeeService.updateDismissal(id, request))
 				.build();
 	}
 

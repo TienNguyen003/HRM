@@ -80,7 +80,7 @@ public class UserController {
 
 	@PreAuthorize("@requiredPermission.checkPermission('USER_RSPASS')")
 	@PutMapping("/rs-pass")
-	ApiResponse<String> resetPass( @RequestBody UserRsPass request) {
+	ApiResponse<String> resetPass(@RequestBody @Valid UserRsPass request) {
 		return ApiResponse.<String>builder()
 				.result(userService.rsPass(request))
 				.build();
@@ -88,7 +88,7 @@ public class UserController {
 
 	@PreAuthorize("@requiredPermission.checkPermission('USER_CPASS')")
 	@PutMapping("/change-pass")
-	ApiResponse<String> changePass( @RequestBody UserChangePassRequest request) {
+	ApiResponse<String> changePass(@RequestBody @Valid UserChangePassRequest request) {
 		return ApiResponse.<String>builder()
 				.result(userService.changePass(request))
 				.build();
@@ -96,8 +96,10 @@ public class UserController {
 
 	@PreAuthorize("@requiredPermission.checkPermission('USER_EDIT')")
 	@PutMapping
-	UserResponse updateUser(@RequestParam String userId, @RequestBody UserUpdateRequest request) {
-		return userService.updateUser(userId, request);
+	ApiResponse<UserResponse> updateUser(@RequestParam String userId, @RequestBody @Valid UserUpdateRequest request) {
+		return ApiResponse.<UserResponse>builder()
+				.result(userService.updateUser(userId, request))
+				.build();
 	}
 
 	@PreAuthorize("@requiredPermission.checkPermission('USER_EDIT')")

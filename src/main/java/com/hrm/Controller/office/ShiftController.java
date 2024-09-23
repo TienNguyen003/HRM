@@ -4,6 +4,7 @@ import com.hrm.Service.office.ShiftService;
 import com.hrm.dto.request.office.ShiftRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.office.ShiftResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +20,7 @@ public class ShiftController {
     ShiftService shiftService;
 
     @PostMapping
-    ApiResponse<ShiftResponse> create(@RequestBody ShiftRequest request){
+    ApiResponse<ShiftResponse> create(@RequestBody @Valid ShiftRequest request){
         return ApiResponse.<ShiftResponse>builder()
                 .result(shiftService.create(request))
                 .build();
@@ -33,7 +34,7 @@ public class ShiftController {
     }
 
     @PutMapping
-    ApiResponse<ShiftResponse> update(@RequestParam int shiftId, @RequestBody ShiftRequest request){
+    ApiResponse<ShiftResponse> update(@RequestParam int shiftId,@RequestBody @Valid ShiftRequest request){
         return ApiResponse.<ShiftResponse>builder()
                 .result(shiftService.update(shiftId, request))
                 .build();

@@ -1,9 +1,12 @@
 package com.hrm.Controller.wage;
 
 import com.hrm.Service.wage.PayrollService;
-import com.hrm.dto.request.wage.PayrollRequest;
+import com.hrm.dto.request.wage.payroll.PayrollEmailRequest;
+import com.hrm.dto.request.wage.payroll.PayrollRequest;
+import com.hrm.dto.request.wage.payroll.PayrollSttRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.PayrollRespone;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +24,7 @@ public class PayrollController {
 
     @PreAuthorize("@requiredPermission.checkPermission('SALA_ADD')")
     @PostMapping
-    ApiResponse<PayrollRespone> create(@RequestBody PayrollRequest request){
+    ApiResponse<PayrollRespone> create(@RequestBody @Valid PayrollRequest request){
         return ApiResponse.<PayrollRespone>builder()
                 .result(payrollService.create(request))
                 .build();
@@ -56,9 +59,25 @@ public class PayrollController {
 
     @PreAuthorize("@requiredPermission.checkPermission('SALA_EDIT')")
     @PutMapping
-    ApiResponse<PayrollRespone> update(@RequestParam int payrollIdEmployee, @RequestBody PayrollRequest request){
+    ApiResponse<PayrollRespone> update(@RequestParam int payrollIdEmployee,@RequestBody @Valid PayrollRequest request){
         return ApiResponse.<PayrollRespone>builder()
                 .result(payrollService.update(payrollIdEmployee, request))
+                .build();
+    }
+
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_EDIT')")
+    @PutMapping("payroll")
+    ApiResponse<String> updateStt(@RequestBody @Valid List<PayrollSttRequest> request){
+        return ApiResponse.<String>builder()
+                .result(payrollService.updateStt(request))
+                .build();
+    }
+
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_EDIT')")
+    @PutMapping("email")
+    ApiResponse<String> sendEmail(@RequestBody @Valid List<PayrollEmailRequest> request){
+        return ApiResponse.<String>builder()
+                .result(payrollService.sendEmail(request))
                 .build();
     }
 
