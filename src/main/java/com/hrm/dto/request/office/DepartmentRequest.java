@@ -17,7 +17,7 @@ public class DepartmentRequest {
     @NotBlank(message = "Tên không được để trống")
     String name;
 
-    @NotBlank(message = "Tên ngắn không được trống")
+    @NotBlank(message = "Tên ngắn không được để trống")
     String shortName;
 
     @NotNull(message = "Công ty không được để trống")
