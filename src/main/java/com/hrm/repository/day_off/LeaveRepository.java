@@ -13,7 +13,8 @@ public interface LeaveRepository extends JpaRepository<ApplicationLeave, Integer
     @Query("SELECT al FROM ApplicationLeave al WHERE " +
             "(:name IS NULL OR al.employee.name LIKE %:name%) AND " +
             "(:dayOff IS NULL OR al.dayOffCategories.id = :dayOff) AND " +
+            "(:employeeId IS NULL OR al.employee.id = :employeeId) AND " +
             "(:status IS NULL OR al.status = :status)")
     Page<ApplicationLeave> findByNameContainingAndDayOffAndStatus(
-            String name, Integer dayOff, Integer status, Pageable pageable);
+            String name, Integer dayOff, Integer status, Pageable pageable, Integer employeeId);
 }

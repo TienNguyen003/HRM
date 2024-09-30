@@ -28,7 +28,7 @@ public class WageCateController {
                 .build();
     }
 
-    @PreAuthorize("@requiredPermission.checkPermission('CATG_VIEW')")
+//    @PreAuthorize("@requiredPermission.checkPermission('CATG_VIEW')")
     @GetMapping("/type")
     ApiResponse<List<WageCateRespone>> getAll(@RequestParam(name = "type", required = false) String type){
         return ApiResponse.<List<WageCateRespone>>builder()

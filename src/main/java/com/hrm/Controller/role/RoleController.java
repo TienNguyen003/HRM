@@ -32,7 +32,7 @@ public class RoleController {
     }
 
     @PreAuthorize("@requiredPermission.checkPermission('PERM_VIEW')")
-    @GetMapping()
+    @GetMapping
     ApiResponse<List<RoleResponse>> searchAll(@RequestParam int pageNumber,
                                               @RequestParam(name = "name", required = false) String name){
         return ApiResponse.<List<RoleResponse>>builder()

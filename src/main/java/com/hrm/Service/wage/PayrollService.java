@@ -102,14 +102,14 @@ public class PayrollService {
     }
 
     // tìm kiếm
-    public List<PayrollRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer status){
+    public List<PayrollRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer status, Integer id){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return payrollRepository.findByNameAndTime(name, time, status, pageable)
+        return payrollRepository.findByNameAndTime(name, time, status, pageable, id)
                 .stream().map(payRollMapper::toPayRollRespone).toList();
     }
-    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer status){
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer status, Integer id){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        Page<Payroll> page = payrollRepository.findByNameAndTime(name, time, status, pageable);
+        Page<Payroll> page = payrollRepository.findByNameAndTime(name, time, status, pageable, id);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))

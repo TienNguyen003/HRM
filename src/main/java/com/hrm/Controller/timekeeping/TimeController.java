@@ -36,10 +36,11 @@ public class TimeController {
                                                     @RequestParam(name = "name", required = false) String name,
                                                     @RequestParam(name = "day", required = false) String day,
                                                     @RequestParam(name = "office", required = false) String office,
-                                                    @RequestParam(name = "department", required = false) String department){
+                                                    @RequestParam(name = "department", required = false) String department,
+                                                    @RequestParam(name = "id", required = false) Integer id){
         return ApiResponse.<List<TimeKeepingRespone>>builder()
-                .result(timeService.getTimes(name, day, department, office, pageNumber, 30))
-                .page(timeService.getPagination(name, day, department, office, pageNumber, 30))
+                .result(timeService.getTimes(name, day, department, office, id, pageNumber, 30))
+                .page(timeService.getPagination(name, day, department, office, id, pageNumber, 30))
                 .build();
     }
 

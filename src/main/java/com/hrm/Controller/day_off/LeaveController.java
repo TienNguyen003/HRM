@@ -55,16 +55,18 @@ public class LeaveController {
                 .build();
     }
 
-    @PreAuthorize("@requiredPermission.checkPermission('REQ_VIEW')")
+//    @PreAuthorize("@requiredPermission.checkPermission('REQ_VIEW')")
     @GetMapping
-    ApiResponse<List<LeaveRespone>> searchAll(@RequestParam("pageNumber") int pageNumber ,
-                                        @RequestParam(name = "name", required = false) String name,
-                                        @RequestParam(name = "status", required = false)  Integer status,
-                                        @RequestParam(name = "dayOff", required = false) Integer dayOff){
-        return ApiResponse.<List<LeaveRespone>>builder()
-                .result(leaveService.searchAll(pageNumber, 30, name, dayOff, status))
-                .page(leaveService.getPagination(pageNumber, 30, name, dayOff, status))
-                .build();
+    ApiResponse<List<LeaveRespone>> searchAll(@RequestParam("pageNumber") int pageNumber,
+                                              @RequestParam(name = "name", required = false) String name,
+                                              @RequestParam(name = "status", required = false)  Integer status,
+                                              @RequestParam(name = "dayOff", required = false) Integer dayOff,
+                                              @RequestParam(name = "employeeId", required = false) Integer employeeId){
+
+            return ApiResponse.<List<LeaveRespone>>builder()
+                    .result(leaveService.searchAll(pageNumber, 30, name, dayOff, status, employeeId))
+                    .page(leaveService.getPagination(pageNumber, 30, name, dayOff, status, employeeId))
+                    .build();
     }
 
     @PreAuthorize("@requiredPermission.checkPermission('REQ_DELETE')")

@@ -13,7 +13,6 @@ import com.hrm.repository.user.EmployeeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,15 +50,15 @@ public class TimeService {
 				.stream().map(keepingMapper::toKeepingRespone).toList();
 	}
 
-	public List<TimeKeepingRespone> getTimes(String name, String date, String department, String office, int pageNumber, int pageSize){
+	public List<TimeKeepingRespone> getTimes(String name, String date, String department, String office, Integer id, int pageNumber, int pageSize){
 		Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-		return timeRepository.findByName(name, date, department, office, pageable)
+		return timeRepository.findByName(name, date, department, office, id, pageable)
 				.stream().map(keepingMapper::toKeepingRespone).toList();
 	}
 
-	public PageCustom getPagination(String name, String date, String department, String office, int pageNumber, int pageSize){
+	public PageCustom getPagination(String name, String date, String department, String office, Integer id, int pageNumber, int pageSize){
 		Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-		Page<TimeKeeping> page = timeRepository.findByName(name, date, department, office, pageable);
+		Page<TimeKeeping> page = timeRepository.findByName(name, date, department, office, id, pageable);
 		return PageCustom.builder()
 				.totalPages(String.valueOf(page.getTotalPages()))
 				.totalItems(String.valueOf(page.getTotalElements()))

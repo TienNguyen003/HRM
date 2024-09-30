@@ -37,11 +37,12 @@ public class BankController {
                                           @RequestParam(name = "name", required = false) String name,
                                           @RequestParam(name = "status", required = false) Integer status,
                                           @RequestParam(name = "priority", required = false) Integer priority,
-                                          @RequestParam(name = "nameBank", required = false) String nameBank) {
-        return ApiResponse.<List<BankRespone>>builder()
-                .result(bankService.searchAllB(pageNumber, 30, name, nameBank, status, priority))
-                .page(bankService.getPagination(pageNumber, name, nameBank, status, priority))
-                .build();
+                                          @RequestParam(name = "nameBank", required = false) String nameBank,
+                                          @RequestParam(name = "id", required = false) Integer id) {
+            return ApiResponse.<List<BankRespone>>builder()
+                    .result(bankService.searchAllB(pageNumber, 30, name, nameBank, status, priority, id))
+                    .page(bankService.getPagination(pageNumber, name, nameBank, status, priority, id))
+                    .build();
     }
 
     @GetMapping("/bank")

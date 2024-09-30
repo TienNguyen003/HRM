@@ -82,15 +82,15 @@ public class WageService {
     }
 
     // tìm kiếm
-    public List<WageRespone> searchAll(int pageNumber, int pageSize, String name, Integer wageCategories, String type) {
+    public List<WageRespone> searchAll(int pageNumber, int pageSize, String name, Integer wageCategories, String type, Integer id) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return wageRepository.findByNameAndWage(name, wageCategories, type, pageable)
+        return wageRepository.findByNameAndWage(name, wageCategories, type, id, pageable)
                 .stream().map(wageMapper::toWageRespone).toList();
     }
 
-    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer wageCategories, String type) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, 30);
-        Page<Wage> page = wageRepository.findByNameAndWage(name, wageCategories, type, pageable);
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer wageCategories, String type, Integer id) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+        Page<Wage> page = wageRepository.findByNameAndWage(name, wageCategories, type, id, pageable);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))

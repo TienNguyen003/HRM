@@ -95,9 +95,9 @@ public class LeaveService {
                 .orElseThrow(() -> new AppException(ErrorCode.DAYOFF_NOT_EXISTED)));
     }
 
-    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer dayOff, Integer status){
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer dayOff, Integer status, Integer emplyeeID){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        Page<ApplicationLeave> page = leaveRepository.findByNameContainingAndDayOffAndStatus(name, dayOff, status, pageable);
+        Page<ApplicationLeave> page = leaveRepository.findByNameContainingAndDayOffAndStatus(name, dayOff, status, pageable, emplyeeID);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))
@@ -107,9 +107,9 @@ public class LeaveService {
     }
 
     // tìm kiếm đơn
-    public List<LeaveRespone> searchAll(int pageNumber, int pageSize, String name, Integer dayOff, Integer status){
+    public List<LeaveRespone> searchAll(int pageNumber, int pageSize, String name, Integer dayOff, Integer status, Integer emplyeeID){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return leaveRepository.findByNameContainingAndDayOffAndStatus(name, dayOff, status, pageable)
+        return leaveRepository.findByNameContainingAndDayOffAndStatus(name, dayOff, status, pageable, emplyeeID)
                 .stream().map(leaveMapper::toLeaveResponse).toList();
     }
 

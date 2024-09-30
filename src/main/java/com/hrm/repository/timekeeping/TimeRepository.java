@@ -19,7 +19,8 @@ public interface TimeRepository extends JpaRepository<TimeKeeping, Integer> {
             "(:department IS NULL OR t.employee.department.name LIKE %:department%) AND" +
             "(:office IS NULL OR t.employee.department.officeI.name LIKE %:office%) AND" +
             "(:date IS NULL OR t.date LIKE %:date%) AND" +
+            "(:id IS NULL OR t.employee.id = :id) AND" +
             "(:name IS NULL OR t.employee.name LIKE %:name%)")
     Page<TimeKeeping> findByName
-            (String name, String date, String department, String office, Pageable pageable);
+            (String name, String date, String department, String office, Integer id, Pageable pageable);
 }

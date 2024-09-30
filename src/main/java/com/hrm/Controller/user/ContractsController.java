@@ -35,10 +35,11 @@ public class ContractsController {
     @GetMapping
     ApiResponse<List<ContractsRespone>> getAll(@RequestParam("pageNumber") int pageNumber,
                                                @RequestParam(name = "name", required = false) String name,
-                                               @RequestParam(name = "status", required = false) Integer status) {
+                                               @RequestParam(name = "status", required = false) Integer status,
+                                               @RequestParam(name = "id", required = false) Integer id) {
         return ApiResponse.<List<ContractsRespone>>builder()
-                .result(contractsService.searchAllB(pageNumber, 30, name, status))
-                .page(contractsService.getPagination(pageNumber, name, status))
+                .result(contractsService.searchAllB(pageNumber, 30, name, status, id))
+                .page(contractsService.getPagination(pageNumber, name, status, id))
                 .build();
     }
 

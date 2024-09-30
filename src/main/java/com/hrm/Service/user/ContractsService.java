@@ -67,15 +67,15 @@ public class ContractsService {
 
     // tìm kiếm
     public List<ContractsRespone> searchAllB
-    (int pageNumber, int pageSize, String name, Integer status) {
+    (int pageNumber, int pageSize, String name, Integer status, Integer id) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return contractsRepository.findByName(name, status, pageable)
+        return contractsRepository.findByName(name, status, id, pageable)
                 .stream().map(contractsMapper::toContractsRespone).toList();
     }
 
-    public PageCustom getPagination(int pageNumber, String name, Integer status) {
+    public PageCustom getPagination(int pageNumber, String name, Integer status, Integer id) {
         Pageable pageable = PageRequest.of(pageNumber - 1, 30);
-        Page<Contracts> page = contractsRepository.findByName(name, status, pageable);
+        Page<Contracts> page = contractsRepository.findByName(name, status, id, pageable);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))

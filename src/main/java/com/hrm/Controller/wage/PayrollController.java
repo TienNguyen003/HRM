@@ -50,11 +50,12 @@ public class PayrollController {
     ApiResponse<List<PayrollRespone>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "name", required = false) String name,
                                              @RequestParam(name = "status", required = false) Integer status,
-                                             @RequestParam(name = "time", required = false) String time){
-        return ApiResponse.<List<PayrollRespone>>builder()
-                .result(payrollService.searchAll(pageNumber, 30, name, time, status))
-                .page(payrollService.getPagination(pageNumber, 30, name, time, status))
-                .build();
+                                             @RequestParam(name = "time", required = false) String time,
+                                             @RequestParam(name = "id", required = false) Integer id){
+            return ApiResponse.<List<PayrollRespone>>builder()
+                    .result(payrollService.searchAll(pageNumber, 30, name, time, status, id))
+                    .page(payrollService.getPagination(pageNumber, 30, name, time, status, id))
+                    .build();
     }
 
     @PreAuthorize("@requiredPermission.checkPermission('SALA_EDIT')")

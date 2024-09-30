@@ -87,15 +87,15 @@ public class BankService {
 
     // tìm kiếm
     public List<BankRespone> searchAllB
-    (int pageNumber, int pageSize, String name, String nameDay, Integer status, Integer priority) {
+    (int pageNumber, int pageSize, String name, String nameDay, Integer status, Integer priority, Integer id) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return bankRepository.findBankByNameAndNameBank(name, status, priority, nameDay, pageable)
+        return bankRepository.findBankByNameAndNameBank(name, status, priority, nameDay, pageable, id)
                 .stream().map(bankMapper::toBankRespone).toList();
     }
 
-    public PageCustom getPagination(int pageNumber, String name, String nameBank, Integer status, Integer priority){
+    public PageCustom getPagination(int pageNumber, String name, String nameBank, Integer status, Integer priority, Integer id){
         Pageable pageable = PageRequest.of(pageNumber - 1, 30);
-        Page<Bank> page = bankRepository.findBankByNameAndNameBank(name, status, priority, nameBank, pageable);
+        Page<Bank> page = bankRepository.findBankByNameAndNameBank(name, status, priority, nameBank, pageable, id);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))

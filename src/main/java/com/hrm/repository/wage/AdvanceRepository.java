@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
 public interface AdvanceRepository extends JpaRepository<Advance, Integer> {
     @Query("SELECT a FROM Advance a WHERE" +
             "(:status IS NULL OR a.status = :status) AND" +
+            "(:id IS NULL OR a.employee.id = :id) AND " +
             "(:name IS NULL OR a.employee.name LIKE %:name%)")
     Page<Advance> findByNameAndStatus
-            (String name, Integer status, Pageable pageable);
+            (String name, Integer status, Integer id, Pageable pageable);
 
     @Query("SELECT SUM(money) FROM Advance a WHERE" +
             "(:status IS NULL OR a.status = :status) AND" +

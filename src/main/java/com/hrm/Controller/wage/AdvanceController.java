@@ -39,11 +39,12 @@ public class AdvanceController {
     @PreAuthorize("@requiredPermission.checkPermission('ADV_VIEW')")
     @GetMapping
     ApiResponse<List<AdvanceRespone>> search(@RequestParam("pageNumber") int pageNumber ,
-                                              @RequestParam(name = "name", required = false) String name,
-                                                 @RequestParam(name = "status", required = false) Integer status){
+                                             @RequestParam(name = "name", required = false) String name,
+                                             @RequestParam(name = "status", required = false) Integer status,
+                                             @RequestParam(name = "id", required = false) Integer id){
         return ApiResponse.<List<AdvanceRespone>>builder()
-                .result(advanceService.search(pageNumber, 30, name, status))
-                .page(advanceService.getPagination(pageNumber, 30, name, status))
+                .result(advanceService.search(pageNumber, 30, name, status, id))
+                .page(advanceService.getPagination(pageNumber, 30, name, status, id))
                 .build();
     }
 

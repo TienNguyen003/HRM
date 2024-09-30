@@ -86,7 +86,7 @@ public class UserController {
 				.build();
 	}
 
-	@PreAuthorize("@requiredPermission.checkPermission('USER_CPASS')")
+//	@PreAuthorize("@requiredPermission.checkPermission('USER_CPASS')")
 	@PutMapping("/change-pass")
 	ApiResponse<String> changePass(@RequestBody @Valid UserChangePassRequest request) {
 		return ApiResponse.<String>builder()

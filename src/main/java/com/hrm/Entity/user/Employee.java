@@ -23,6 +23,7 @@ public class Employee {
     String gender;
     String image;
     String birth_date;
+    String joined_date;
     int shift_id;
     int vacationTime;
     int hourOff;

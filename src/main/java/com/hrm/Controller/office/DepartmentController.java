@@ -47,7 +47,7 @@ public class DepartmentController {
                 .build();
     }
 
-    @PreAuthorize("@requiredPermission.checkPermission('COMP_VIEW')")
+//    @PreAuthorize("@requiredPermission.checkPermission('COMP_VIEW')")
     @GetMapping("/struc")
     ApiResponse<List<DepartmentResponse>> getAll(){
         return ApiResponse.<List<DepartmentResponse>>builder()

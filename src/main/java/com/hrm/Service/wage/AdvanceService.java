@@ -112,14 +112,14 @@ public class AdvanceService {
     }
 
     // tìm kiếm
-    public List<AdvanceRespone> search(int pageNumber, int pageSize, String name, Integer status){
+    public List<AdvanceRespone> search(int pageNumber, int pageSize, String name, Integer status, Integer id){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return advanceRepository.findByNameAndStatus(name, status, pageable)
+        return advanceRepository.findByNameAndStatus(name, status, id, pageable)
                 .stream().map(advanceMapper::toAdvanceRespone).toList();
     }
-    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer status){
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer status, Integer id){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        Page<Advance> page = advanceRepository.findByNameAndStatus(name, status, pageable);
+        Page<Advance> page = advanceRepository.findByNameAndStatus(name, status, id, pageable);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))

@@ -15,7 +15,8 @@ public interface PayrollRepository extends JpaRepository<Payroll, Integer> {
     @Query("SELECT p FROM Payroll p WHERE" +
             "(:time IS NULL OR p.time LIKE :time%) AND" +
             "(:status IS NULL OR p.status = :status) AND" +
+            "(:id IS NULL OR p.employee.id = :id) AND" +
             "(:name IS NULL OR p.employee.name LIKE %:name%)")
     Page<Payroll> findByNameAndTime
-            (String name, String time, Integer status, Pageable pageable);
+            (String name, String time, Integer status, Pageable pageable, Integer id);
 }

@@ -5,8 +5,6 @@ import com.hrm.Entity.wage.Formula;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +19,7 @@ public class EmployeeRespone {
     String gender;
     String image;
     String birth_date;
-    String hire_date;
-    String dismissal_date;
+    String joined_date;
     int shift_id;
     int vacationTime;
     int hourOff;

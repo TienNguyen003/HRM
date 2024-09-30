@@ -18,9 +18,10 @@ public interface BankRepository extends JpaRepository<Bank, Integer> {
             "(:name IS NULL OR b.employee.name LIKE %:name%) AND" +
             "(:status IS NULL OR b.status = :status) AND" +
             "(:priority IS NULL OR b.priority = :priority) AND" +
+            "(:id IS NULL OR b.employee.id = :id) AND " +
             "(:nameBank IS NULL OR b.nameBank LIKE %:nameBank%)")
     Page<Bank> findBankByNameAndNameBank
-            (String name, Integer status, Integer priority, String nameBank, Pageable pageable);
+            (String name, Integer status, Integer priority, String nameBank, Pageable pageable, Integer id);
 
     @Query("SELECT b FROM Bank b WHERE" +
             "(b.status = 1) AND" +

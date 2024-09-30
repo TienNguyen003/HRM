@@ -29,7 +29,7 @@ public class DayOffController {
                 .build();
     }
 
-    @PreAuthorize("@requiredPermission.checkPermission('LEAV_VIEW')")
+//    @PreAuthorize("@requiredPermission.checkPermission('LEAV_VIEW')")
     @GetMapping
     ApiResponse<List<DayOffResponse>> getAll(){
         return ApiResponse.<List<DayOffResponse>>builder()

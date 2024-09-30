@@ -31,10 +31,11 @@ public class SabLogsController {
     @PreAuthorize("@requiredPermission.checkPermission('HIST_VIEW')")
     @GetMapping()
     ApiResponse<List<SabbaticalLogsResponse>> search(@RequestParam("pageNumber") int pageNumber ,
-                                             @RequestParam(name = "name", required = false) String name){
+                                                     @RequestParam(name = "name", required = false) String name,
+                                                     @RequestParam(name = "id", required = false) Integer id){
         return ApiResponse.<List<SabbaticalLogsResponse>>builder()
-                .result(sabLogsService.searchAllSab(pageNumber, 30, name))
-                .page(sabLogsService.getPagination(pageNumber, 30, name))
+                .result(sabLogsService.searchAllSab(pageNumber, 30, name, id))
+                .page(sabLogsService.getPagination(pageNumber, 30, name, id))
                 .build();
     }
 }

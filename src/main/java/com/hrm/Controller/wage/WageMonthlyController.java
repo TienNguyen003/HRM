@@ -5,7 +5,6 @@ import com.hrm.dto.request.wage.salaryDynamicValues.WageMonthlyRequest;
 import com.hrm.dto.request.wage.salaryDynamicValues.WageUpdateRequest;
 import com.hrm.dto.response.ApiResponse;
 import com.hrm.dto.response.wage.WageMonthlyRespone;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,13 +38,14 @@ public class WageMonthlyController {
     @PreAuthorize("@requiredPermission.checkPermission('SAUP_VIEW')")
     @GetMapping
     ApiResponse<List<WageMonthlyRespone>> search(@RequestParam("pageNumber") int pageNumber ,
-                                              @RequestParam(name = "name", required = false) String name,
+                                                 @RequestParam(name = "name", required = false) String name,
                                                  @RequestParam(name = "time", required = false) String time,
-                                              @RequestParam(name = "wageCategories", required = false) Integer wageCategories,
-                                                 @RequestParam(name = "type", required = false) String type){
+                                                 @RequestParam(name = "wageCategories", required = false) Integer wageCategories,
+                                                 @RequestParam(name = "type", required = false) String type,
+                                                 @RequestParam(name = "id", required = false) Integer id){
         return ApiResponse.<List<WageMonthlyRespone>>builder()
-                .result(wageService.searchAll(pageNumber, 30, name, time, wageCategories, type))
-                .page(wageService.getPagination(pageNumber, 30, name, time, wageCategories, type))
+                .result(wageService.searchAll(pageNumber, 30, name, time, wageCategories, type, id))
+                .page(wageService.getPagination(pageNumber, 30, name, time, wageCategories, type, id))
                 .build();
     }
 

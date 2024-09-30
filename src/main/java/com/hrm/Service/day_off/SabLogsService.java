@@ -41,15 +41,15 @@ public class SabLogsService {
     }
 
     // tìm kiếm
-    public List<SabbaticalLogsResponse> searchAllSab(int pageNumber, int pageSize, String name){
+    public List<SabbaticalLogsResponse> searchAllSab(int pageNumber, int pageSize, String name, Integer id){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return sabLogsRepository.findByNameContaining(name, pageable)
+        return sabLogsRepository.findByNameContaining(name, id, pageable)
                 .stream().map(sabbaticalLogsMapper::toSabLogsResponse).toList();
     }
 
-    public PageCustom getPagination(int pageNumber, int pageSize, String name){
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, Integer id){
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        Page<SabbaticalLeaveLogs> page = sabLogsRepository.findByNameContaining(name, pageable);
+        Page<SabbaticalLeaveLogs> page = sabLogsRepository.findByNameContaining(name, id, pageable);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))

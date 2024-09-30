@@ -82,15 +82,15 @@ public class WageMonthlyService {
     }
 
     // tìm kiếm
-    public List<WageMonthlyRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type) {
+    public List<WageMonthlyRespone> searchAll(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type, Integer id) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        return wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, pageable)
+        return wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, id, pageable)
                 .stream().map(wageMonthlyMapper::toWageMonthlyRespone).toList();
     }
 
-    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type) {
+    public PageCustom getPagination(int pageNumber, int pageSize, String name, String time, Integer wageCategories, String type, Integer id) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
-        Page<WageMonthly> page = wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, pageable);
+        Page<WageMonthly> page = wageMonthlyRepository.findByTimeWage(name, time, wageCategories, type, id, pageable);
         return PageCustom.builder()
                 .totalPages(String.valueOf(page.getTotalPages()))
                 .totalItems(String.valueOf(page.getTotalElements()))

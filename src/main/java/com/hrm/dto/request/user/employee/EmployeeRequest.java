@@ -32,9 +32,9 @@ public class EmployeeRequest {
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "Định dạng ngày phải là yyyy-MM-dd")
     String birth_date;
 
-    @NotBlank(message = "Ngày bắt đầu không được để trống")
+    @NotBlank(message = "Ngày tham gia không được để trống")
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "Định dạng ngày phải là yyyy-MM-dd")
-    String hire_date;
+    String joined_date;
 
     int shift_id;
 

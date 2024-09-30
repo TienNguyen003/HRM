@@ -41,10 +41,11 @@ public class WageController {
     ApiResponse<List<WageRespone>> search(@RequestParam("pageNumber") int pageNumber,
                                           @RequestParam(name = "name", required = false) String name,
                                           @RequestParam(name = "wageCategories", required = false) Integer wageCategories,
-                                          @RequestParam(name = "type", required = false) String type) {
+                                          @RequestParam(name = "type", required = false) String type,
+                                          @RequestParam(name = "id", required = false) Integer id) {
         return ApiResponse.<List<WageRespone>>builder()
-                .result(wageService.searchAll(pageNumber, 30, name, wageCategories, type))
-                .page(wageService.getPagination(pageNumber, 30, name, wageCategories, type))
+                .result(wageService.searchAll(pageNumber, 30, name, wageCategories, type, id))
+                .page(wageService.getPagination(pageNumber, 30, name, wageCategories, type, id))
                 .build();
     }
 
