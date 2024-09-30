@@ -35,7 +35,7 @@ public class HolidayController {
                 .build();
     }
 
-    @PreAuthorize("@requiredPermission.checkPermission('HOLI_VIEW')")
+//    @PreAuthorize("@requiredPermission.checkPermission('HOLI_VIEW')")
     @GetMapping
     ApiResponse<List<HolidayResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                               @RequestParam(name = "name", required = false) String name){

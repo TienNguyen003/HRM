@@ -44,7 +44,7 @@ public class DayOffController {
                 .build();
     }
 
-    @PreAuthorize("@requiredPermission.checkPermission('LEAV_VIEW')")
+//    @PreAuthorize("@requiredPermission.checkPermission('LEAV_VIEW')")
     @GetMapping("/search")
     ApiResponse<List<DayOffResponse>> search(@RequestParam("pageNumber") int pageNumber ,
                                              @RequestParam(name = "nameDay", required = false) String nameDay,
