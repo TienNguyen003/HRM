@@ -21,6 +21,6 @@ public class Contracts {
     String dismissal_date;
     int status;
 
-    @OneToOne
+    @ManyToOne
     Employee employee;
 }

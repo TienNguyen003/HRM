@@ -14,11 +14,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BankUpdateRequest {
     @NotBlank(message = "Tên ngân hàng không được để trống")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "Tên ngân hàng chỉ được chứa chữ cái")
+    @Pattern(regexp = "^[\\p{L}]+(\\s[\\p{L}]+)*$", message = "Tên sở hữu chỉ được chứa chữ cái")
     String nameBank;
 
     @NotBlank(message = "Tên sở hữu không được để trống")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "Tên sở hữu chỉ được chứa chữ cái")
+    @Pattern(regexp = "^[\\p{L}]+(\\s[\\p{L}]+)*$", message = "Tên sở hữu chỉ được chứa chữ cái")
     String owner;
 
     @NotBlank(message = "Số tài khoản không được để trống")
