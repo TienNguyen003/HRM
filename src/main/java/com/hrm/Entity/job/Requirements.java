@@ -1,6 +1,5 @@
-package com.hrm.Entity.timekeeping;
+package com.hrm.Entity.job;
 
-import com.hrm.Entity.user.Employee;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,15 +11,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TimeKeeping {
+public class Requirements {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
-    String time;
-    String date;
-    String reason;
-    int type;
-
-    @ManyToOne
-    Employee employee;
+    String title;
+    int assessmentId;
 }

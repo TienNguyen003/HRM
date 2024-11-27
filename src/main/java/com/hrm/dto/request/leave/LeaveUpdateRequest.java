@@ -23,7 +23,7 @@ public class LeaveUpdateRequest {
     String nameApproval;
 
     @NotNull(message = "Thời gian không được để trống")
-    @Min(value = 1, message = "Thời gian phải lớn hơn 0")
+    @Min(value = 0, message = "Thời gian phải lớn hơn 0")
     int time;
 
     @NotNull(message = "ID nhân viên không được để trống")

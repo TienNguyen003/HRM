@@ -15,5 +15,6 @@ public class TimeKeepingRespone {
     String time;
     String date;
     String reason;
+    int type;
     Employee employee;
 }

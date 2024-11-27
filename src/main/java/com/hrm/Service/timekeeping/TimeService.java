@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -30,7 +31,8 @@ public class TimeService {
 	EmployeeRepository employeeRepository;
 	
 	public TimeKeepingRespone createTime(TimeKeepingRequest request) {
-		if(timeRepository.exitsByDayId(request.getEmployeeId(), request.getDate()))
+		int isCheck = timeRepository.exitsByDayId(request.getEmployeeId(), request.getDate());
+		if(isCheck > 1)
 			throw new AppException(ErrorCode.TIME_EXISTED);
 		Employee employee = employeeRepository.findById(request.getEmployeeId())
 				.orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
@@ -41,6 +43,7 @@ public class TimeService {
 		employee.setTimekeeping(employee.getTimekeeping() - 1);
 		TimeKeeping keeping = keepingMapper.toKeeping(request);
 		keeping.setEmployee(employee);
+		if (isCheck == 1) keeping.setType(1);
 
 		return keepingMapper.toKeepingRespone(timeRepository.save(keeping));
 	}
@@ -67,6 +70,7 @@ public class TimeService {
 				.build();
 	}
 
+	@PostAuthorize("returnObject.employee.id == authentication.principal.getClaimAsString('idE') or !hasRole('NHÂN')")
 	public TimeKeepingRespone getTime(int id) {
 		return keepingMapper.toKeepingRespone(timeRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.TIME_NOT_EXISTED)));

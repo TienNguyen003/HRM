@@ -1,6 +1,7 @@
 package com.hrm.Controller.wage;
 
 import com.hrm.Service.wage.AdvanceService;
+import com.hrm.Service.wage.WageService;
 import com.hrm.dto.request.wage.advance.AdvanceRequest;
 import com.hrm.dto.request.wage.advance.AdvanceUpdateSttRequest;
 import com.hrm.dto.response.ApiResponse;

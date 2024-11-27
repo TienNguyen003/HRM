@@ -21,6 +21,10 @@ public class TimeKeepingRequest {
 
     String reason;
 
+    @NotNull(message = "Giá trị không được để trống")
+    @Min(value = 0, message = "Giá trị là 0 hoặc 1")
+    int type;
+
     @NotNull(message = "ID nhân viên không được để trống")
     @Min(value = 1, message = "ID nhân viên phải lớn hơn 0")
     int employeeId;

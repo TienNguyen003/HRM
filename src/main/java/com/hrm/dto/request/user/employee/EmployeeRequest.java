@@ -47,7 +47,7 @@ public class EmployeeRequest {
     int hourOff;
 
     @NotNull(message = "Số gi nghỉ phép không được để trống")
-    @Min(value = 1, message = "Số gi nghỉ phép phải lớn hơn 0")
+    @Min(value = 1, message = "Số giờ nghỉ phép phải lớn hơn 0")
     int vacationHours;
 
     @NotNull(message = "Phòng không được để trống")

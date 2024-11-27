@@ -155,6 +155,8 @@ public class AuthenticationService {
                 .expirationTime(new Date(Instant.now().plus(EXP_DURARION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
+                .claim("id", user.getId())
+                .claim("idE", user.getEmployee().getId())
                 .build();
         Payload payload = new Payload(jwsClaimsSet.toJSONObject());
 

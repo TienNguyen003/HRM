@@ -21,12 +21,13 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(value = AppException.class)
 	ResponseEntity<ApiResponse> handlingAppException(AppException exception){
-		ErrorCode errorCode = exception.getErrorCode();	
+		ErrorCode errorCode = exception.getErrorCode();
+		String formattedMessage = exception.getMessage(); // Lấy message đã format từ exception
+
 		ApiResponse apiResponse = new ApiResponse<>();
-		
 		apiResponse.setCode(errorCode.getCode());
-		apiResponse.setMessage(errorCode.getMessage());
-		
+		apiResponse.setMessage(formattedMessage); // Sử dụng message đã được format
+
 		return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
 	}
 

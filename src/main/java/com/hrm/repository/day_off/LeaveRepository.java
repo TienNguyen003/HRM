@@ -7,8 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface LeaveRepository extends JpaRepository<ApplicationLeave, Integer> {
+    @Query("SELECT al FROM ApplicationLeave al WHERE " +
+            "(:employeeId IS NULL OR al.employee.id = :employeeId)")
+    List<ApplicationLeave> findByEmployeeId(Integer employeeId);
 
     @Query("SELECT al FROM ApplicationLeave al WHERE " +
             "(:name IS NULL OR al.employee.name LIKE %:name%) AND " +

@@ -3,6 +3,7 @@ package com.hrm.Service.wage;
 import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.wage.Advance;
+import com.hrm.Entity.wage.Wage;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.wage.AdvanceMapper;
@@ -11,6 +12,7 @@ import com.hrm.dto.request.wage.advance.AdvanceUpdateSttRequest;
 import com.hrm.dto.response.wage.AdvanceRespone;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.wage.AdvanceRepository;
+import com.hrm.repository.wage.WageRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -32,6 +34,7 @@ import java.util.List;
 public class AdvanceService {
     AdvanceRepository advanceRepository;
     EmployeeRepository employeeRepository;
+    WageRepository wageRepository;
     AdvanceMapper advanceMapper;
 
     // thêm danh sách
@@ -40,6 +43,11 @@ public class AdvanceService {
 
         advance.setEmployee(employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED)));
+
+        Wage wage = wageRepository.existsByEmployeeCate(request.getEmployeeId(), 4);
+        int month = 3;
+        if(Long.parseLong(request.getMoney()) > Long.parseLong(wage.getSalary())*month)
+            throw new AppException(ErrorCode.ADVANCE_NOT_TOO_MONTH, Long.parseLong(wage.getSalary()), month);
 
         return advanceMapper.toAdvanceRespone(advanceRepository.save(advance));
     }

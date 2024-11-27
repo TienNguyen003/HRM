@@ -69,6 +69,14 @@ public class LeaveController {
                     .build();
     }
 
+    @GetMapping("/get")
+    ApiResponse<List<LeaveRespone>> findAll(@RequestParam(name = " ", required = false) Integer employeeId){
+
+        return ApiResponse.<List<LeaveRespone>>builder()
+                .result(leaveService.getAll(employeeId))
+                .build();
+    }
+
     @PreAuthorize("@requiredPermission.checkPermission('REQ_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int leaveId){

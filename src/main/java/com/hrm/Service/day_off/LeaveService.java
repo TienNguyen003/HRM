@@ -117,4 +117,9 @@ public class LeaveService {
     public void deleteLeave(int leaveId){
         leaveRepository.deleteById(leaveId);
     }
+
+    public List<LeaveRespone> getAll(Integer emplyeeID){
+        return leaveRepository.findByEmployeeId(emplyeeID)
+                .stream().map(leaveMapper::toLeaveResponse).toList();
+    }
 }

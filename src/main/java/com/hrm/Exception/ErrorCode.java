@@ -55,7 +55,7 @@ public enum ErrorCode {
 	//lương
 	WAGECATE_EXISTED(502, "Danh mục lương đã tồn tại.", HttpStatus.BAD_REQUEST),
 	WAGECATE_NOT_EXISTED(504, "Danh mục lương không tồn tại.", HttpStatus.BAD_REQUEST),
-	WAGE_NOT_EXISTED(502, "Lương không tồn tại.", HttpStatus.BAD_REQUEST),
+	WAGE_NOT_EXISTED(504, "Lương không tồn tại.", HttpStatus.BAD_REQUEST),
 
 	// luong theo thang
 	PAYROLL_EMPLOYEE_EXISTED(502, "Nhân viên đã có bảng lương tháng.", HttpStatus.BAD_REQUEST),
@@ -63,13 +63,19 @@ public enum ErrorCode {
 	// ứng lương
 	ADVANCE_NOT_EXISTED(504, "Phiếu ứng lương không tồn tại.", HttpStatus.BAD_REQUEST),
 	ADVANCE_NOT_EDIT(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST),
+	ADVANCE_NOT_TOO_MONTH(503, "Lương cơ bản của bạn là %d, ứng lương không quá %d tháng lương.", HttpStatus.BAD_REQUEST),
 
 	// công thức lương
 	FORMULA_NOT_EXISTED(504, "Công thức không tồn tại.", HttpStatus.BAD_REQUEST),
 
 	//chấm công
 	TIME_NOT_EXISTED(504, "Không tồn tại.", HttpStatus.BAD_REQUEST),
-	TIME_EXISTED(504, "Bạn đã điểm danh rồi.", HttpStatus.BAD_REQUEST);
+	TIME_EXISTED(504, "Bạn đã điểm danh rồi.", HttpStatus.BAD_REQUEST),
+
+	// check cv
+	REQUIRE_NOT_EXISTED(504, "Yêu cầu chưa đã tồn tại.", HttpStatus.BAD_REQUEST),
+	CV_DISQUALIFIED(503, "CV đã bị từ chối.", HttpStatus.BAD_REQUEST),
+	REQUIRE_EXISTED(502, "Yêu cầu đã tồn tại.", HttpStatus.BAD_REQUEST);
 
 	ErrorCode(int code, String message, HttpStatusCode statusCode) {
 		this.code = code;

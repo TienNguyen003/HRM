@@ -21,6 +21,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -56,8 +57,7 @@ public class UserService {
 	}
 
 	public List<UserResponse> getAll(){
-		return userRepository.findAll()
-				.stream().map(userMapper::toUserResponse).toList();
+		return userRepository.findAllUserActive().stream().map(userMapper::toUserResponse).toList();
 	}
 
 	public List<UserResponse> getUsers(String name, String username, String department, String office, String role, int pageNumber, int pageSize){
@@ -77,6 +77,7 @@ public class UserService {
 				.build();
 	}
 
+	@PostAuthorize("returnObject.id == authentication.principal.getClaimAsString('id') or !hasRole('NHÂN')")
 	public UserResponse getUser(String id) {
 		return userMapper.toUserResponse(userRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED)));
@@ -109,15 +110,22 @@ public class UserService {
 		employeeRepository.deleteById(user.getEmployee().getId());
 	}
 
+	@PostAuthorize("returnObject.id == authentication.principal.getClaimAsString('id') or !hasRole('NHÂN')")
 	public UserResponse getInfo(){
 		var context = SecurityContextHolder.getContext();
 		String name = context.getAuthentication().getName();
-		User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
+		User user = userRepository.findByUsername(name)
+				.orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
 
 		return userMapper.toUserResponse(user);
 	}
 
 	public String rsPass(UserRsPass request) {
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//		User userLogin = (User) authentication.getPrincipal();
+//
+//		if(userLogin.getId().equals(request.getId()))
+//			throw new AppException(ErrorCode.UNAUTHORIZED);
 		User user = userRepository.findById(request.getId())
 				.orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
 

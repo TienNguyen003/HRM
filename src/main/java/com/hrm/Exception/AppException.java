@@ -1,19 +1,16 @@
 package com.hrm.Exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class AppException extends RuntimeException{
 	private ErrorCode errorCode;
 
-	public AppException(ErrorCode errorCode) {
-		super(errorCode.getMessage());
+	public AppException(ErrorCode errorCode, Object... args) {
+		super(String.format(errorCode.getMessage(), args));
 		this.errorCode = errorCode;
 	}
 
-	public ErrorCode getErrorCode() {
-		return errorCode;
-	}
-
-	public void setErrorCode(ErrorCode errorCode) {
-		this.errorCode = errorCode;
-	}
-	
 }
