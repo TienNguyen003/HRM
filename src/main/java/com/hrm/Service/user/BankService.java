@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -87,8 +88,9 @@ public class BankService {
 
     // tìm kiếm
     public List<BankRespone> searchAllB
-    (int pageNumber, int pageSize, String name, String nameDay, Integer status, Integer priority, Integer id) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
+    (int pageNumber, int pageSize, String name, String nameDay, Integer status, Integer priority, Integer id, String sort, String desc) {
+        Sort.Direction sortDirection = (desc.equals("desc")) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, Sort.by(sortDirection, sort));
         return bankRepository.findBankByNameAndNameBank(name, status, priority, nameDay, pageable, id)
                 .stream().map(bankMapper::toBankRespone).toList();
     }

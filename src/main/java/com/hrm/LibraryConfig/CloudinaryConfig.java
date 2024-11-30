@@ -1,4 +1,4 @@
-package com.hrm.Webconfig;
+package com.hrm.LibraryConfig;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;

@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +23,15 @@ import java.util.List;
 @Slf4j
 public class BankController {
     BankService bankService;
+    SimpMessagingTemplate messagingTemplate;
 
     @PreAuthorize("@requiredPermission.checkPermission('BANK_ADD')")
     @PostMapping
-    ApiResponse<BankRespone> create(@RequestBody @Valid BankRequest request) {
-        return ApiResponse.<BankRespone>builder()
-                .result(bankService.createB(request))
+    ApiResponse<String> create(@RequestBody @Valid BankRequest request) {
+        bankService.createB(request);
+        messagingTemplate.convertAndSend("/topic/bank", "tien");
+        return ApiResponse.<String>builder()
+                .result("Create success")
                 .build();
     }
 
@@ -38,9 +42,11 @@ public class BankController {
                                           @RequestParam(name = "status", required = false) Integer status,
                                           @RequestParam(name = "priority", required = false) Integer priority,
                                           @RequestParam(name = "nameBank", required = false) String nameBank,
-                                          @RequestParam(name = "id", required = false) Integer id) {
+                                          @RequestParam(name = "id", required = false) Integer id,
+                                          @RequestParam(name = "sort", required = false) String sort,
+                                          @RequestParam(name = "desc", required = false) String desc) {
             return ApiResponse.<List<BankRespone>>builder()
-                    .result(bankService.searchAllB(pageNumber, 30, name, nameBank, status, priority, id))
+                    .result(bankService.searchAllB(pageNumber, 30, name, nameBank, status, priority, id, sort, desc))
                     .page(bankService.getPagination(pageNumber, name, nameBank, status, priority, id))
                     .build();
     }
