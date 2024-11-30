@@ -73,7 +73,7 @@ public class CheckCVService {
                 if (!itemsWithRequireZero.isEmpty()) {
                     List<Map<String, String>> zeroRequirementResults = checkAgainstRequirements(content, text, itemsWithRequireZero);
 
-                    Map<String, String> lastMessage = zeroRequirementResults.getLast();
+                    Map<String, String> lastMessage = zeroRequirementResults.get(zeroRequirementResults.size() - 1);
                     flagTotal = lastMessage.get("flagTotal") != null ? Integer.parseInt(lastMessage.get("flagTotal")) : 0;
                     flagCheck = lastMessage.get("flagCheck") != null ? Integer.parseInt(lastMessage.get("flagCheck")): 0;
 
