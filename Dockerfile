@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-alpine3.12-jdk
+FROM amazoncorretto:17-alpine
 
 COPY target/hrm-0.0.1-SNAPSHOT.jar app.jar
 
