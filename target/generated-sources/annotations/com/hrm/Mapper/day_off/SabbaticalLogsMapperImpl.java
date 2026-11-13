@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
 )
 @Component
 public class SabbaticalLogsMapperImpl implements SabbaticalLogsMapper {
@@ -21,10 +21,10 @@ public class SabbaticalLogsMapperImpl implements SabbaticalLogsMapper {
 
         SabbaticalLeaveLogs.SabbaticalLeaveLogsBuilder sabbaticalLeaveLogs = SabbaticalLeaveLogs.builder();
 
-        sabbaticalLeaveLogs.content( request.getContent() );
-        sabbaticalLeaveLogs.fluctuatesTime( request.getFluctuatesTime() );
-        sabbaticalLeaveLogs.remaining( request.getRemaining() );
         sabbaticalLeaveLogs.updateTime( request.getUpdateTime() );
+        sabbaticalLeaveLogs.fluctuatesTime( request.getFluctuatesTime() );
+        sabbaticalLeaveLogs.content( request.getContent() );
+        sabbaticalLeaveLogs.remaining( request.getRemaining() );
 
         return sabbaticalLeaveLogs.build();
     }
@@ -37,12 +37,12 @@ public class SabbaticalLogsMapperImpl implements SabbaticalLogsMapper {
 
         SabbaticalLogsResponse.SabbaticalLogsResponseBuilder sabbaticalLogsResponse = SabbaticalLogsResponse.builder();
 
-        sabbaticalLogsResponse.content( dayOffCategories.getContent() );
-        sabbaticalLogsResponse.employee( dayOffCategories.getEmployee() );
-        sabbaticalLogsResponse.fluctuatesTime( dayOffCategories.getFluctuatesTime() );
         sabbaticalLogsResponse.id( dayOffCategories.getId() );
+        sabbaticalLogsResponse.content( dayOffCategories.getContent() );
+        sabbaticalLogsResponse.fluctuatesTime( dayOffCategories.getFluctuatesTime() );
         sabbaticalLogsResponse.remaining( dayOffCategories.getRemaining() );
         sabbaticalLogsResponse.updateTime( dayOffCategories.getUpdateTime() );
+        sabbaticalLogsResponse.employee( dayOffCategories.getEmployee() );
 
         return sabbaticalLogsResponse.build();
     }
@@ -53,9 +53,9 @@ public class SabbaticalLogsMapperImpl implements SabbaticalLogsMapper {
             return;
         }
 
-        sabbaticalLeaveLogs.setContent( request.getContent() );
-        sabbaticalLeaveLogs.setFluctuatesTime( request.getFluctuatesTime() );
-        sabbaticalLeaveLogs.setRemaining( request.getRemaining() );
         sabbaticalLeaveLogs.setUpdateTime( request.getUpdateTime() );
+        sabbaticalLeaveLogs.setFluctuatesTime( request.getFluctuatesTime() );
+        sabbaticalLeaveLogs.setContent( request.getContent() );
+        sabbaticalLeaveLogs.setRemaining( request.getRemaining() );
     }
 }

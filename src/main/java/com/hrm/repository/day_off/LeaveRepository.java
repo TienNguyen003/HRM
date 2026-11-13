@@ -22,4 +22,7 @@ public interface LeaveRepository extends JpaRepository<ApplicationLeave, Integer
             "(:status IS NULL OR al.status = :status)")
     Page<ApplicationLeave> findByNameContainingAndDayOffAndStatus(
             String name, Integer dayOff, Integer status, Pageable pageable, Integer employeeId);
+
+    // số đơn nghỉ theo trạng thái (dùng cho dashboard)
+    long countByStatus(int status);
 }

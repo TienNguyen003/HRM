@@ -18,4 +18,5 @@ public class UserResponse  {
     Employee employee;
     RoleResponse role;
     int status;
+    boolean mustChangePassword;
 }

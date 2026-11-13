@@ -69,6 +69,11 @@ public enum ErrorCode {
 	ADVANCE_NOT_TOO_MONTH(503, "Lương cơ bản của bạn là %d, ứng lương không quá %d tháng lương.", HttpStatus.BAD_REQUEST),
 	ADVANCE_NOT_TOO_TIME(503, "1 tháng chỉ được ứng lương %d lần.", HttpStatus.BAD_REQUEST),
 
+	// đơn từ mở rộng (tăng ca, công tác, từ xa)
+	EXTRA_NOT_EXISTED(504, "Đơn từ không tồn tại.", HttpStatus.NOT_FOUND),
+	EXTRA_NOT_EDIT(503, "Đơn từ đã được xử lý, không thể chỉnh sửa.", HttpStatus.BAD_REQUEST),
+	EXTRA_INVALID(500, "Thông tin đơn từ không hợp lệ.", HttpStatus.BAD_REQUEST),
+
 	// công thức lương
 	FORMULA_NOT_EXISTED(504, "Công thức không tồn tại.", HttpStatus.BAD_REQUEST),
 
@@ -76,10 +81,24 @@ public enum ErrorCode {
 	TIME_NOT_EXISTED(504, "Không tồn tại.", HttpStatus.BAD_REQUEST),
 	TIME_EXISTED(504, "Bạn đã chấm công rồi.", HttpStatus.BAD_REQUEST),
 
+	// đánh giá hiệu suất
+	REVIEW_NOT_EXISTED(504, "Đánh giá không tồn tại.", HttpStatus.NOT_FOUND),
+
+	// tuyển dụng
+	JOB_EXISTED(502, "Tin tuyển dụng đã tồn tại.", HttpStatus.BAD_REQUEST),
+	JOB_NOT_EXISTED(504, "Tin tuyển dụng không tồn tại.", HttpStatus.NOT_FOUND),
+
 	// check cv
 	REQUIRE_NOT_EXISTED(504, "Yêu cầu chưa đã tồn tại.", HttpStatus.BAD_REQUEST),
 	CV_DISQUALIFIED(503, "CV đã bị từ chối.", HttpStatus.BAD_REQUEST),
-	REQUIRE_EXISTED(502, "Yêu cầu đã tồn tại.", HttpStatus.BAD_REQUEST);
+	CV_NOT_EXISTED(504, "CV không tồn tại.", HttpStatus.NOT_FOUND),
+	REQUIRE_EXISTED(502, "Yêu cầu đã tồn tại.", HttpStatus.BAD_REQUEST),
+
+	// tài liệu
+	DOCUMENT_NOT_EXISTED(504, "Tài liệu không tồn tại.", HttpStatus.NOT_FOUND),
+
+	// nhiệm vụ
+	TASK_NOT_EXISTED(504, "Nhiệm vụ không tồn tại.", HttpStatus.NOT_FOUND);
 
 	ErrorCode(int code, String message, HttpStatusCode statusCode) {
 		this.code = code;

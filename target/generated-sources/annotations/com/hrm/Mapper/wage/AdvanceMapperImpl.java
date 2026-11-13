@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
 )
 @Component
 public class AdvanceMapperImpl implements AdvanceMapper {
@@ -22,10 +22,10 @@ public class AdvanceMapperImpl implements AdvanceMapper {
 
         Advance.AdvanceBuilder advance = Advance.builder();
 
-        advance.money( request.getMoney() );
-        advance.note( request.getNote() );
         advance.requestTime( request.getRequestTime() );
+        advance.money( request.getMoney() );
         advance.status( request.getStatus() );
+        advance.note( request.getNote() );
 
         return advance.build();
     }
@@ -53,14 +53,14 @@ public class AdvanceMapperImpl implements AdvanceMapper {
 
         AdvanceRespone.AdvanceResponeBuilder advanceRespone = AdvanceRespone.builder();
 
-        advanceRespone.approvalTime( advance.getApprovalTime() );
-        advanceRespone.approvedBy( advance.getApprovedBy() );
-        advanceRespone.employee( advance.getEmployee() );
         advanceRespone.id( advance.getId() );
-        advanceRespone.money( advance.getMoney() );
-        advanceRespone.note( advance.getNote() );
         advanceRespone.requestTime( advance.getRequestTime() );
+        advanceRespone.approvalTime( advance.getApprovalTime() );
+        advanceRespone.money( advance.getMoney() );
+        advanceRespone.approvedBy( advance.getApprovedBy() );
         advanceRespone.status( advance.getStatus() );
+        advanceRespone.note( advance.getNote() );
+        advanceRespone.employee( advance.getEmployee() );
 
         return advanceRespone.build();
     }
@@ -71,10 +71,10 @@ public class AdvanceMapperImpl implements AdvanceMapper {
             return;
         }
 
-        advance.setMoney( request.getMoney() );
-        advance.setNote( request.getNote() );
         advance.setRequestTime( request.getRequestTime() );
+        advance.setMoney( request.getMoney() );
         advance.setStatus( request.getStatus() );
+        advance.setNote( request.getNote() );
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.hrm.Mapper.job.AssessmentMapper;
 import com.hrm.dto.request.job.AssessmentRequest;
 import com.hrm.dto.response.job.AssessmentResponse;
 import com.hrm.repository.job.AssessmentRepository;
+import com.hrm.repository.job.RequireRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,7 @@ import java.util.List;
 public class AssessmentService {
     AssessmentRepository assessmentRepository;
     AssessmentMapper assessmentMapper;
+    RequireRepository requireRepository;
 
     // thêm
     public AssessmentResponse createAssess(AssessmentRequest request){
@@ -52,8 +54,11 @@ public class AssessmentService {
                 .orElseThrow(() -> new AppException(ErrorCode.REQUIRE_NOT_EXISTED)));
     }
 
-    // xóa
+    // xóa (xóa kèm các tiêu chí con để tránh dữ liệu mồ côi)
     public void deleteAssess(int assessId){
-        assessmentRepository.deleteById(assessId);
+        Assessment assessment = assessmentRepository.findById(assessId)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUIRE_NOT_EXISTED));
+        requireRepository.deleteAll(requireRepository.getByAssessmentId(assessId));
+        assessmentRepository.delete(assessment);
     }
 }

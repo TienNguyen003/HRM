@@ -1,5 +1,9 @@
 package com.hrm.Controller.day_off;
 
+import com.hrm.Entity.user.Employee;
+import com.hrm.Exception.AppException;
+import com.hrm.Exception.ErrorCode;
+import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.Service.day_off.LeaveService;
 import com.hrm.dto.request.leave.LeaveRequest;
 import com.hrm.dto.request.leave.LeaveUpdateRequest;
@@ -14,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -23,6 +28,7 @@ import java.util.List;
 @Slf4j
 public class LeaveController {
     LeaveService leaveService;
+    EmployeeRepository employeeRepository;
 
     @PreAuthorize("@requiredPermission.checkPermission('REQ_ADD')")
     @PostMapping
@@ -55,7 +61,10 @@ public class LeaveController {
                 .build();
     }
 
-//    @PreAuthorize("@requiredPermission.checkPermission('REQ_VIEW')")
+    @PreAuthorize(
+            "@requiredPermission.checkPermission('REQ_VIEW') or "
+                    + "@requiredPermission.checkPermission('REQ_ADD') or "
+                    + "@requiredPermission.checkPermission('REQ_APPROVALS')")
     @GetMapping
     ApiResponse<List<LeaveRespone>> searchAll(@RequestParam("pageNumber") int pageNumber,
                                               @RequestParam(name = "name", required = false) String name,
@@ -69,6 +78,10 @@ public class LeaveController {
                     .build();
     }
 
+    @PreAuthorize(
+            "@requiredPermission.checkPermission('REQ_VIEW') or "
+                    + "@requiredPermission.checkPermission('REQ_APPROVALS') or "
+                    + "@requiredPermission.checkPermission('ATTD_VIEW')")
     @GetMapping("/get")
     ApiResponse<List<LeaveRespone>> findAll(@RequestParam(name = " ", required = false) Integer employeeId){
 
@@ -83,6 +96,16 @@ public class LeaveController {
         leaveService.deleteLeave(leaveId);
         return ApiResponse.<String>builder()
                 .result("Day off has been deleted")
+                .build();
+    }
+
+    @PreAuthorize("ROLE_ROOT or @requiredPermission.checkPermission('REQ_EDIT')")
+    @GetMapping("/remaining-hours/{employeeId}")
+    ApiResponse<Map<String, Integer>> getRemainingHours(@PathVariable int employeeId){
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+        return ApiResponse.<Map<String, Integer>>builder()
+                .result(Map.of("remainingHours", employee.getVacationHours()))
                 .build();
     }
 }

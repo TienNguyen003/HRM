@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
 )
 @Component
 public class RequirementsMapperImpl implements RequirementsMapper {
@@ -21,8 +21,8 @@ public class RequirementsMapperImpl implements RequirementsMapper {
 
         Requirements.RequirementsBuilder requirements = Requirements.builder();
 
-        requirements.assessmentId( request.getAssessmentId() );
         requirements.title( request.getTitle() );
+        requirements.assessmentId( request.getAssessmentId() );
 
         return requirements.build();
     }
@@ -35,9 +35,9 @@ public class RequirementsMapperImpl implements RequirementsMapper {
 
         RequirementsResponse.RequirementsResponseBuilder requirementsResponse = RequirementsResponse.builder();
 
-        requirementsResponse.assessmentId( requirements.getAssessmentId() );
         requirementsResponse.id( requirements.getId() );
         requirementsResponse.title( requirements.getTitle() );
+        requirementsResponse.assessmentId( requirements.getAssessmentId() );
 
         return requirementsResponse.build();
     }
@@ -48,7 +48,7 @@ public class RequirementsMapperImpl implements RequirementsMapper {
             return;
         }
 
-        requirements.setAssessmentId( request.getAssessmentId() );
         requirements.setTitle( request.getTitle() );
+        requirements.setAssessmentId( request.getAssessmentId() );
     }
 }

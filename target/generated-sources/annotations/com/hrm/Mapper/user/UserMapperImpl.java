@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
 )
 @Component
 public class UserMapperImpl implements UserMapper {
@@ -28,9 +28,9 @@ public class UserMapperImpl implements UserMapper {
 
         User.UserBuilder user = User.builder();
 
+        user.username( request.getUsername() );
         user.password( request.getPassword() );
         user.status( request.getStatus() );
-        user.username( request.getUsername() );
 
         return user.build();
     }
@@ -43,11 +43,12 @@ public class UserMapperImpl implements UserMapper {
 
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
-        userResponse.employee( user.getEmployee() );
         userResponse.id( user.getId() );
+        userResponse.username( user.getUsername() );
+        userResponse.employee( user.getEmployee() );
         userResponse.role( roleToRoleResponse( user.getRole() ) );
         userResponse.status( user.getStatus() );
-        userResponse.username( user.getUsername() );
+        userResponse.mustChangePassword( user.isMustChangePassword() );
 
         return userResponse.build();
     }
@@ -66,8 +67,8 @@ public class UserMapperImpl implements UserMapper {
 
         PermissionResponse.PermissionResponseBuilder permissionResponse = PermissionResponse.builder();
 
-        permissionResponse.des( permission.getDes() );
         permissionResponse.name( permission.getName() );
+        permissionResponse.des( permission.getDes() );
 
         return permissionResponse.build();
     }
@@ -92,8 +93,8 @@ public class UserMapperImpl implements UserMapper {
 
         RoleResponse.RoleResponseBuilder roleResponse = RoleResponse.builder();
 
-        roleResponse.des( role.getDes() );
         roleResponse.name( role.getName() );
+        roleResponse.des( role.getDes() );
         roleResponse.permissions( permissionSetToPermissionResponseSet( role.getPermissions() ) );
 
         return roleResponse.build();

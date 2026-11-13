@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +19,9 @@ public interface ContractsRepository extends JpaRepository<Contracts, Integer>{
 			"(:name IS NULL OR c.employee.name LIKE %:name%)")
 	Page<Contracts> findByName
 			(String name, Integer status, Integer id, Pageable pageable);
+
+	// hợp đồng sắp đến ngày kết thúc (dùng cho nhắc việc)
+	@Query("SELECT c FROM Contracts c WHERE c.dismissal_date IS NOT NULL AND c.dismissal_date BETWEEN :from AND :to")
+	List<Contracts> findExpiring(@org.springframework.data.repository.query.Param("from") String from,
+								 @org.springframework.data.repository.query.Param("to") String to);
 }

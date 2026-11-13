@@ -30,4 +30,14 @@ public interface AdvanceRepository extends JpaRepository<Advance, Integer> {
             "(:endRequestTime IS NULL OR a.requestTime <= :endRequestTime) AND" +
             "(:id IS NULL OR a.employee.id = :id)")
     int money(Integer id, Integer status, LocalDateTime startRequestTime, LocalDateTime endRequestTime);
+
+    @Query("SELECT COALESCE(SUM(a.money), 0) FROM Advance a WHERE " +
+            "a.status = 1 AND " +
+            "a.requestTime >= :startRequestTime AND " +
+            "a.requestTime <= :endRequestTime AND " +
+            "a.employee.id = :id")
+    long totalApprovedMoney(Integer id, LocalDateTime startRequestTime, LocalDateTime endRequestTime);
+
+    // số phiếu ứng lương theo trạng thái (dùng cho dashboard)
+    long countByStatus(int status);
 }

@@ -44,6 +44,7 @@ public class TimeController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('ATTD_VIEW')")
     @GetMapping("/get")
     ApiResponse<List<TimeKeepingRespone>> getAll(){
         return ApiResponse.<List<TimeKeepingRespone>>builder()

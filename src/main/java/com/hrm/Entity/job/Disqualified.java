@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -23,4 +25,10 @@ public class Disqualified {
     String phone;
     String linkFile;
     int status;
+    LocalDateTime updateTime;
+
+    // pipeline tuyển dụng
+    Integer jobId;      // tin tuyển dụng đang theo (nullable)
+    int stage = 0;      // 0 mới, 1 sàng lọc, 2 phỏng vấn, 3 tuyển, 4 loại
+    String interviewTime;
 }

@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("${api.prefix}advances")
@@ -80,6 +81,15 @@ public class AdvanceController {
         advanceService.delete(advaceId);
         return ApiResponse.<String>builder()
                 .result("This advace has been deleted")
+                .build();
+    }
+
+    @PreAuthorize("ROLE_ROOT or @requiredPermission.checkPermission('ADV_ADD')")
+    @GetMapping("/quota/{employeeId}")
+    ApiResponse<Map<String, Object>> getQuota(@PathVariable int employeeId){
+        Map<String, Object> quota = advanceService.getQuotaInfo(employeeId);
+        return ApiResponse.<Map<String, Object>>builder()
+                .result(quota)
                 .build();
     }
 }

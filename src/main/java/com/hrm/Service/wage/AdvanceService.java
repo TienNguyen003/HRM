@@ -13,6 +13,7 @@ import com.hrm.dto.response.wage.AdvanceRespone;
 import com.hrm.repository.user.EmployeeRepository;
 import com.hrm.repository.wage.AdvanceRepository;
 import com.hrm.repository.wage.WageRepository;
+import com.hrm.Service.notification.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +28,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -36,21 +38,33 @@ public class AdvanceService {
     EmployeeRepository employeeRepository;
     WageRepository wageRepository;
     AdvanceMapper advanceMapper;
+    NotificationService notificationService;
+
+    // 1 tháng tối đa 3 lần ứng lương
+    private static final int ADVANCE_MAX_PER_MONTH = 3;
+    // số tiền ứng tối đa = 3 tháng lương cơ bản
+    private static final int ADVANCE_LIMIT_MONTHS_OF_SALARY = 3;
+    // danh mục lương cơ bản
+    private static final int BASIC_SALARY_CATEGORY_ID = 4;
 
     // thêm danh sách
     public AdvanceRespone create(AdvanceRequest request){
         Advance advance = advanceMapper.toAdvance(request);
-        int month = 3;
 
         int checkAdvance = advanceRepository.countAdvanceMonth(request.getEmployeeId(), request.getRequestTime());
-        if(checkAdvance > 2) throw new AppException(ErrorCode.ADVANCE_NOT_TOO_TIME, month);
+        if(checkAdvance >= ADVANCE_MAX_PER_MONTH)
+            throw new AppException(ErrorCode.ADVANCE_NOT_TOO_TIME, ADVANCE_MAX_PER_MONTH);
 
         advance.setEmployee(employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED)));
 
-        Wage wage = wageRepository.existsByEmployeeCate(request.getEmployeeId(), 4);
-        if(Long.parseLong(request.getMoney()) > Long.parseLong(wage.getSalary())*month)
-            throw new AppException(ErrorCode.ADVANCE_NOT_TOO_MONTH, Long.parseLong(wage.getSalary()), month);
+        Wage wage = wageRepository.existsByEmployeeCate(request.getEmployeeId(), BASIC_SALARY_CATEGORY_ID);
+        if(wage == null) throw new AppException(ErrorCode.WAGE_NOT_EXISTED);
+
+        long basicSalary = Long.parseLong(wage.getSalary());
+        long maxMoney = basicSalary * ADVANCE_LIMIT_MONTHS_OF_SALARY;
+        if(Long.parseLong(request.getMoney()) > maxMoney)
+            throw new AppException(ErrorCode.ADVANCE_NOT_TOO_MONTH, basicSalary, ADVANCE_LIMIT_MONTHS_OF_SALARY);
 
         return advanceMapper.toAdvanceRespone(advanceRepository.save(advance));
     }
@@ -80,6 +94,13 @@ public class AdvanceService {
         else {
             advanceMapper.updateAdvanceStt(advance, request);
             advanceRepository.save(advance);
+
+            // thông báo kết quả duyệt cho nhân viên
+            notificationService.pushToEmployee(advance.getEmployee(), "Kết quả ứng lương",
+                    request.getApprovedBy() + (request.getStatus() == 1 ? " đã duyệt phiếu ứng lương của bạn"
+                            : request.getStatus() == 2 ? " đã từ chối phiếu ứng lương của bạn"
+                            : " đã hủy phiếu ứng lương của bạn"),
+                    "/advances");
         }
 
         return advanceMapper.toAdvanceRespone(advance);
@@ -142,6 +163,27 @@ public class AdvanceService {
     // xóa
     public void delete(int advanceId){
         advanceRepository.deleteById(advanceId);
+    }
+    // lấy thông tin hạn mức ứng lương
+    public Map<String, Object> getQuotaInfo(int employeeId){
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
+        Wage wage = wageRepository.existsByEmployeeCate(employeeId, BASIC_SALARY_CATEGORY_ID);
+        if(wage == null) throw new AppException(ErrorCode.WAGE_NOT_EXISTED);
+        long basicSalary = Long.parseLong(wage.getSalary());
+        long maxMoney = basicSalary * ADVANCE_LIMIT_MONTHS_OF_SALARY;
+        YearMonth currentMonth = YearMonth.now();
+        int countThisMonth = advanceRepository.countAdvanceMonth(employeeId, currentMonth.atDay(1).atStartOfDay());
+        long totalApprovedThisMonth = advanceRepository.totalApprovedMoney(employeeId, currentMonth.atDay(1).atStartOfDay(), currentMonth.atEndOfMonth().atStartOfDay());
+        return Map.of(
+                "basicSalary", basicSalary,
+                "maxMoney", maxMoney,
+                "maxPerMonth", ADVANCE_MAX_PER_MONTH,
+                "countThisMonth", countThisMonth,
+                "remainingCount", Math.max(0, ADVANCE_MAX_PER_MONTH - countThisMonth),
+                "totalApprovedThisMonth", totalApprovedThisMonth,
+                "remainingMoney", Math.max(0, maxMoney - totalApprovedThisMonth)
+        );
     }
 
 }

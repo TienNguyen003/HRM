@@ -19,6 +19,7 @@ public class User {
 	String username;
 	String password;
 	int status;
+	boolean mustChangePassword = true;
 
 	@OneToOne
 	Employee employee;

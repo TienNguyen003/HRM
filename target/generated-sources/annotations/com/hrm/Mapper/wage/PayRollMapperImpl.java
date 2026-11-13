@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
 )
 @Component
 public class PayRollMapperImpl implements PayRollMapper {
@@ -21,10 +21,10 @@ public class PayRollMapperImpl implements PayRollMapper {
 
         Payroll.PayrollBuilder payroll = Payroll.builder();
 
-        payroll.advance( request.getAdvance() );
-        payroll.status( request.getStatus() );
         payroll.time( request.getTime() );
+        payroll.advance( request.getAdvance() );
         payroll.totalSalary( request.getTotalSalary() );
+        payroll.status( request.getStatus() );
 
         return payroll.build();
     }
@@ -37,13 +37,13 @@ public class PayRollMapperImpl implements PayRollMapper {
 
         PayrollRespone.PayrollResponeBuilder payrollRespone = PayrollRespone.builder();
 
-        payrollRespone.advance( payroll.getAdvance() );
-        payrollRespone.bank( payroll.getBank() );
-        payrollRespone.employee( payroll.getEmployee() );
         payrollRespone.id( payroll.getId() );
-        payrollRespone.status( payroll.getStatus() );
         payrollRespone.time( payroll.getTime() );
+        payrollRespone.advance( payroll.getAdvance() );
         payrollRespone.totalSalary( payroll.getTotalSalary() );
+        payrollRespone.status( payroll.getStatus() );
+        payrollRespone.employee( payroll.getEmployee() );
+        payrollRespone.bank( payroll.getBank() );
 
         return payrollRespone.build();
     }
@@ -54,9 +54,9 @@ public class PayRollMapperImpl implements PayRollMapper {
             return;
         }
 
-        payroll.setAdvance( request.getAdvance() );
-        payroll.setStatus( request.getStatus() );
         payroll.setTime( request.getTime() );
+        payroll.setAdvance( request.getAdvance() );
         payroll.setTotalSalary( request.getTotalSalary() );
+        payroll.setStatus( request.getStatus() );
     }
 }

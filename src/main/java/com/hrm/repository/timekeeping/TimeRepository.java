@@ -19,6 +19,9 @@ public interface TimeRepository extends JpaRepository<TimeKeeping, Integer> {
             "(:date IS NULL OR t.date = :date)")
     TimeKeeping getTimeKeeping(int id, String date);
 
+    // số lượt chấm công trong ngày (dùng cho dashboard)
+    int countByDate(String date);
+
     @Query("SELECT t FROM TimeKeeping t WHERE" +
             "(:department IS NULL OR t.employee.department.name LIKE %:department%) AND" +
             "(:office IS NULL OR t.employee.department.officeI.name LIKE %:office%) AND" +

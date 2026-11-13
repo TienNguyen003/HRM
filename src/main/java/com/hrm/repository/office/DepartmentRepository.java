@@ -20,4 +20,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
             "(:shortName IS NULL OR d.shortName LIKE %:shortName%) AND " +
             "(:status IS NULL OR d.status = :status)")
     Page<Department> findByNameAndStatus(String name, String shortName, Integer status, Pageable pageable);
+
+    // số phòng ban theo trạng thái (dùng cho dashboard)
+    long countByStatus(int status);
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
 )
 @Component
 public class DayOffMapperImpl implements DayOffMapper {
@@ -23,9 +23,9 @@ public class DayOffMapperImpl implements DayOffMapper {
         DayOffCategories.DayOffCategoriesBuilder dayOffCategories = DayOffCategories.builder();
 
         dayOffCategories.nameDay( request.getNameDay() );
-        dayOffCategories.status( request.getStatus() );
         dayOffCategories.timeDay( request.getTimeDay() );
         dayOffCategories.timeUpdate( request.getTimeUpdate() );
+        dayOffCategories.status( request.getStatus() );
 
         return dayOffCategories.build();
     }
@@ -40,9 +40,9 @@ public class DayOffMapperImpl implements DayOffMapper {
 
         dayOffResponse.id( dayOffCategories.getId() );
         dayOffResponse.nameDay( dayOffCategories.getNameDay() );
-        dayOffResponse.status( dayOffCategories.getStatus() );
         dayOffResponse.timeDay( dayOffCategories.getTimeDay() );
         dayOffResponse.timeUpdate( dayOffCategories.getTimeUpdate() );
+        dayOffResponse.status( dayOffCategories.getStatus() );
 
         return dayOffResponse.build();
     }
@@ -54,9 +54,9 @@ public class DayOffMapperImpl implements DayOffMapper {
         }
 
         dayOffCategories.setNameDay( request.getNameDay() );
-        dayOffCategories.setStatus( request.getStatus() );
         dayOffCategories.setTimeDay( request.getTimeDay() );
         dayOffCategories.setTimeUpdate( request.getTimeUpdate() );
+        dayOffCategories.setStatus( request.getStatus() );
     }
 
     @Override

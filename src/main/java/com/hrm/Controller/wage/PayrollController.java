@@ -38,6 +38,7 @@ public class PayrollController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SALA_VIEW')")
     @GetMapping("/wage")
     ApiResponse<PayrollRespone> getWage(@RequestParam int id){
         return ApiResponse.<PayrollRespone>builder()

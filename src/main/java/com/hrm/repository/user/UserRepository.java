@@ -20,6 +20,9 @@ public interface UserRepository extends JpaRepository<User, String>{
 	@Query("SELECT u FROM User u WHERE u.status = 1")
 	List<User> findAllUserActive();
 
+	@Query("SELECT u FROM User u WHERE u.employee.id = :employeeId")
+	Optional<User> findByEmployeeId(int employeeId);
+
 	@Query("SELECT u FROM User u WHERE" +
 			"(:username IS NULL OR u.username LIKE %:username%) AND" +
 			"(:department IS NULL OR u.employee.department.name LIKE %:department%) AND" +

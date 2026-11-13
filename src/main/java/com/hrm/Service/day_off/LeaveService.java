@@ -3,6 +3,7 @@ package com.hrm.Service.day_off;
 import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.day_off.ApplicationLeave;
 import com.hrm.Entity.day_off.DayOffCategories;
+import com.hrm.Entity.day_off.SabbaticalLeaveLogs;
 import com.hrm.Entity.user.Employee;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
@@ -12,7 +13,9 @@ import com.hrm.dto.request.leave.LeaveUpdateRequest;
 import com.hrm.dto.response.day_off.LeaveRespone;
 import com.hrm.repository.day_off.DayOffRepository;
 import com.hrm.repository.day_off.LeaveRepository;
+import com.hrm.repository.day_off.SabLogsRepository;
 import com.hrm.repository.user.EmployeeRepository;
+import com.hrm.Service.notification.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,6 +35,8 @@ public class LeaveService {
     LeaveMapper leaveMapper;
     EmployeeRepository employeeRepository;
     DayOffRepository dayOffRepository;
+    SabLogsRepository sabLogsRepository;
+    NotificationService notificationService;
 
     // tạo đơn xin nghỉ
     public LeaveRespone createLeave(LeaveRequest leaveRequest){
@@ -83,6 +89,25 @@ public class LeaveService {
             }
             employeeRepository.save(employee);
             leaveRepository.save(applicationLeave);
+
+            // Create sabbatical log automatically on status update
+            SabbaticalLeaveLogs log = SabbaticalLeaveLogs.builder()
+                    .updateTime(LocalDateTime.now())
+                    .fluctuatesTime(request.getTime())
+                    .content(request.getNameApproval() + (request.getStatus() == 1 ? " đã duyệt đơn xin nghỉ" :
+                            request.getStatus() == 2 ? " đã từ chối đơn xin nghỉ" :
+                            " đã hủy đơn xin nghỉ"))
+                    .remaining(employee.getVacationHours())
+                    .employee(employee)
+                    .build();
+            sabLogsRepository.save(log);
+
+            // thông báo kết quả duyệt cho nhân viên
+            notificationService.pushToEmployee(employee, "Kết quả đơn nghỉ phép",
+                    request.getNameApproval() + (request.getStatus() == 1 ? " đã duyệt đơn nghỉ phép của bạn"
+                            : request.getStatus() == 2 ? " đã từ chối đơn nghỉ phép của bạn"
+                            : " đã hủy đơn nghỉ phép của bạn"),
+                    "/day_off_letters");
         }
 
 

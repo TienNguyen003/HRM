@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 public class AssessController {
     AssessmentService assessService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_ADD')")
     @PostMapping
     ApiResponse<AssessmentResponse> create(@RequestBody @Valid AssessmentRequest request){
         return ApiResponse.<AssessmentResponse>builder()
@@ -26,6 +28,7 @@ public class AssessController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_VIEW')")
     @GetMapping
     ApiResponse<List<AssessmentResponse>> getAll(){
         return ApiResponse.<List<AssessmentResponse>>builder()
@@ -33,6 +36,7 @@ public class AssessController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_VIEW')")
     @GetMapping("/assess")
     ApiResponse<AssessmentResponse> getDay(@RequestParam int assessId){
         return ApiResponse.<AssessmentResponse>builder()
@@ -40,6 +44,7 @@ public class AssessController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_EDIT')")
     @PutMapping
     ApiResponse<AssessmentResponse> update(@RequestParam int assessId,@RequestBody @Valid AssessmentRequest request){
         return ApiResponse.<AssessmentResponse>builder()
@@ -47,6 +52,7 @@ public class AssessController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int assessId){
         assessService.deleteAssess(assessId);

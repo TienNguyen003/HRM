@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 public class RequireController {
     RequireService requireService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_ADD')")
     @PostMapping
     ApiResponse<RequirementsResponse> create(@RequestBody @Valid RequirementsRequest request){
         return ApiResponse.<RequirementsResponse>builder()
@@ -26,6 +28,7 @@ public class RequireController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_VIEW')")
     @GetMapping
     ApiResponse<List<RequirementsResponse>> getAll(){
         return ApiResponse.<List<RequirementsResponse>>builder()
@@ -33,6 +36,7 @@ public class RequireController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_VIEW')")
     @GetMapping("/require")
     ApiResponse<RequirementsResponse> getDay(@RequestParam int requireId){
         return ApiResponse.<RequirementsResponse>builder()
@@ -40,6 +44,7 @@ public class RequireController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_VIEW')")
     @GetMapping("/assess")
     ApiResponse<List<RequirementsResponse>> getByAssessId(@RequestParam int assessId){
         return ApiResponse.<List<RequirementsResponse>>builder()
@@ -47,6 +52,7 @@ public class RequireController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_EDIT')")
     @PutMapping
     ApiResponse<RequirementsResponse> update(@RequestParam int requireId,@RequestBody @Valid RequirementsRequest request){
         return ApiResponse.<RequirementsResponse>builder()
@@ -54,6 +60,7 @@ public class RequireController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('CV_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int requireId){
         requireService.deleteRequire(requireId);

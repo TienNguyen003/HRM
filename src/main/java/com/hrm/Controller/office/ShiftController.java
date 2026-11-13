@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 public class ShiftController {
     ShiftService shiftService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_ADD')")
     @PostMapping
     ApiResponse<ShiftResponse> create(@RequestBody @Valid ShiftRequest request){
         return ApiResponse.<ShiftResponse>builder()
@@ -33,6 +35,7 @@ public class ShiftController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_EDIT')")
     @PutMapping
     ApiResponse<ShiftResponse> update(@RequestParam int shiftId,@RequestBody @Valid ShiftRequest request){
         return ApiResponse.<ShiftResponse>builder()
@@ -40,6 +43,7 @@ public class ShiftController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('OFF_DELETE')")
     @DeleteMapping
     ApiResponse<String> delete (@RequestParam int shiftId){
         shiftService.delete(shiftId);

@@ -89,7 +89,9 @@ public class TimeService {
 				.build();
 	}
 
-	@PostAuthorize("returnObject.employee.id == authentication.principal.getClaimAsString('idE') or !hasRole('NHÂN')")
+	@PostAuthorize("authentication.principal.getClaim('idE') != null and "
+			+ "(returnObject.employee.id == authentication.principal.getClaim('idE') "
+			+ "or @requiredPermission.checkPermission('ATTD_EDIT'))")
 	public TimeKeepingRespone getTime(int id) {
 		return keepingMapper.toKeepingRespone(timeRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.TIME_NOT_EXISTED)));

@@ -52,6 +52,7 @@ public class UserService {
 				.orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 		User user = userMapper.toUser(request);
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setMustChangePassword(true);
 
 		user.setRole(role);
 		user.setEmployee(employee);
@@ -145,6 +146,7 @@ public class UserService {
 		if(passwordEncoder.matches(request.getNew_pass(), user.getPassword()))
 			throw new AppException(ErrorCode.PASSWORD_NO_MATCH);
 		user.setPassword(passwordEncoder.encode(request.getNew_pass()));
+        user.setMustChangePassword(false);
 		userRepository.save(user);
 
 		return "Change success";
@@ -154,6 +156,7 @@ public class UserService {
 		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
 
+        user.setMustChangePassword(true);
 		user.setPassword(passwordEncoder.encode(new_pass));
 		userRepository.save(user);
 
