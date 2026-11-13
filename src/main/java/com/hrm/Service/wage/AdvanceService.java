@@ -40,12 +40,15 @@ public class AdvanceService {
     // thêm danh sách
     public AdvanceRespone create(AdvanceRequest request){
         Advance advance = advanceMapper.toAdvance(request);
+        int month = 3;
+
+        int checkAdvance = advanceRepository.countAdvanceMonth(request.getEmployeeId(), request.getRequestTime());
+        if(checkAdvance > 2) throw new AppException(ErrorCode.ADVANCE_NOT_TOO_TIME, month);
 
         advance.setEmployee(employeeRepository.findById(request.getEmployeeId())
                 .orElseThrow(() -> new AppException(ErrorCode.ADVANCE_NOT_EXISTED)));
 
         Wage wage = wageRepository.existsByEmployeeCate(request.getEmployeeId(), 4);
-        int month = 3;
         if(Long.parseLong(request.getMoney()) > Long.parseLong(wage.getSalary())*month)
             throw new AppException(ErrorCode.ADVANCE_NOT_TOO_MONTH, Long.parseLong(wage.getSalary()), month);
 

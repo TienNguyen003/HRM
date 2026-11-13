@@ -38,7 +38,7 @@ public class CheckCVService {
                 Map<String, String> info = getInfo(content);
 
                 boolean checkCVExit = disqualifiedService.getDisqualified(info.get("email"), info.get("phone"));
-                if(checkCVExit) {
+                if (checkCVExit) {
                     Map<String, Object> result = new HashMap<>();
                     result.put("fileName", files.getOriginalFilename());
                     result.put("requirements", "CV đã bị loại");
@@ -75,7 +75,7 @@ public class CheckCVService {
 
                     Map<String, String> lastMessage = zeroRequirementResults.get(zeroRequirementResults.size() - 1);
                     flagTotal = lastMessage.get("flagTotal") != null ? Integer.parseInt(lastMessage.get("flagTotal")) : 0;
-                    flagCheck = lastMessage.get("flagCheck") != null ? Integer.parseInt(lastMessage.get("flagCheck")): 0;
+                    flagCheck = lastMessage.get("flagCheck") != null ? Integer.parseInt(lastMessage.get("flagCheck")) : 0;
 
                     matchesRequirements.addAll(zeroRequirementResults);
                 }
@@ -83,10 +83,12 @@ public class CheckCVService {
                 boolean flagRemove = flagCheck + flagRequireObliCount > (flagTotal + flagRequireObli) / 2;
 
                 Disqualified disqualified = Disqualified.builder()
-                                            .dob(info.get("dob"))
-                                            .email(info.get("email"))
-                                            .phone(info.get("phone")).build();
-                if(!flagRemove) disqualifiedService.createDisqualified(disqualified, files, files.getName());
+                        .dob(info.get("dob"))
+                        .email(info.get("email"))
+                        .phone(info.get("phone"))
+                        .status(flagRemove ? 1 : 2)
+                        .build();
+                disqualifiedService.createDisqualified(disqualified, files, files.getName());
 
                 Map<String, Object> result = new HashMap<>();
                 result.put("fileName", files.getOriginalFilename());
@@ -194,7 +196,7 @@ public class CheckCVService {
             String substring = content.substring((int) start, (int) end);
             boolean contains = substring.toLowerCase().contains(keyword.toLowerCase());
             String message = String.format("Từ khóa \"%s\" %s trong phần %s", keyword, contains ? "xuất hiện" : "không xuất hiện", name);
-            if(contains) flagCount++;
+            if (contains) flagCount++;
             Map<String, String> newItem = new HashMap<>();
             newItem.put("message", message);
 

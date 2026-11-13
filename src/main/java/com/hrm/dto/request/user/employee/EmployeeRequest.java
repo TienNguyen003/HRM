@@ -38,15 +38,15 @@ public class EmployeeRequest {
 
     int shift_id;
 
-    @NotNull(message = "Thời gian ần làm không được để trống")
+    @NotNull(message = "Thời gian cần làm không được để trống")
     @Min(value = 0, message = "Thời gian ần làm phải lớn hơn 0")
-    int vacationTime;
+    float vacationTime;
 
     @NotNull(message = "Thời gian không được để trống")
     @Min(value = 0, message = "Thời gian phải lớn hơn 0")
     int hourOff;
 
-    @NotNull(message = "Số gi nghỉ phép không được để trống")
+    @NotNull(message = "Số giờ nghỉ phép không được để trống")
     @Min(value = 1, message = "Số giờ nghỉ phép phải lớn hơn 0")
     int vacationHours;
 

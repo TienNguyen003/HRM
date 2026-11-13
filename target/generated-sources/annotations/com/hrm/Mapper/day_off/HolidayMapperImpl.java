@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class HolidayMapperImpl implements HolidayMapper {
@@ -21,9 +21,9 @@ public class HolidayMapperImpl implements HolidayMapper {
 
         Holiday.HolidayBuilder holiday = Holiday.builder();
 
+        holiday.endTime( request.getEndTime() );
         holiday.name( request.getName() );
         holiday.startTime( request.getStartTime() );
-        holiday.endTime( request.getEndTime() );
         holiday.totalTime( request.getTotalTime() );
 
         return holiday.build();
@@ -37,10 +37,10 @@ public class HolidayMapperImpl implements HolidayMapper {
 
         HolidayResponse.HolidayResponseBuilder holidayResponse = HolidayResponse.builder();
 
+        holidayResponse.endTime( holiday.getEndTime() );
         holidayResponse.id( holiday.getId() );
         holidayResponse.name( holiday.getName() );
         holidayResponse.startTime( holiday.getStartTime() );
-        holidayResponse.endTime( holiday.getEndTime() );
         holidayResponse.totalTime( holiday.getTotalTime() );
 
         return holidayResponse.build();
@@ -52,9 +52,9 @@ public class HolidayMapperImpl implements HolidayMapper {
             return;
         }
 
+        holiday.setEndTime( request.getEndTime() );
         holiday.setName( request.getName() );
         holiday.setStartTime( request.getStartTime() );
-        holiday.setEndTime( request.getEndTime() );
         holiday.setTotalTime( request.getTotalTime() );
     }
 }

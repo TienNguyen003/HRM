@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 2003
 
 spring:
   datasource:
@@ -11,9 +11,9 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       dialect: org.hibernate.dialect.MySQL8Dialect
-    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
+#    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
 
   mail:
     host: smtp.gmail.com

@@ -11,6 +11,8 @@ public enum ErrorCode {
 	UNAUTHENTICATED(504, "Unauthenticated", HttpStatus.UNAUTHORIZED),
 	UNAUTHORIZED(505, "You don't have permission", HttpStatus.FORBIDDEN),
 
+	ACCOUNT_EXISTED(504, "Nhân viên đã có tài khoản.", HttpStatus.NOT_FOUND),
+
 	// user name
 	USERNAME_INVALID(500, "Tên đăng nhập phải có ít nhất 6 kí tự.", HttpStatus.BAD_REQUEST),
 	USERNAME_NOT_EXISTED(504, "Tên đăng nhập không chính xác.", HttpStatus.NOT_FOUND),
@@ -26,6 +28,7 @@ public enum ErrorCode {
 
 	// nhân viên
 	EMPLOYEE_NOT_EXISTED(504, "Nhân viên không tồn tại.", HttpStatus.NOT_FOUND),
+	EMPLOYEE_EXISTED(504, "Nhân viên đã tồn tại.", HttpStatus.NOT_FOUND),
 
 	// quyền
 	ROLE_EXISTED(502, "Quyền đã tồn tại.", HttpStatus.BAD_REQUEST),
@@ -64,13 +67,14 @@ public enum ErrorCode {
 	ADVANCE_NOT_EXISTED(504, "Phiếu ứng lương không tồn tại.", HttpStatus.BAD_REQUEST),
 	ADVANCE_NOT_EDIT(503, "Thông tin không thể chỉnh sửa.", HttpStatus.BAD_REQUEST),
 	ADVANCE_NOT_TOO_MONTH(503, "Lương cơ bản của bạn là %d, ứng lương không quá %d tháng lương.", HttpStatus.BAD_REQUEST),
+	ADVANCE_NOT_TOO_TIME(503, "1 tháng chỉ được ứng lương %d lần.", HttpStatus.BAD_REQUEST),
 
 	// công thức lương
 	FORMULA_NOT_EXISTED(504, "Công thức không tồn tại.", HttpStatus.BAD_REQUEST),
 
 	//chấm công
 	TIME_NOT_EXISTED(504, "Không tồn tại.", HttpStatus.BAD_REQUEST),
-	TIME_EXISTED(504, "Bạn đã điểm danh rồi.", HttpStatus.BAD_REQUEST),
+	TIME_EXISTED(504, "Bạn đã chấm công rồi.", HttpStatus.BAD_REQUEST),
 
 	// check cv
 	REQUIRE_NOT_EXISTED(504, "Yêu cầu chưa đã tồn tại.", HttpStatus.BAD_REQUEST),

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class WageCateMapperImpl implements WageCateMapper {
@@ -22,8 +22,8 @@ public class WageCateMapperImpl implements WageCateMapper {
         WageCategories.WageCategoriesBuilder wageCategories = WageCategories.builder();
 
         wageCategories.name( request.getName() );
-        wageCategories.symbol( request.getSymbol() );
         wageCategories.salaryType( request.getSalaryType() );
+        wageCategories.symbol( request.getSymbol() );
 
         return wageCategories.build();
     }
@@ -38,8 +38,8 @@ public class WageCateMapperImpl implements WageCateMapper {
 
         wageCateRespone.id( wageCategories.getId() );
         wageCateRespone.name( wageCategories.getName() );
-        wageCateRespone.symbol( wageCategories.getSymbol() );
         wageCateRespone.salaryType( wageCategories.getSalaryType() );
+        wageCateRespone.symbol( wageCategories.getSymbol() );
 
         return wageCateRespone.build();
     }
@@ -51,7 +51,7 @@ public class WageCateMapperImpl implements WageCateMapper {
         }
 
         wageCategories.setName( request.getName() );
-        wageCategories.setSymbol( request.getSymbol() );
         wageCategories.setSalaryType( request.getSalaryType() );
+        wageCategories.setSymbol( request.getSymbol() );
     }
 }

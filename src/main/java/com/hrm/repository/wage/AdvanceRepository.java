@@ -18,6 +18,12 @@ public interface AdvanceRepository extends JpaRepository<Advance, Integer> {
     Page<Advance> findByNameAndStatus
             (String name, Integer status, Integer id, Pageable pageable);
 
+    @Query("SELECT COUNT(a) FROM Advance a WHERE " +
+            "(:id IS NULL OR a.employee.id = :id) AND " +
+            "(:time IS NULL OR (FUNCTION('MONTH', a.requestTime) = FUNCTION('MONTH', :time) " +
+            "AND FUNCTION('YEAR', a.requestTime) = FUNCTION('YEAR', :time)))")
+    int countAdvanceMonth(Integer id, LocalDateTime time);
+
     @Query("SELECT SUM(money) FROM Advance a WHERE" +
             "(:status IS NULL OR a.status = :status) AND" +
             "(:startRequestTime IS NULL OR a.requestTime >= :startRequestTime) AND" +

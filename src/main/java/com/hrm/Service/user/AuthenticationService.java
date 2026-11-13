@@ -173,7 +173,7 @@ public class AuthenticationService {
 
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
-                stringJoiner.add("ROLE_" + user.getRole().getName());
+                stringJoiner.add("ROLE_" + user.getRole().getName().replace(" ", "_"));
                 if (!CollectionUtils.isEmpty(user.getRole().getPermissions()))
                     user.getRole().getPermissions().forEach(permission -> {
                         stringJoiner.add(permission.getName());

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class BankMapperImpl implements BankMapper {
@@ -23,8 +23,8 @@ public class BankMapperImpl implements BankMapper {
         Bank.BankBuilder bank = Bank.builder();
 
         bank.nameBank( request.getNameBank() );
-        bank.owner( request.getOwner() );
         bank.numberBank( request.getNumberBank() );
+        bank.owner( request.getOwner() );
         bank.priority( request.getPriority() );
         bank.status( request.getStatus() );
 
@@ -39,13 +39,13 @@ public class BankMapperImpl implements BankMapper {
 
         BankRespone.BankResponeBuilder bankRespone = BankRespone.builder();
 
+        bankRespone.employee( bank.getEmployee() );
         bankRespone.id( bank.getId() );
         bankRespone.nameBank( bank.getNameBank() );
-        bankRespone.owner( bank.getOwner() );
         bankRespone.numberBank( bank.getNumberBank() );
+        bankRespone.owner( bank.getOwner() );
         bankRespone.priority( bank.getPriority() );
         bankRespone.status( bank.getStatus() );
-        bankRespone.employee( bank.getEmployee() );
 
         return bankRespone.build();
     }
@@ -57,8 +57,8 @@ public class BankMapperImpl implements BankMapper {
         }
 
         bank.setNameBank( request.getNameBank() );
-        bank.setOwner( request.getOwner() );
         bank.setNumberBank( request.getNumberBank() );
+        bank.setOwner( request.getOwner() );
         bank.setPriority( request.getPriority() );
         bank.setStatus( request.getStatus() );
     }
@@ -70,8 +70,8 @@ public class BankMapperImpl implements BankMapper {
         }
 
         bank.setNameBank( request.getNameBank() );
-        bank.setOwner( request.getOwner() );
         bank.setNumberBank( request.getNumberBank() );
+        bank.setOwner( request.getOwner() );
         bank.setPriority( request.getPriority() );
     }
 }

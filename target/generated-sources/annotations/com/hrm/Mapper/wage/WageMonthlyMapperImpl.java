@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class WageMonthlyMapperImpl implements WageMonthlyMapper {
@@ -21,8 +21,8 @@ public class WageMonthlyMapperImpl implements WageMonthlyMapper {
 
         WageMonthly.WageMonthlyBuilder wageMonthly = WageMonthly.builder();
 
-        wageMonthly.time( request.getTime() );
         wageMonthly.salary( request.getSalary() );
+        wageMonthly.time( request.getTime() );
 
         return wageMonthly.build();
     }
@@ -35,11 +35,11 @@ public class WageMonthlyMapperImpl implements WageMonthlyMapper {
 
         WageMonthlyRespone.WageMonthlyResponeBuilder wageMonthlyRespone = WageMonthlyRespone.builder();
 
-        wageMonthlyRespone.id( wageMonthly.getId() );
-        wageMonthlyRespone.time( wageMonthly.getTime() );
-        wageMonthlyRespone.salary( wageMonthly.getSalary() );
-        wageMonthlyRespone.wageCategories( wageMonthly.getWageCategories() );
         wageMonthlyRespone.employee( wageMonthly.getEmployee() );
+        wageMonthlyRespone.id( wageMonthly.getId() );
+        wageMonthlyRespone.salary( wageMonthly.getSalary() );
+        wageMonthlyRespone.time( wageMonthly.getTime() );
+        wageMonthlyRespone.wageCategories( wageMonthly.getWageCategories() );
 
         return wageMonthlyRespone.build();
     }
@@ -50,7 +50,7 @@ public class WageMonthlyMapperImpl implements WageMonthlyMapper {
             return;
         }
 
-        wageMonthly.setTime( request.getTime() );
         wageMonthly.setSalary( request.getSalary() );
+        wageMonthly.setTime( request.getTime() );
     }
 }

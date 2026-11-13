@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ContractsRepository extends JpaRepository<Contracts, Integer>{
 	@Query("SELECT c FROM Contracts c WHERE" +
-			"(:status IS NULL OR c.status = :status%) AND" +
+			"(:status IS NULL OR c.status = :status) AND" +
 			"(:id IS NULL OR c.employee.id = :id) AND"+
 			"(:name IS NULL OR c.employee.name LIKE %:name%)")
 	Page<Contracts> findByName

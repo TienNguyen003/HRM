@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class EmployeeMapperImpl implements EmployeeMapper {
@@ -21,17 +21,17 @@ public class EmployeeMapperImpl implements EmployeeMapper {
 
         Employee.EmployeeBuilder employee = Employee.builder();
 
-        employee.name( request.getName() );
-        employee.email( request.getEmail() );
-        employee.phone_number( request.getPhone_number() );
-        employee.gender( request.getGender() );
-        employee.image( request.getImage() );
         employee.birth_date( request.getBirth_date() );
-        employee.joined_date( request.getJoined_date() );
-        employee.shift_id( request.getShift_id() );
-        employee.vacationTime( request.getVacationTime() );
+        employee.email( request.getEmail() );
+        employee.gender( request.getGender() );
         employee.hourOff( request.getHourOff() );
+        employee.image( request.getImage() );
+        employee.joined_date( request.getJoined_date() );
+        employee.name( request.getName() );
+        employee.phone_number( request.getPhone_number() );
+        employee.shift_id( request.getShift_id() );
         employee.vacationHours( request.getVacationHours() );
+        employee.vacationTime( request.getVacationTime() );
 
         return employee.build();
     }
@@ -44,21 +44,21 @@ public class EmployeeMapperImpl implements EmployeeMapper {
 
         EmployeeRespone.EmployeeResponeBuilder employeeRespone = EmployeeRespone.builder();
 
-        employeeRespone.id( employee.getId() );
-        employeeRespone.name( employee.getName() );
-        employeeRespone.email( employee.getEmail() );
-        employeeRespone.phone_number( employee.getPhone_number() );
-        employeeRespone.gender( employee.getGender() );
-        employeeRespone.image( employee.getImage() );
         employeeRespone.birth_date( employee.getBirth_date() );
-        employeeRespone.joined_date( employee.getJoined_date() );
-        employeeRespone.shift_id( employee.getShift_id() );
-        employeeRespone.vacationTime( employee.getVacationTime() );
-        employeeRespone.hourOff( employee.getHourOff() );
-        employeeRespone.vacationHours( employee.getVacationHours() );
-        employeeRespone.timekeeping( employee.getTimekeeping() );
         employeeRespone.department( employee.getDepartment() );
+        employeeRespone.email( employee.getEmail() );
         employeeRespone.formula( employee.getFormula() );
+        employeeRespone.gender( employee.getGender() );
+        employeeRespone.hourOff( employee.getHourOff() );
+        employeeRespone.id( employee.getId() );
+        employeeRespone.image( employee.getImage() );
+        employeeRespone.joined_date( employee.getJoined_date() );
+        employeeRespone.name( employee.getName() );
+        employeeRespone.phone_number( employee.getPhone_number() );
+        employeeRespone.shift_id( employee.getShift_id() );
+        employeeRespone.timekeeping( employee.getTimekeeping() );
+        employeeRespone.vacationHours( employee.getVacationHours() );
+        employeeRespone.vacationTime( employee.getVacationTime() );
 
         return employeeRespone.build();
     }
@@ -69,16 +69,16 @@ public class EmployeeMapperImpl implements EmployeeMapper {
             return;
         }
 
-        employee.setName( request.getName() );
-        employee.setEmail( request.getEmail() );
-        employee.setPhone_number( request.getPhone_number() );
-        employee.setGender( request.getGender() );
-        employee.setImage( request.getImage() );
         employee.setBirth_date( request.getBirth_date() );
-        employee.setJoined_date( request.getJoined_date() );
-        employee.setShift_id( request.getShift_id() );
-        employee.setVacationTime( request.getVacationTime() );
+        employee.setEmail( request.getEmail() );
+        employee.setGender( request.getGender() );
         employee.setHourOff( request.getHourOff() );
+        employee.setImage( request.getImage() );
+        employee.setJoined_date( request.getJoined_date() );
+        employee.setName( request.getName() );
+        employee.setPhone_number( request.getPhone_number() );
+        employee.setShift_id( request.getShift_id() );
         employee.setVacationHours( request.getVacationHours() );
+        employee.setVacationTime( request.getVacationTime() );
     }
 }

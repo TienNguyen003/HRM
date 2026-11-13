@@ -28,11 +28,11 @@ public class PayrollRequest {
 
     int status = 0;
 
-    @NotNull(message = "ID nhân viên không được để trống")
+    @NotNull(message = "Nhân viên không được để trống")
     @Min(value = 1, message = "ID nhân viên phải lớn hơn 0")
     int employeeId;
 
-    @NotNull(message = "ID ngân hàng không được để trống")
+    @NotNull(message = "Ngân hàng không được để trống")
     @Min(value = 1, message = "ID ngân hàng phải lớn hơn 0")
     int bankId;
 }

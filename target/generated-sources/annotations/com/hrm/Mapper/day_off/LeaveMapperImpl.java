@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class LeaveMapperImpl implements LeaveMapper {
@@ -21,13 +21,13 @@ public class LeaveMapperImpl implements LeaveMapper {
 
         ApplicationLeave.ApplicationLeaveBuilder applicationLeave = ApplicationLeave.builder();
 
-        applicationLeave.startTime( leaveRequest.getStartTime() );
-        applicationLeave.endTime( leaveRequest.getEndTime() );
-        applicationLeave.totalTime( leaveRequest.getTotalTime() );
         applicationLeave.approved( leaveRequest.getApproved() );
-        applicationLeave.reason( leaveRequest.getReason() );
-        applicationLeave.status( leaveRequest.getStatus() );
         applicationLeave.creationTime( leaveRequest.getCreationTime() );
+        applicationLeave.endTime( leaveRequest.getEndTime() );
+        applicationLeave.reason( leaveRequest.getReason() );
+        applicationLeave.startTime( leaveRequest.getStartTime() );
+        applicationLeave.status( leaveRequest.getStatus() );
+        applicationLeave.totalTime( leaveRequest.getTotalTime() );
 
         return applicationLeave.build();
     }
@@ -40,16 +40,16 @@ public class LeaveMapperImpl implements LeaveMapper {
 
         LeaveRespone.LeaveResponeBuilder leaveRespone = LeaveRespone.builder();
 
-        leaveRespone.id( applicationLeave.getId() );
-        leaveRespone.startTime( applicationLeave.getStartTime() );
-        leaveRespone.endTime( applicationLeave.getEndTime() );
-        leaveRespone.totalTime( applicationLeave.getTotalTime() );
         leaveRespone.approved( applicationLeave.getApproved() );
-        leaveRespone.reason( applicationLeave.getReason() );
-        leaveRespone.status( applicationLeave.getStatus() );
         leaveRespone.creationTime( applicationLeave.getCreationTime() );
         leaveRespone.dayOffCategories( applicationLeave.getDayOffCategories() );
         leaveRespone.employee( applicationLeave.getEmployee() );
+        leaveRespone.endTime( applicationLeave.getEndTime() );
+        leaveRespone.id( applicationLeave.getId() );
+        leaveRespone.reason( applicationLeave.getReason() );
+        leaveRespone.startTime( applicationLeave.getStartTime() );
+        leaveRespone.status( applicationLeave.getStatus() );
+        leaveRespone.totalTime( applicationLeave.getTotalTime() );
 
         return leaveRespone.build();
     }
@@ -60,12 +60,12 @@ public class LeaveMapperImpl implements LeaveMapper {
             return;
         }
 
-        applicationLeave.setStartTime( request.getStartTime() );
-        applicationLeave.setEndTime( request.getEndTime() );
-        applicationLeave.setTotalTime( request.getTotalTime() );
         applicationLeave.setApproved( request.getApproved() );
-        applicationLeave.setReason( request.getReason() );
-        applicationLeave.setStatus( request.getStatus() );
         applicationLeave.setCreationTime( request.getCreationTime() );
+        applicationLeave.setEndTime( request.getEndTime() );
+        applicationLeave.setReason( request.getReason() );
+        applicationLeave.setStartTime( request.getStartTime() );
+        applicationLeave.setStatus( request.getStatus() );
+        applicationLeave.setTotalTime( request.getTotalTime() );
     }
 }

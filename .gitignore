@@ -24,6 +24,7 @@ HELP.md
 /nbproject/private/
 /nbbuild/
 /dist/
+/target/
 /nbdist/
 /.nb-gradle/
 build/
@@ -33,3 +34,4 @@ build/
 ### VS Code ###
 .vscode/
 /src/main/resources
+.vercel

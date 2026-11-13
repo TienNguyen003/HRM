@@ -22,4 +22,5 @@ public class Disqualified {
     String dob;
     String phone;
     String linkFile;
+    int status;
 }

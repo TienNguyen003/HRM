@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class AssessmentMapperImpl implements AssessmentMapper {
@@ -21,8 +21,8 @@ public class AssessmentMapperImpl implements AssessmentMapper {
 
         Assessment.AssessmentBuilder assessment = Assessment.builder();
 
-        assessment.title( request.getTitle() );
         assessment.requirement( request.getRequirement() );
+        assessment.title( request.getTitle() );
 
         return assessment.build();
     }
@@ -36,8 +36,8 @@ public class AssessmentMapperImpl implements AssessmentMapper {
         AssessmentResponse.AssessmentResponseBuilder assessmentResponse = AssessmentResponse.builder();
 
         assessmentResponse.id( assessment.getId() );
-        assessmentResponse.title( assessment.getTitle() );
         assessmentResponse.requirement( assessment.getRequirement() );
+        assessmentResponse.title( assessment.getTitle() );
 
         return assessmentResponse.build();
     }
@@ -48,7 +48,7 @@ public class AssessmentMapperImpl implements AssessmentMapper {
             return;
         }
 
-        assessment.setTitle( request.getTitle() );
         assessment.setRequirement( request.getRequirement() );
+        assessment.setTitle( request.getTitle() );
     }
 }

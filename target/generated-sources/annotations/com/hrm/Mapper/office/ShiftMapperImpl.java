@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class ShiftMapperImpl implements ShiftMapper {
@@ -21,8 +21,8 @@ public class ShiftMapperImpl implements ShiftMapper {
 
         Shift.ShiftBuilder shift = Shift.builder();
 
-        shift.start( request.getStart() );
         shift.end( request.getEnd() );
+        shift.start( request.getStart() );
         shift.workingDay( request.getWorkingDay() );
 
         return shift.build();
@@ -36,9 +36,9 @@ public class ShiftMapperImpl implements ShiftMapper {
 
         ShiftResponse.ShiftResponseBuilder shiftResponse = ShiftResponse.builder();
 
+        shiftResponse.end( shift.getEnd() );
         shiftResponse.id( shift.getId() );
         shiftResponse.start( shift.getStart() );
-        shiftResponse.end( shift.getEnd() );
         shiftResponse.workingDay( shift.getWorkingDay() );
 
         return shiftResponse.build();
@@ -50,8 +50,8 @@ public class ShiftMapperImpl implements ShiftMapper {
             return;
         }
 
-        shift.setStart( request.getStart() );
         shift.setEnd( request.getEnd() );
+        shift.setStart( request.getStart() );
         shift.setWorkingDay( request.getWorkingDay() );
     }
 }

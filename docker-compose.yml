@@ -1,0 +1,9 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "8080:2003"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hrm
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 170803

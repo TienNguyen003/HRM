@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class WageMapperImpl implements WageMapper {
@@ -34,10 +34,10 @@ public class WageMapperImpl implements WageMapper {
 
         WageRespone.WageResponeBuilder wageRespone = WageRespone.builder();
 
+        wageRespone.employee( wage.getEmployee() );
         wageRespone.id( wage.getId() );
         wageRespone.salary( wage.getSalary() );
         wageRespone.wageCategories( wage.getWageCategories() );
-        wageRespone.employee( wage.getEmployee() );
 
         return wageRespone.build();
     }

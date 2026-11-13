@@ -19,7 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -38,12 +40,29 @@ public class TimeService {
 				.orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_EXISTED));
 		LocalTime time = LocalTime.parse(request.getTime());
 		LocalTime defaultTime = LocalTime.parse("08:00:00");
-		if (time.isAfter(defaultTime)) employee.setLateness(employee.getLateness() + 1);
+		LocalTime startTime = LocalTime.parse("12:00:00");
+		LocalTime endTime = LocalTime.parse("14:00:00");
+		if (time.isAfter(defaultTime) && (time.isBefore(startTime) || time.isAfter(endTime))) employee.setLateness(employee.getLateness() + 1);
 
 		employee.setTimekeeping(employee.getTimekeeping() - 1);
 		TimeKeeping keeping = keepingMapper.toKeeping(request);
 		keeping.setEmployee(employee);
-		if (isCheck == 1) keeping.setType(1);
+		if (isCheck == 1) {
+			keeping.setType(1);
+			TimeKeeping timeKeeping = timeRepository.getTimeKeeping(request.getEmployeeId(), request.getDate());
+			DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+			LocalTime timeCO = LocalTime.parse(timeKeeping.getTime(), timeFormatter);
+			LocalTime requestTime = LocalTime.parse(request.getTime(), timeFormatter);
+
+			Duration duration = Duration.between(timeCO, requestTime);
+			float hoursDifference = duration.toHours();
+			float minutesDifference = duration.toMinutes() % 60;
+
+			float timeChange = employee.getVacationTime() - (hoursDifference + (minutesDifference / 60.0f));
+
+			employee.setVacationTime(timeChange);
+			employeeRepository.save(employee);
+		}
 
 		return keepingMapper.toKeepingRespone(timeRepository.save(keeping));
 	}

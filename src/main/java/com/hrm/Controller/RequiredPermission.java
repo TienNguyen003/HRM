@@ -29,7 +29,7 @@ public class RequiredPermission {
 
         String role = firstAuthority.getAuthority().replace("ROLE_", "");
         if(role.equals("NHÂN")) role = "NHÂN VIÊN";
-        RoleResponse roleResponse = roleService.getRole(role);
+        RoleResponse roleResponse = roleService.getRole(role.replace("_", " "));
         Set<String> permissionNames = roleResponse.getPermissions().stream()
                 .map(PermissionResponse::getName)
                 .collect(Collectors.toSet());

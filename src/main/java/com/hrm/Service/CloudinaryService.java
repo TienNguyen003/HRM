@@ -21,9 +21,10 @@ public class CloudinaryService {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
                 ObjectUtils.asMap(
                         "folder", folderName,
-                        "resource_type", "raw",
+                        "resource_type", "auto",
                         "format", "pdf"
                 ));
+        System.out.println(uploadResult);
         return (String) uploadResult.get("secure_url");
     }
 }

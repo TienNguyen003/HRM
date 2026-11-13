@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class TimeKeepingMapperImpl implements TimeKeepingMapper {
@@ -21,9 +21,9 @@ public class TimeKeepingMapperImpl implements TimeKeepingMapper {
 
         TimeKeeping.TimeKeepingBuilder timeKeeping = TimeKeeping.builder();
 
-        timeKeeping.time( request.getTime() );
         timeKeeping.date( request.getDate() );
         timeKeeping.reason( request.getReason() );
+        timeKeeping.time( request.getTime() );
         timeKeeping.type( request.getType() );
 
         return timeKeeping.build();
@@ -37,12 +37,12 @@ public class TimeKeepingMapperImpl implements TimeKeepingMapper {
 
         TimeKeepingRespone.TimeKeepingResponeBuilder timeKeepingRespone = TimeKeepingRespone.builder();
 
-        timeKeepingRespone.id( keeping.getId() );
-        timeKeepingRespone.time( keeping.getTime() );
         timeKeepingRespone.date( keeping.getDate() );
-        timeKeepingRespone.reason( keeping.getReason() );
-        timeKeepingRespone.type( keeping.getType() );
         timeKeepingRespone.employee( keeping.getEmployee() );
+        timeKeepingRespone.id( keeping.getId() );
+        timeKeepingRespone.reason( keeping.getReason() );
+        timeKeepingRespone.time( keeping.getTime() );
+        timeKeepingRespone.type( keeping.getType() );
 
         return timeKeepingRespone.build();
     }
@@ -53,9 +53,9 @@ public class TimeKeepingMapperImpl implements TimeKeepingMapper {
             return;
         }
 
-        keeping.setTime( request.getTime() );
         keeping.setDate( request.getDate() );
         keeping.setReason( request.getReason() );
+        keeping.setTime( request.getTime() );
         keeping.setType( request.getType() );
     }
 }

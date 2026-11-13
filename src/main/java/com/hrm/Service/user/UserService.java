@@ -42,9 +42,12 @@ public class UserService {
 	public UserResponse createUser(UserCreationRequest request) {
 		if(userRepository.existsByUsername(request.getUsername()))
 			throw new AppException(ErrorCode.USERNAME_EXISTED);
+		if (userRepository.existsByEmployeeId(request.getEmployeeId())) {
+			throw new AppException(ErrorCode.ACCOUNT_EXISTED);
+		}
 
 		Employee employee = employeeRepository.findById(request.getEmployeeId())
-				.orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
+				.orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_EXISTED));
 		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRoleName())
 				.orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
 		User user = userMapper.toUser(request);

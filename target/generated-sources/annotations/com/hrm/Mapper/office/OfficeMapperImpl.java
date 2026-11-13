@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.3 (Oracle Corporation)"
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.44.0.v20251001-1143, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class OfficeMapperImpl implements OfficeMapper {
@@ -21,9 +21,9 @@ public class OfficeMapperImpl implements OfficeMapper {
 
         OfficeI.OfficeIBuilder officeI = OfficeI.builder();
 
-        officeI.name( request.getName() );
         officeI.address( request.getAddress() );
         officeI.email( request.getEmail() );
+        officeI.name( request.getName() );
         officeI.phone( request.getPhone() );
 
         return officeI.build();
@@ -37,10 +37,10 @@ public class OfficeMapperImpl implements OfficeMapper {
 
         OfficeRespone.OfficeResponeBuilder officeRespone = OfficeRespone.builder();
 
-        officeRespone.id( officeI.getId() );
-        officeRespone.name( officeI.getName() );
         officeRespone.address( officeI.getAddress() );
         officeRespone.email( officeI.getEmail() );
+        officeRespone.id( officeI.getId() );
+        officeRespone.name( officeI.getName() );
         officeRespone.phone( officeI.getPhone() );
         officeRespone.status( officeI.getStatus() );
 
@@ -53,9 +53,9 @@ public class OfficeMapperImpl implements OfficeMapper {
             return;
         }
 
-        officeI.setName( request.getName() );
         officeI.setAddress( request.getAddress() );
         officeI.setEmail( request.getEmail() );
+        officeI.setName( request.getName() );
         officeI.setPhone( request.getPhone() );
     }
 }

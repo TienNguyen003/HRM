@@ -15,6 +15,11 @@ public interface TimeRepository extends JpaRepository<TimeKeeping, Integer> {
     int exitsByDayId(int id, String date);
 
     @Query("SELECT t FROM TimeKeeping t WHERE" +
+            "(:id IS NULL OR t.employee.id = :id) AND" +
+            "(:date IS NULL OR t.date = :date)")
+    TimeKeeping getTimeKeeping(int id, String date);
+
+    @Query("SELECT t FROM TimeKeeping t WHERE" +
             "(:department IS NULL OR t.employee.department.name LIKE %:department%) AND" +
             "(:office IS NULL OR t.employee.department.officeI.name LIKE %:office%) AND" +
             "(:date IS NULL OR t.date LIKE %:date%) AND" +

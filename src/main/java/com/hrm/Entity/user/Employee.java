@@ -25,7 +25,7 @@ public class Employee {
     String birth_date;
     String joined_date;
     int shift_id;
-    int vacationTime;
+    float vacationTime;
     int hourOff;
     int vacationHours;
     int timekeeping;
