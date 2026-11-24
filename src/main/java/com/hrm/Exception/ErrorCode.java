@@ -98,7 +98,11 @@ public enum ErrorCode {
 	DOCUMENT_NOT_EXISTED(504, "Tài liệu không tồn tại.", HttpStatus.NOT_FOUND),
 
 	// nhiệm vụ
-	TASK_NOT_EXISTED(504, "Nhiệm vụ không tồn tại.", HttpStatus.NOT_FOUND);
+	TASK_NOT_EXISTED(504, "Nhiệm vụ không tồn tại.", HttpStatus.NOT_FOUND),
+
+	// hrm
+	HRM_NOT_FOUND(504, "%s không tồn tại.", HttpStatus.NOT_FOUND),
+	HRM_INVALID_REQUEST(500, "%s", HttpStatus.BAD_REQUEST);
 
 	ErrorCode(int code, String message, HttpStatusCode statusCode) {
 		this.code = code;
