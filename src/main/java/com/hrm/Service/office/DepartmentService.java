@@ -10,6 +10,7 @@ import com.hrm.dto.request.office.DepartmentRequest;
 import com.hrm.dto.response.office.DepartmentResponse;
 import com.hrm.repository.office.DepartmentRepository;
 import com.hrm.repository.office.OfficeRepository;
+import com.hrm.repository.user.EmployeeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +28,7 @@ public class DepartmentService {
     DepartmentRepository departmentRepository;
     DepartmentMapper departmentMapper;
     OfficeRepository officeRepository;
+    EmployeeRepository employeeRepository;
 
     // thêm
     public DepartmentResponse create(DepartmentRequest request){
@@ -50,10 +52,20 @@ public class DepartmentService {
         OfficeI officeI = officeRepository.findById(request.getOfficeId())
                 .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
 
+        String oldName = department.getName();
         department.setOfficeI(officeI);
         departmentMapper.updateDepartment(department, request);
+        Department saved = departmentRepository.save(department);
 
-        return departmentMapper.toDepartmentResponse(departmentRepository.save(department));
+        if (oldName != null && !oldName.equals(saved.getName())) {
+            var affected = employeeRepository.findByDepartment_Name(oldName);
+            affected.forEach(e -> {
+                e.setDepartment(saved);
+                e.setDepartmentName(saved.getName());
+            });
+            employeeRepository.saveAll(affected);
+        }
+        return departmentMapper.toDepartmentResponse(saved);
     }
 
     public String updateStt(int id, int status){
@@ -97,6 +109,15 @@ public class DepartmentService {
 
     // xóa
     public void delete(int id){
+        Department department = departmentRepository.findById(id).orElse(null);
+        if (department != null) {
+            var affected = employeeRepository.findByDepartment_Name(department.getName());
+            affected.forEach(e -> {
+                e.setDepartment(null);
+                e.setDepartmentName("Unassigned");
+            });
+            employeeRepository.saveAll(affected);
+        }
         departmentRepository.deleteById(id);
     }
 }

@@ -89,6 +89,8 @@ public enum ErrorCode {
 	JOB_NOT_EXISTED(504, "Tin tuyển dụng không tồn tại.", HttpStatus.NOT_FOUND),
 
 	// check cv
+	CV_ASSESSMENT_NOT_FOUND(504, "Bộ tiêu chí đánh giá không tồn tại.", HttpStatus.NOT_FOUND),
+	CV_SCORE_INVALID(500, "Điểm đánh giá không hợp lệ: %s", HttpStatus.BAD_REQUEST),
 	REQUIRE_NOT_EXISTED(504, "Yêu cầu chưa đã tồn tại.", HttpStatus.BAD_REQUEST),
 	CV_DISQUALIFIED(503, "CV đã bị từ chối.", HttpStatus.BAD_REQUEST),
 	CV_NOT_EXISTED(504, "CV không tồn tại.", HttpStatus.NOT_FOUND),

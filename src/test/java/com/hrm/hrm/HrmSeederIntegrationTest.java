@@ -2,6 +2,7 @@ package com.hrm.hrm;
 
 import com.hrm.Service.hrm.HrmSeeder;
 import com.hrm.repository.hrm.*;
+import com.hrm.repository.user.EmployeeRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class HrmSeederIntegrationTest {
     @Autowired HrmSeeder seeder;
     @Autowired HrmReferenceDataRepository referenceDataRepository;
     @Autowired HrmSeedLogRepository seedLogRepository;
-    @Autowired HrmEmployeeRepository employeeRepository;
+    @Autowired EmployeeRepository employeeRepository;
     @Autowired HrmAttendanceRepository attendanceRepository;
     @Autowired HrmLeaveRequestRepository leaveRequestRepository;
     @Autowired HrmCandidateRepository candidateRepository;
@@ -56,3 +57,4 @@ class HrmSeederIntegrationTest {
         assertThat(referenceDataRepository.count()).isEqualTo(referenceBefore);
     }
 }
+

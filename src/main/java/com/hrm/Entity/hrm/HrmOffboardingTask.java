@@ -1,6 +1,7 @@
 package com.hrm.Entity.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hrm.Entity.user.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Nhiệm vụ offboarding khi nhân viên nghỉ việc. */
+/** NhiA�»‡m vA�»¥ offboarding khi nhĂ¢n viĂªn nghA�»‰ viA�»‡c. */
 @Entity
 @Getter
 @Setter
@@ -30,7 +31,7 @@ public class HrmOffboardingTask {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id", nullable = false)
-    private HrmEmployee employee;
+    private Employee employee;
 
     @Column(name = "employee_name")
     private String employeeName;
@@ -42,6 +43,6 @@ public class HrmOffboardingTask {
     private String created;
 
     public String getEmployeeId() {
-        return employee == null ? null : employee.getId();
+        return employee == null ? null : employee.getHrmId();
     }
 }

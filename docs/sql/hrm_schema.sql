@@ -36,43 +36,16 @@ CREATE TABLE IF NOT EXISTS hrm_audit_log (
   KEY idx_hrm_audit_entity (entity, entity_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS hrm_employee (
-  id varchar(20) NOT NULL,
-  first_name varchar(255),
-  last_name varchar(255),
-  name varchar(255),
-  initials varchar(20),
-  position varchar(255),
-  department varchar(255),
-  manager varchar(255),
-  employment_type varchar(80),
-  status varchar(80),
-  joined_date varchar(80),
-  joined_date_iso varchar(40),
-  email varchar(255),
-  phone varchar(80),
-  date_of_birth varchar(80),
-  address varchar(500),
-  emergency_name varchar(255),
-  emergency_relation varchar(80),
-  emergency_phone varchar(80),
-  location varchar(255),
-  id_card varchar(80),
-  bank_account varchar(120),
-  probation_end_date varchar(80),
-  avatar varchar(500),
-  attendance_rate int NOT NULL DEFAULT 0,
-  leave_balance int NOT NULL DEFAULT 0,
-  goals int NOT NULL DEFAULT 0,
-  PRIMARY KEY (id),
-  KEY idx_hrm_emp_department (department),
-  KEY idx_hrm_emp_status (status),
-  KEY idx_hrm_emp_email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- NHÂN VIÊN: chỉ còn 1 bảng `employee` (xem Entity/user/Employee.java).
+-- Hibernate ddl-auto=update tự thêm các cột HRM: employee_code, first_name, last_name,
+-- initials, position, department_name, manager, employment_type, status,
+-- joined_date_iso, location, address, emergency_*, id_card, bank_account,
+-- probation_end_date, avatar, attendance_rate, leave_balance, goals.
+-- employee_code (EMP-00123) có UNIQUE INDEX uk_employee_code.
 
 CREATE TABLE IF NOT EXISTS hrm_attendance (
   id varchar(80) NOT NULL,
-  employee_id varchar(20) NOT NULL,
+  employee_id int NOT NULL,
   employee_name varchar(255),
   department varchar(255),
   att_date varchar(40),
@@ -87,13 +60,14 @@ CREATE TABLE IF NOT EXISTS hrm_attendance (
   KEY idx_hrm_att_date (att_date),
   KEY idx_hrm_att_employee (employee_id),
   KEY idx_hrm_att_status (status),
-  CONSTRAINT fk_hrm_att_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_att_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_leave_request (
   id varchar(40) NOT NULL,
-  employee_id varchar(20) NOT NULL,
+  employee_id int NOT NULL,
   employee_name varchar(255),
+  legacy_id int,
   type varchar(120),
   start varchar(40),
   end varchar(40),
@@ -105,29 +79,29 @@ CREATE TABLE IF NOT EXISTS hrm_leave_request (
   PRIMARY KEY (id),
   KEY idx_hrm_leave_status (status),
   KEY idx_hrm_leave_employee (employee_id),
-  CONSTRAINT fk_hrm_leave_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_leave_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_leave_balance (
   id varchar(40) NOT NULL,
-  employee_id varchar(20) NOT NULL,
+  employee_id int NOT NULL,
   employee_name varchar(255),
   department varchar(255),
   annual_total int NOT NULL DEFAULT 0, annual_used int NOT NULL DEFAULT 0, annual_pending int NOT NULL DEFAULT 0,
   sick_total int NOT NULL DEFAULT 0, sick_used int NOT NULL DEFAULT 0, sick_pending int NOT NULL DEFAULT 0,
   unpaid_total int NOT NULL DEFAULT 0, unpaid_used int NOT NULL DEFAULT 0, unpaid_pending int NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
-  CONSTRAINT fk_hrm_balance_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_balance_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_document (
   id varchar(40) NOT NULL,
-  employee_id varchar(20) NOT NULL,
+  employee_id int NOT NULL,
   name varchar(255), type varchar(120), size varchar(80), updated varchar(80), expires varchar(80),
   url varchar(1000), file_name varchar(255), content_type varchar(255),
   PRIMARY KEY (id),
   KEY idx_hrm_doc_employee (employee_id),
-  CONSTRAINT fk_hrm_doc_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_doc_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_activity_log (
@@ -221,7 +195,7 @@ CREATE TABLE IF NOT EXISTS hrm_overtime_request (
   PRIMARY KEY (id),
   KEY idx_hrm_ot_status (status),
   KEY idx_hrm_ot_employee (employee_id),
-  CONSTRAINT fk_hrm_ot_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_ot_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_payroll_run (
@@ -234,13 +208,13 @@ CREATE TABLE IF NOT EXISTS hrm_payroll_run (
 
 CREATE TABLE IF NOT EXISTS hrm_payslip (
   id varchar(40) NOT NULL,
-  employee_id varchar(20) NOT NULL,
+  employee_id int NOT NULL,
   employee_name varchar(255), pay_month varchar(40), basic double, allowances double, deductions double,
   net double, status varchar(80), created varchar(40),
   PRIMARY KEY (id),
   KEY idx_hrm_payslip_employee (employee_id),
   KEY idx_hrm_payslip_month (pay_month),
-  CONSTRAINT fk_hrm_payslip_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_payslip_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_onboarding_task (
@@ -250,7 +224,7 @@ CREATE TABLE IF NOT EXISTS hrm_onboarding_task (
   PRIMARY KEY (id),
   KEY idx_hrm_onb_employee (employee_id),
   KEY idx_hrm_onb_status (status),
-  CONSTRAINT fk_hrm_onb_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_onb_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_offboarding_task (
@@ -260,7 +234,7 @@ CREATE TABLE IF NOT EXISTS hrm_offboarding_task (
   PRIMARY KEY (id),
   KEY idx_hrm_offb_employee (employee_id),
   KEY idx_hrm_offb_status (status),
-  CONSTRAINT fk_hrm_offb_employee FOREIGN KEY (employee_id) REFERENCES hrm_employee (id)
+  CONSTRAINT fk_hrm_offb_employee FOREIGN KEY (employee_id) REFERENCES employee (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS hrm_leave_policy (
@@ -270,11 +244,9 @@ CREATE TABLE IF NOT EXISTS hrm_leave_policy (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS hrm_shift_schedule (
-  id varchar(40) NOT NULL,
-  name varchar(255), start_time varchar(40), end_time varchar(40), break_minutes int, location varchar(255), attributes json,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Ca làm việc dùng CHUNG bảng `shift` (xem Entity/office/Shift.java).
+-- Hibernate thêm: shift_code (unique), shift_name, break_minutes, location.
+-- Bảng hrm_shift_schedule cũ được import vào `shift` rồi bỏ qua (không tạo bảng mới).
 
 CREATE TABLE IF NOT EXISTS hrm_roster (
   id varchar(40) NOT NULL,
@@ -321,4 +293,37 @@ CREATE TABLE IF NOT EXISTS hrm_company_event (
   title varchar(255), event_date varchar(40), location varchar(255), description varchar(1000), attributes json,
   PRIMARY KEY (id),
   KEY idx_hrm_event_date (event_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- LỌC CV: tiêu chí từ DB + điểm đánh giá ứng viên
+-- ============================================================
+
+ALTER TABLE assessment ADD COLUMN job_id int NULL;
+
+ALTER TABLE requirements
+  ADD COLUMN keyword varchar(500) NULL,
+  ADD COLUMN weight int NOT NULL DEFAULT 1,
+  ADD COLUMN mandatory tinyint NOT NULL DEFAULT 0;
+
+CREATE INDEX IF NOT EXISTS idx_require_assessment ON requirements (assessment_id);
+CREATE INDEX IF NOT EXISTS idx_assessment_job ON assessment (job_id);
+CREATE INDEX IF NOT EXISTS idx_hrm_leave_legacy ON hrm_leave_request (legacy_id);
+
+-- Hibernate ddl-auto=update tự thêm các cột sau (đã có trong Entity):
+--   employee.employee_code (UNIQUE uk_employee_code), employee.department_id
+--   hrm_leave_request.legacy_id
+--   shift.shift_code, shift.shift_name, shift.break_minutes, shift.location
+
+CREATE TABLE IF NOT EXISTS cv_assessment_score (
+  id int NOT NULL AUTO_INCREMENT,
+  candidate_id int NOT NULL,
+  requirement_id int NOT NULL,
+  score double NOT NULL,
+  comment varchar(500),
+  assessed_by varchar(120),
+  assessed_at datetime NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_cv_score_candidate_require (candidate_id, requirement_id),
+  KEY idx_cv_score_candidate (candidate_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

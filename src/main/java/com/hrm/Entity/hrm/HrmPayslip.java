@@ -1,6 +1,7 @@
 package com.hrm.Entity.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hrm.Entity.user.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Phiếu lương được sinh ra từ một đợt chạy lương. */
+/** PhiA�º¿u lA�°A�¡ng A�‘A�°A�»£c sinh ra tA�»« mA�»™t A�‘A�»£t chA�º¡y lA�°A�¡ng. */
 @Entity
 @Getter
 @Setter
@@ -30,7 +31,7 @@ public class HrmPayslip {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id", nullable = false)
-    private HrmEmployee employee;
+    private Employee employee;
 
     @Column(name = "employee_name")
     private String employeeName;
@@ -44,6 +45,6 @@ public class HrmPayslip {
     private String created;
 
     public String getEmployeeId() {
-        return employee == null ? null : employee.getId();
+        return employee == null ? null : employee.getHrmId();
     }
 }

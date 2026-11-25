@@ -2,7 +2,9 @@ package com.hrm.Service.hrm;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.hrm.Entity.hrm.*;
+import com.hrm.Entity.user.Employee;
 import com.hrm.repository.hrm.*;
+import com.hrm.repository.user.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -34,7 +36,7 @@ public class HrmSeeder implements ApplicationRunner {
     private final HrmSeedLogRepository seedLogRepository;
     private final HrmReferenceDataRepository referenceDataRepository;
 
-    private final HrmEmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
     private final HrmAttendanceRepository attendanceRepository;
     private final HrmLeaveRequestRepository leaveRequestRepository;
     private final HrmLeaveBalanceRepository leaveBalanceRepository;
@@ -128,23 +130,15 @@ public class HrmSeeder implements ApplicationRunner {
         }
 
         int count = 0;
-        Map<String, HrmEmployee> employeesById = new LinkedHashMap<>();
+        Map<String, Employee> employeesById = new LinkedHashMap<>();
         for (Map<String, Object> m : (List<Map<String, Object>>) seed.getOrDefault("employees", List.of())) {
-            HrmEmployee e = HrmJson.fromMap(m, HrmEmployee.class);
-            Object ec = m.get("emergencyContact");
-            if (ec instanceof Map<?, ?> contact) {
-                e.setEmergencyName(str(contact.get("name")));
-                e.setEmergencyRelation(str(contact.get("relation")));
-                e.setEmergencyPhone(str(contact.get("phone")));
-            }
-            if (e.getName() == null || e.getName().isBlank()) {
-                e.setName((nvl(e.getFirstName()) + " " + nvl(e.getLastName())).trim());
-            }
-            if (!employeeRepository.existsById(e.getId())) {
+            Employee e = mapSeedEmployee(m);
+            String code = e.getEmployeeCode();
+            if (!employeeRepository.existsByEmployeeCode(code)) {
                 employeeRepository.save(e);
                 count++;
             }
-            employeesById.put(e.getId(), e);
+            employeesById.put(code, e);
         }
 
         Map<String, HrmCandidate> candidatesById = new LinkedHashMap<>();
@@ -270,6 +264,49 @@ public class HrmSeeder implements ApplicationRunner {
 
         seedLogRepository.save(new HrmSeedLog(key, "Business sample seed", count, "IMPORTED"));
         log.info("[HRM Seed] Sample '{}' import thành công: {} bản ghi", key, count);
+    }
+
+    /** Map bản ghi employees trong hrm-seed.json sang entity Employee duy nhất. */
+    private Employee mapSeedEmployee(Map<String, Object> m) {
+        Employee e = new Employee();
+        e.setEmployeeCode(str(m.get("id")));
+        e.setFirstName(str(m.get("firstName")));
+        e.setLastName(str(m.get("lastName")));
+        e.setName(str(m.get("name")));
+        e.setInitials(str(m.get("initials")));
+        e.setPosition(str(m.get("position")));
+        e.setDepartmentName(str(m.get("department")));
+        e.setManager(str(m.get("manager")));
+        e.setEmploymentType(str(m.get("employmentType")));
+        e.setStatus(str(m.get("status")));
+        e.setJoinedDateIso(str(m.get("joinedDateIso")));
+        e.setJoined_date(str(m.get("joinedDate")));
+        e.setEmail(str(m.get("email")));
+        e.setPhone_number(str(m.get("phone")));
+        e.setBirth_date(str(m.get("dateOfBirth")));
+        e.setAddress(str(m.get("address")));
+        e.setLocation(str(m.get("location")));
+        e.setIdCard(str(m.get("idCard")));
+        e.setBankAccount(str(m.get("bankAccount")));
+        e.setProbationEndDate(str(m.get("probationEndDate")));
+        e.setAvatar(str(m.get("avatar")));
+        e.setAttendanceRate(intOf(m.get("attendanceRate"), 0));
+        e.setLeaveBalance(intOf(m.get("leaveBalance"), 20));
+        e.setGoals(intOf(m.get("goals"), 0));
+        if (m.get("emergencyContact") instanceof Map<?, ?> ec) {
+            e.setEmergencyName(str(ec.get("name")));
+            e.setEmergencyRelation(str(ec.get("relation")));
+            e.setEmergencyPhone(str(ec.get("phone")));
+        }
+        if ((e.getName() == null || e.getName().isBlank()) && (e.getFirstName() != null || e.getLastName() != null)) {
+            e.setName((nvl(e.getFirstName()) + " " + nvl(e.getLastName())).trim());
+        }
+        return e;
+    }
+
+    private int intOf(Object value, int fallback) {
+        if (value instanceof Number n) return n.intValue();
+        try { return Integer.parseInt(String.valueOf(value)); } catch (Exception ex) { return fallback; }
     }
 
     private <T extends HrmAttributesAware> T fillAttributes(Map<String, Object> source, T entity) {

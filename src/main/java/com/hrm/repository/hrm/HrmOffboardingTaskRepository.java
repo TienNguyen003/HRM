@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface HrmOffboardingTaskRepository extends JpaRepository<HrmOffboardingTask, String> {
-    List<HrmOffboardingTask> findAllByEmployee_Id(String employeeId);
+    List<HrmOffboardingTask> findAllByEmployee_Id(Integer employeeId);
 }

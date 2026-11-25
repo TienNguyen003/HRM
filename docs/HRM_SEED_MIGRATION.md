@@ -21,9 +21,13 @@ HrmService  ── validation + workflow + @Transactional + audit
         └── HrmSeeder → hrm_reference_data / hrm_seed_log + các bảng nghiệp vụ
 ```
 
-Không tạo backend mới; dùng lại Spring Boot 3.3 / JPA / MySQL đang có. Các Entity/API cũ
-(`com.hrm.Entity.user.Employee`, `/api/employees`, ...) **không bị sửa đổi**, nên không ảnh hưởng
-chức năng hiện hữu.
+Không tạo backend mới; dùng lại Spring Boot 3.3 / JPA / MySQL đang có.
+
+**Chỉ còn 1 bảng nhân viên**: `Employee` (`com.hrm.Entity.user.Employee`, bảng `employee`, id số).
+Module `/api/hrm` dùng thêm cột `employee_code` (`EMP-00123`) ngay trên bảng này; các entity con
+(`hrm_attendance`, `hrm_leave_request`, ...) có FK `employee_id int → employee(id)`.
+`HrmEmployee` và bảng `hrm_employee` đã bị xóa. API cũ `/api/employee`, lương, hợp đồng và JWT
+(`employeeId` dạng số) vẫn hoạt động nguyên.
 
 ## 3. Phân loại Seed
 
@@ -54,7 +58,7 @@ Idempotent được đảm bảo bởi:
 
 | Nhóm | Entity / bảng | Quản lý qua API |
 |---|---|---|
-| Nhân viên | `HrmEmployee` / `hrm_employee` | CRUD, import/export, check-id, hồ sơ + quan hệ |
+| Nhân viên | `Employee` / `employee` (cột `employee_code`) | CRUD, import/export, check-id, hồ sơ + quan hệ |
 | Chấm công | `HrmAttendance` / `hrm_attendance` | danh sách, summary, calendar, check-in/out |
 | Nghỉ phép | `HrmLeaveRequest`, `HrmLeaveBalance`, `HrmLeavePolicy` | CRUD đơn, phê duyệt cập nhật số dư, cộng dồn idempotent |
 | Tuyển dụng | `HrmCandidate`, `HrmInterview`, `HrmPosition` | CRUD ứng viên, chuyển stage, phỏng vấn, vị trí |
@@ -82,6 +86,33 @@ Idempotent được đảm bảo bởi:
   seed chạy lại không trùng bản ghi.
 - Audit log persistent, có index theo ngày/thực thể.
 
+### Lọc CV (job module)
+
+- `Assessment` có thêm `jobId` — bộ tiêu chí gắn được với tin tuyển dụng.
+- `Requirements` có thêm `keyword`, `weight`, `mandatory` — tiêu chí có giá trị tìm kiếm, trọng số và bắt buộc.
+- `POST /api/cv/filter?assessmentId=...`: khi truyền `assessmentId`, tiêu chí được **đọc từ DB**
+  (`Assessment` + `Requirements`) thay vì tin payload do client gửi; client cũ không truyền vẫn chạy như trước.
+  Bản ghi `Disqualified` được gắn `jobId`/`stage`. Sửa bug đếm tiêu chí bắt buộc (`flagRequireObliCount++`
+  không bao giờ tăng).
+- `POST /api/cv/assess/{candidateId}` + `GET /api/cv/assess/{candidateId}`: lưu/lấy điểm theo từng tiêu chí
+  (`cv_assessment_score`, unique theo `candidate_id + requirement_id`, upsert khi chấm lại), trả về
+  `totalScore`, `maxScore`, `percentage`. Validate điểm nằm trong `[0, weight]` và tiêu chí phải thuộc bộ.
+
+### Gom nghỉ phép & tổ chức (lần cuối)
+
+- **Nghỉ phép**: nguồn duy nhất là `hrm_leave_request`. API cũ `/api/day_off_letter` giờ gọi chung
+  `HrmService`/`HrmLeaveRequestRepository` (giữ nguyên contract `id` số qua cột `legacy_id` và `status` số).
+  `DashboardService`, `ReportService`, `NotificationService` cùng đếm từ bảng này.
+  `HrmLeaveMigration` import đơn cũ `application_leave` (66 bản ghi trong DB hiện tại) một lần.
+  Xóa `ApplicationLeave`, `LeaveRepository`, `LeaveMapper`.
+- **Tổ chức**: `Department` (`Employee.department`, FK `department_id`) là nguồn đơn nhất.
+  `/api/hrm/organization/*` đọc `Department` thay vì chuỗi `departmentName`; khi tạo/sửa nhân viên qua
+  `/api/hrm` sẽ gắn relation; đổi tên phòng ở `/api/structures` tự cập nhật `Employee.departmentName`.
+  `HrmOrganizationMigration` tạo Department từ reference/employee và backfill FK.
+- **Ca làm việc**: gộp về bảng `shift`; `Shift` thêm `shift_code`, `shift_name`, `break_minutes`, `location`.
+  `/api/hrm/shift-schedules` giờ đọc/ghi bảng `shift` (vẫn trả `id` dạng `SH-001`).
+  Xóa `HrmShiftSchedule`, `HrmShiftScheduleRepository`.
+
 ## 6. Database & Migration
 
 - Hibernate `ddl-auto: update` tiếp tục tạo/cập nhật schema (không xóa dữ liệu cũ).
@@ -91,13 +122,17 @@ Idempotent được đảm bảo bởi:
 
 ## 7. Kiểm thử
 
-`./mvnw test` → **15 tests, 0 failures, 0 errors** (H2 profile `test`):
+`./mvnw test` → **20 tests, 0 failures, 0 errors** (H2 profile `test`):
 
 - `HrmApplicationTests`: context Spring tải thành công.
 - `HrmSeederIntegrationTest`: seed lần đầu (8 nhân viên/112 chấm công), chạy lại 2 lần không trùng.
 - `HrmServiceBusinessTest`: CRUD, cascade delete, workflow nghỉ phép, sinh payslip idempotent,
   validation/exception, audit, check-in/out.
 - `HrmApiContractTest`: path + shape response `/api/hrm/*`, CRUD qua HTTP, phân quyền (401 khi chưa login).
+- `CvAssessmentServiceTest`: chấm điểm theo tiêu chí từ DB, lưu điểm, tổng hợp/tỷ lệ, từ chối điểm ngoài
+  trọng số và tiêu chí không thuộc bộ.
+- `LegacyLeaveDelegationTest`: API cũ tạo/duyệt đơn → ghi vào `hrm_leave_request`, cập nhật số dư.
+- `OrganizationCanonicalTest`: tạo nhân viên gắn `Department`, API HRM đọc/ghi bảng `shift`.
 
 ## 8. Cách chạy
 

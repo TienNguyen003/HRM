@@ -1,6 +1,7 @@
 package com.hrm.Entity.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hrm.Entity.user.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,7 +16,7 @@ import lombok.Setter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Số dư nghỉ phép theo từng loại (annual/sick/unpaid). */
+/** SĂ¡Â»â€˜ dĂ†Â° nghĂ¡Â»â€° phÄ‚Â©p theo tĂ¡Â»Â«ng loĂ¡ÂºÂ¡i (annual/sick/unpaid). */
 @Entity
 @Getter
 @Setter
@@ -29,7 +30,7 @@ public class HrmLeaveBalance {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id", nullable = false)
-    private HrmEmployee employee;
+    private Employee employee;
 
     @Column(name = "employee_name")
     private String employeeName;
@@ -46,7 +47,7 @@ public class HrmLeaveBalance {
     @JsonIgnore private int unpaidPending;
 
     public String getEmployeeId() {
-        return employee == null ? null : employee.getId();
+        return employee == null ? null : employee.getHrmId();
     }
 
     public Map<String, Object> getAnnual() {

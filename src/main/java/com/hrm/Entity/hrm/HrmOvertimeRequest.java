@@ -1,6 +1,7 @@
 package com.hrm.Entity.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hrm.Entity.user.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Đơn đăng ký tăng ca. */
+/** Ă„ÂĂ†Â¡n Ă„â€˜Ă„Æ’ng kÄ‚Â½ tĂ„Æ’ng ca. */
 @Entity
 @Getter
 @Setter
@@ -30,7 +31,7 @@ public class HrmOvertimeRequest {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id", nullable = false)
-    private HrmEmployee employee;
+    private Employee employee;
 
     @Column(name = "employee_name")
     private String employeeName;
@@ -44,6 +45,6 @@ public class HrmOvertimeRequest {
     private String submitted;
 
     public String getEmployeeId() {
-        return employee == null ? null : employee.getId();
+        return employee == null ? null : employee.getHrmId();
     }
 }

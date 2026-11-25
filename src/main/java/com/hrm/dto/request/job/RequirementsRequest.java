@@ -17,4 +17,14 @@ public class RequirementsRequest {
 
     @Min(value = 0, message = "Trường pha lớn hơn 0")
     int assessmentId;
+
+    /** Từ khóa tìm kiếm trong CV; nếu trống sẽ dùng title. */
+    String keyword;
+
+    /** Điểm tối đa / trọng số, mặc định 1. */
+    @Min(value = 1, message = "Trọng số phải lớn hơn 0")
+    int weight = 1;
+
+    /** Tiêu chí bắt buộc: thiếu thì CV bị loại. */
+    boolean mandatory;
 }

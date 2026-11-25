@@ -13,4 +13,5 @@ public class AssessmentResponse {
     int id;
     String title;
     int requirement;
+    Integer jobId;
 }

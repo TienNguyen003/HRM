@@ -9,4 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     Page<Employee> findAll(Pageable pageable);
+
+    java.util.Optional<Employee> findByEmployeeCode(String employeeCode);
+
+    boolean existsByEmployeeCode(String employeeCode);
+
+    java.util.List<Employee> findByDepartment_Name(String departmentName);
 }

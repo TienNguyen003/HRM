@@ -7,7 +7,7 @@ import com.hrm.Entity.user.Employee;
 import com.hrm.Entity.user.User;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
-import com.hrm.repository.day_off.LeaveRepository;
+import com.hrm.repository.hrm.HrmLeaveRequestRepository;
 import com.hrm.repository.job.DisqualifiedRepository;
 import com.hrm.repository.notification.NotificationRepository;
 import com.hrm.repository.user.ContractsRepository;
@@ -38,7 +38,7 @@ public class NotificationService {
     UserRepository userRepository;
     EmployeeRepository employeeRepository;
     ContractsRepository contractsRepository;
-    LeaveRepository leaveRepository;
+    HrmLeaveRequestRepository leaveRequestRepository;
     AdvanceRepository advanceRepository;
     DisqualifiedRepository disqualifiedRepository;
     RequiredPermission requiredPermission;
@@ -100,7 +100,7 @@ public class NotificationService {
         List<Map<String, Object>> result = new ArrayList<>();
 
         if (checkSafe("REQ_APPROVALS")) {
-            long pending = leaveRepository.countByStatus(0);
+            long pending = leaveRequestRepository.countByStatus("Pending");
             if (pending > 0) result.add(reminder("Đơn nghỉ phép chờ duyệt",
                     pending + " đơn nghỉ phép đang chờ bạn xử lý", "/day_off_letters/approvals"));
         }

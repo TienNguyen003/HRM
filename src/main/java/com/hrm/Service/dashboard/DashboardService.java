@@ -1,7 +1,7 @@
 package com.hrm.Service.dashboard;
 
 import com.hrm.dto.response.dashboard.DashboardResponse;
-import com.hrm.repository.day_off.LeaveRepository;
+import com.hrm.repository.hrm.HrmLeaveRequestRepository;
 import com.hrm.repository.job.DisqualifiedRepository;
 import com.hrm.repository.office.DepartmentRepository;
 import com.hrm.repository.timekeeping.TimeRepository;
@@ -20,7 +20,7 @@ import java.time.LocalDate;
 public class DashboardService {
     EmployeeRepository employeeRepository;
     TimeRepository timeRepository;
-    LeaveRepository leaveRepository;
+    HrmLeaveRequestRepository leaveRequestRepository;
     AdvanceRepository advanceRepository;
     DisqualifiedRepository disqualifiedRepository;
     DepartmentRepository departmentRepository;
@@ -31,7 +31,7 @@ public class DashboardService {
         return DashboardResponse.builder()
                 .totalEmployees(employeeRepository.count())
                 .presentToday(timeRepository.countByDate(today))
-                .pendingLeaves(leaveRepository.countByStatus(0))
+                .pendingLeaves(leaveRequestRepository.countByStatus("Pending"))
                 .pendingAdvances(advanceRepository.countByStatus(0))
                 .pendingCvs(disqualifiedRepository.countByStatus(0))
                 .totalDepartments(departmentRepository.countByStatus(1))

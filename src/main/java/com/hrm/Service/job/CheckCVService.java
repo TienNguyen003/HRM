@@ -2,7 +2,13 @@ package com.hrm.Service.job;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.hrm.Entity.job.Assessment;
 import com.hrm.Entity.job.Disqualified;
+import com.hrm.Entity.job.Requirements;
+import com.hrm.Exception.AppException;
+import com.hrm.Exception.ErrorCode;
+import com.hrm.repository.job.AssessmentRepository;
+import com.hrm.repository.job.RequireRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,8 +32,24 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CheckCVService {
     DisqualifiedService disqualifiedService;
+    AssessmentRepository assessmentRepository;
+    RequireRepository requireRepository;
 
+    /** Giữ tương thích client cũ: tiêu chí do client truyền. */
     public List<Map<String, Object>> uploadCV(MultipartFile[] file, List<Map<String, String>> data) {
+        return uploadCV(file, data, null);
+    }
+
+    /**
+     * Nếu có assessmentId thì tiêu chí được ĐỌC TỪ DB (Assessment/Requirements),
+     * không còn tin vào dữ liệu do client gửi lên.
+     */
+    public List<Map<String, Object>> uploadCV(MultipartFile[] file, List<Map<String, String>> data, Integer assessmentId) {
+        if (assessmentId == null && (data == null || data.isEmpty()))
+            throw new AppException(ErrorCode.CV_SCORE_INVALID, "Cần truyền assessmentId hoặc danh sách tiêu chí");
+        List<Map<String, String>> criteria = assessmentId == null ? data : criteriaFromAssessment(assessmentId);
+        Assessment assessment = assessmentId == null ? null : assessmentRepository.findById(assessmentId)
+                .orElseThrow(() -> new AppException(ErrorCode.CV_ASSESSMENT_NOT_FOUND));
         try {
             List<Map<String, Object>> results = new ArrayList<>();
 
@@ -54,14 +76,14 @@ public class CheckCVService {
                 int flagTotal = 0;
                 int flagCheck = 0;
 
-                for (Map<String, String> item : data) {
-                    if (item.get("require").equals("1")) {
+                for (Map<String, String> item : criteria) {
+                    if ("1".equals(item.get("require"))) {
                         flagRequireObli++;
                         boolean contains = content.toLowerCase().contains(item.get("value").toLowerCase());
                         String message = String.format("Từ khóa \"%s\" %s",
                                 item.get("value"),
                                 contains ? "xuất hiện" : "không xuất hiện");
-                        flagRequireObliCount = contains ? flagRequireObliCount++ : flagRequireObliCount;
+                        flagRequireObliCount = contains ? flagRequireObliCount + 1 : flagRequireObliCount;
                         Map<String, String> newItem = new HashMap<>();
                         newItem.put("message", message);
                         matchesRequirements.add(newItem);
@@ -87,6 +109,8 @@ public class CheckCVService {
                         .email(info.get("email"))
                         .phone(info.get("phone"))
                         .status(flagRemove ? 1 : 2)
+                        .jobId(assessment == null ? null : assessment.getJobId())
+                        .stage(flagRemove ? 4 : 0)
                         .build();
                 disqualifiedService.createDisqualified(disqualified, files, files.getName());
 
@@ -102,6 +126,21 @@ public class CheckCVService {
 
         }
         return null;
+    }
+
+    /** Chuyển Requirements trong DB sang format tiêu chí mà logic lọc CV đang dùng. */
+    private List<Map<String, String>> criteriaFromAssessment(int assessmentId) {
+        List<Requirements> requirements = requireRepository.getByAssessmentId(assessmentId);
+        if (requirements.isEmpty())
+            throw new AppException(ErrorCode.CV_SCORE_INVALID, "Bộ tiêu chí chưa có tiêu chí con");
+        return requirements.stream().map(r -> {
+            Map<String, String> item = new HashMap<>();
+            item.put("name", r.getTitle());
+            item.put("value", r.getKeyword() == null || r.getKeyword().isBlank() ? r.getTitle() : r.getKeyword());
+            item.put("require", r.isMandatory() ? "1" : "0");
+            item.put("weight", String.valueOf(r.getWeight()));
+            return item;
+        }).toList();
     }
 
     private static String numberSections(String text) {

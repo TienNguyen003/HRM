@@ -13,6 +13,8 @@ import java.util.List;
 public interface DayOffRepository extends JpaRepository<DayOffCategories, Integer> {
     boolean existsByNameDay(String name);
 
+    java.util.Optional<DayOffCategories> findByNameDay(String nameDay);
+
     @Query("SELECT d FROM DayOffCategories d WHERE d.status = 1")
     List<DayOffCategories> getAllDayOff();
 

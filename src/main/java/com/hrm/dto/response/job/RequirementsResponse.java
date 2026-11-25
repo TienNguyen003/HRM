@@ -15,4 +15,7 @@ public class RequirementsResponse {
     String title;
 
     int assessmentId;
+    String keyword;
+    int weight;
+    boolean mandatory;
 }

@@ -3,8 +3,11 @@ package com.hrm.Controller.job;
 import com.hrm.Entity.PageCustom;
 import com.hrm.Entity.job.Disqualified;
 import com.hrm.Service.job.CheckCVService;
+import com.hrm.Service.job.CvAssessmentService;
 import com.hrm.Service.job.DisqualifiedService;
+import com.hrm.dto.request.job.CvScoreRequest;
 import com.hrm.dto.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,13 +25,33 @@ import java.util.Map;
 public class CheckCVController {
     CheckCVService checkCVService;
     DisqualifiedService disqualifiedService;
+    CvAssessmentService cvAssessmentService;
 
     @PreAuthorize("@requiredPermission.checkPermission('CV_ADD')")
     @PostMapping("/filter")
     public ApiResponse<List<Map<String, Object>>> uploadCv(@RequestParam("file") MultipartFile[] file,
-                                                           @RequestPart("data") List<Map<String, String>> data) {
+                                                           @RequestPart(required = false) List<Map<String, String>> data,
+                                                           @RequestParam(required = false) Integer assessmentId) {
         return ApiResponse.<List<Map<String, Object>>>builder()
-                .result(checkCVService.uploadCV(file, data))
+                .result(checkCVService.uploadCV(file, data, assessmentId))
+                .build();
+    }
+
+    /** Chấm điểm ứng viên theo tiêu chí lưu trong DB. */
+    @PreAuthorize("@requiredPermission.checkPermission('CV_EDIT')")
+    @PostMapping("/assess/{candidateId}")
+    public ApiResponse<Map<String, Object>> scoreCandidate(@PathVariable int candidateId,
+                                                           @Valid @RequestBody CvScoreRequest request) {
+        return ApiResponse.<Map<String, Object>>builder()
+                .result(cvAssessmentService.scoreCandidate(candidateId, request))
+                .build();
+    }
+
+    @PreAuthorize("@requiredPermission.checkPermission('CV_VIEW')")
+    @GetMapping("/assess/{candidateId}")
+    public ApiResponse<Map<String, Object>> getScores(@PathVariable int candidateId) {
+        return ApiResponse.<Map<String, Object>>builder()
+                .result(cvAssessmentService.getScores(candidateId))
                 .build();
     }
 

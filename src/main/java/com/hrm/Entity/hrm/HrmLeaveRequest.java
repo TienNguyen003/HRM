@@ -1,6 +1,7 @@
 package com.hrm.Entity.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hrm.Entity.user.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Đơn xin nghỉ phép. */
+/** Ă„ÂĂ†Â¡n xin nghĂ¡Â»â€° phÄ‚Â©p. */
 @Entity
 @Getter
 @Setter
@@ -30,10 +31,15 @@ public class HrmLeaveRequest {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id", nullable = false)
-    private HrmEmployee employee;
+    private Employee employee;
 
     @Column(name = "employee_name")
     private String employeeName;
+
+    /** Id số của đơn cũ (application_leave) để API /api/day_off_letter vẫn dùng int. */
+    @Column(name = "legacy_id")
+    private Integer legacyId;
+
     private String type;
     private String start;
     private String end;
@@ -44,6 +50,6 @@ public class HrmLeaveRequest {
     private String reason;
 
     public String getEmployeeId() {
-        return employee == null ? null : employee.getId();
+        return employee == null ? null : employee.getHrmId();
     }
 }

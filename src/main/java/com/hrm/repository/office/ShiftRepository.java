@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ShiftRepository extends JpaRepository<Shift, Integer> {
     Page<Shift> findAll(Pageable pageable);
+
+    java.util.Optional<Shift> findByCode(String code);
 }

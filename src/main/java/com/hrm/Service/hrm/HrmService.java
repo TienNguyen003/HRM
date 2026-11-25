@@ -1,9 +1,15 @@
 package com.hrm.Service.hrm;
 
 import com.hrm.Entity.hrm.*;
+import com.hrm.Entity.office.Department;
+import com.hrm.Entity.office.Shift;
+import com.hrm.Entity.user.Employee;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.repository.hrm.*;
+import com.hrm.repository.office.DepartmentRepository;
+import com.hrm.repository.office.ShiftRepository;
+import com.hrm.repository.user.EmployeeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,18 +27,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Nghiệp vụ module HRM (/api/hrm).
- *
- * Toàn bộ dữ liệu được lưu trong DB qua Repository. Seed chỉ đảm nhiệm việc khởi tạo
- * danh mục tham chiếu và (tuỳ cấu hình) dữ liệu mẫu một lần; mọi thao tác đều đi qua
- * service này với validation, transaction và audit log.
+ * Business logic for HRM module (/api/hrm).
+ * All data is persisted through JPA repositories. Seed only initializes reference data
+ * and (optionally) sample data once. Every operation has validation, transactions and audit log.
  */
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class HrmService {
 
-    HrmEmployeeRepository employeeRepository;
+    EmployeeRepository employeeRepository;
     HrmAttendanceRepository attendanceRepository;
     HrmLeaveRequestRepository leaveRequestRepository;
     HrmLeaveBalanceRepository leaveBalanceRepository;
@@ -53,7 +57,8 @@ public class HrmService {
     HrmOnboardingTaskRepository onboardingRepository;
     HrmOffboardingTaskRepository offboardingRepository;
     HrmLeavePolicyRepository leavePolicyRepository;
-    HrmShiftScheduleRepository shiftScheduleRepository;
+    DepartmentRepository departmentRepository;
+    ShiftRepository shiftRepository;
     HrmRosterRepository rosterRepository;
     HrmBenefitRepository benefitRepository;
     HrmBenefitEnrollmentRepository benefitEnrollmentRepository;
@@ -183,7 +188,7 @@ public class HrmService {
     }
 
     private String nextEmployeeId() {
-        return nextId(employeeRepository.findAll().stream().map(HrmEmployee::getId).toList(), "EMP", 5, 132);
+        return nextId(employeeRepository.findAll().stream().map(Employee::getHrmId).toList(), "EMP", 5, 132);
     }
 
     private String nextIdFor(List<String> ids, String prefix, int width, int start) {
@@ -208,11 +213,11 @@ public class HrmService {
     }
 
     private void requireIsoDate(String value, String field) {
-        if (value == null || value.isBlank()) invalidRequest(field + " không được để trống.");
+        if (value == null || value.isBlank()) invalidRequest(field + " khA�ng được để trống.");
         try {
             LocalDate.parse(value);
         } catch (DateTimeParseException e) {
-            invalidRequest(field + " phải có định dạng YYYY-MM-DD.");
+            invalidRequest(field + " phải cA� định dạng YYYY-MM-DD.");
         }
     }
 
@@ -224,16 +229,25 @@ public class HrmService {
     private void requireIn(String value, String category, String label) {
         List<String> allowed = referenceValues(category);
         if (value != null && !allowed.isEmpty() && !allowed.contains(value))
-            invalidRequest(label + " không hợp lệ: " + value);
+            invalidRequest(label + " khA�ng hợp lệ: " + value);
     }
 
-    private HrmEmployee findEmployeeEntity(String id) {
-        return employeeRepository.findById(id).orElse(null);
+    /** Nhận cả mã EMP-00123 lẫn id số (cho bản ghi cũ chưa có employeeCode). */
+    private Employee findEmployeeEntity(String id) {
+        if (id == null || id.isBlank()) return null;
+        String key = normalizeId(id);
+        Employee byCode = employeeRepository.findByEmployeeCode(key).orElse(null);
+        if (byCode != null) return byCode;
+        try {
+            return employeeRepository.findById(Integer.parseInt(key.replaceAll("\\D", ""))).orElse(null);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
-    private HrmEmployee requireEmployee(String id) {
-        HrmEmployee e = findEmployeeEntity(normalizeId(id));
-        if (e == null) notFound("Nhân viên");
+    private Employee requireEmployee(String id) {
+        Employee e = findEmployeeEntity(normalizeId(id));
+        if (e == null) notFound("NhA�n viA�n");
         return e;
     }
 
@@ -308,27 +322,28 @@ public class HrmService {
 
     @Transactional(readOnly = true)
     public boolean isEmployeeIdAvailable(String id) {
-        return id == null || id.isBlank() || !employeeRepository.existsById(normalizeId(id));
+        return id == null || id.isBlank() || findEmployeeEntity(id) == null;
     }
 
     @Transactional(readOnly = true)
     public Map<String, Object> getEmployeeById(String id) {
-        HrmEmployee emp = requireEmployee(id);
+        Employee emp = requireEmployee(id);
         Map<String, Object> r = HrmJson.toMap(emp);
-        String empId = emp.getId();
-        r.put("attendance", HrmJson.toMaps(attendanceRepository.findAllByEmployee_Id(empId)));
-        r.put("leave", HrmJson.toMaps(leaveRequestRepository.findAllByEmployee_Id(empId)));
-        List<HrmLeaveBalance> balances = leaveBalanceRepository.findByEmployee_Id(empId);
+        Integer empDbId = emp.getId();
+        String empCode = emp.getHrmId();
+        r.put("attendance", HrmJson.toMaps(attendanceRepository.findAllByEmployee_Id(empDbId)));
+        r.put("leave", HrmJson.toMaps(leaveRequestRepository.findAllByEmployee_Id(empDbId)));
+        List<HrmLeaveBalance> balances = leaveBalanceRepository.findByEmployee_Id(empDbId);
         r.put("balance", balances.isEmpty() ? null : HrmJson.toMap(balances.get(0)));
-        r.put("documents", HrmJson.toMaps(documentRepository.findAllByEmployee_Id(empId)));
-        r.put("activity", HrmJson.toMaps(activityLogRepository.findAllByEmployeeId(empId)));
+        r.put("documents", HrmJson.toMaps(documentRepository.findAllByEmployee_Id(empDbId)));
+        r.put("activity", HrmJson.toMaps(activityLogRepository.findAllByEmployeeId(empCode)));
         r.put("directReports", employeeRepository.findAll().stream()
                 .filter(x -> emp.getName().equalsIgnoreCase(nvl(x.getManager())))
-                .map(HrmEmployee::getId).toList());
+                .map(Employee::getHrmId).toList());
         return r;
     }
 
-    private void applyEmployeePayload(HrmEmployee e, Map<String, Object> payload, boolean create) {
+    private void applyEmployeePayload(Employee e, Map<String, Object> payload, boolean create) {
         if (payload == null) payload = Map.of();
         String first = create || payload.containsKey("firstName") ? nvl(payload.get("firstName")) : nvl(e.getFirstName());
         String last = create || payload.containsKey("lastName") ? nvl(payload.get("lastName")) : nvl(e.getLastName());
@@ -341,7 +356,7 @@ public class HrmService {
             requireIsoDate(joinIso == null ? LocalDate.now().toString() : joinIso, "joinDate");
             String iso = joinIso == null ? LocalDate.now().toString() : joinIso;
             e.setJoinedDateIso(iso);
-            e.setJoinedDate(formatDisplayDate(iso));
+            e.setJoined_date(formatDisplayDate(iso));
         }
 
         Map<String, Object> ec = payload.get("emergencyContact") instanceof Map<?, ?> m
@@ -359,12 +374,12 @@ public class HrmService {
                     "emergencyName", "emergencyRelation", "emergencyPhone").contains(k)) continue;
             switch (k) {
                 case "position" -> e.setPosition(str(entry.getValue()));
-                case "department" -> e.setDepartment(str(entry.getValue()));
+                case "department" -> e.setDepartmentName(str(entry.getValue()));
                 case "manager" -> e.setManager(str(entry.getValue()));
                 case "employmentType" -> e.setEmploymentType(str(entry.getValue()));
                 case "email" -> e.setEmail(str(entry.getValue()));
-                case "phone" -> e.setPhone(str(entry.getValue()));
-                case "dateOfBirth" -> e.setDateOfBirth(str(entry.getValue()));
+                case "phone" -> e.setPhone_number(str(entry.getValue()));
+                case "dateOfBirth" -> e.setBirth_date(str(entry.getValue()));
                 case "address" -> e.setAddress(str(entry.getValue()));
                 case "location" -> e.setLocation(str(entry.getValue()));
                 case "idCard" -> e.setIdCard(str(entry.getValue()));
@@ -395,7 +410,7 @@ public class HrmService {
         }
         if (create) {
             if (e.getPosition() == null || e.getPosition().isBlank()) e.setPosition("Team Member");
-            if (e.getDepartment() == null || e.getDepartment().isBlank()) e.setDepartment("Unassigned");
+            if (e.getDepartmentName() == null || e.getDepartmentName().isBlank()) e.setDepartmentName("Unassigned");
             if (e.getManager() == null || e.getManager().isBlank()) e.setManager("Not assigned");
             if (e.getEmploymentType() == null || e.getEmploymentType().isBlank()) e.setEmploymentType("Full-time");
             if (e.getLocation() == null || e.getLocation().isBlank()) e.setLocation("Ho Chi Minh City");
@@ -403,17 +418,36 @@ public class HrmService {
             e.setLeaveBalance(20);
             e.setGoals(0);
         }
-        requireIn(e.getStatus(), "employeeStatuses", "Trạng thái nhân viên");
-        requireIn(e.getEmploymentType(), "employmentTypes", "Loại hình làm việc");
+        if (create || payload.containsKey("department") || e.getDepartment() == null) {
+            applyDepartment(e, e.getDepartmentName());
+        }
+        requireIn(e.getStatus(), "employeeStatuses", "Trạng thA�i nhA�n viA�n");
+        requireIn(e.getEmploymentType(), "employmentTypes", "Loại hA�nh lA�m việc");
+    }
+
+    /** Employee.department (entity Department) là nguồn đơn nhất; departmentName chỉ là cache để trả response. */
+    private void applyDepartment(Employee e, String name) {
+        String value = name == null || name.isBlank() ? "Unassigned" : name.trim();
+        e.setDepartmentName(value);
+        Department dept = departmentRepository.findAll().stream()
+                .filter(d -> value.equalsIgnoreCase(nvl(d.getName())))
+                .findFirst().orElseGet(() -> {
+                    Department created = new Department();
+                    created.setName(value);
+                    created.setShortName(value);
+                    created.setStatus(1);
+                    return departmentRepository.save(created);
+                });
+        e.setDepartment(dept);
     }
 
     @Transactional
     public Map<String, Object> createEmployee(Map<String, Object> payload) {
         String requested = normalizeId(payload.get("employeeId"));
-        String id = requested.matches("EMP-\\d{5}") && !employeeRepository.existsById(requested)
+        String id = requested.matches("EMP-\\d{5}") && !employeeRepository.existsByEmployeeCode(requested)
                 ? requested : nextEmployeeId();
-        HrmEmployee e = new HrmEmployee();
-        e.setId(id);
+        Employee e = new Employee();
+        e.setEmployeeCode(id);
         applyEmployeePayload(e, payload, true);
         employeeRepository.save(e);
 
@@ -422,7 +456,7 @@ public class HrmService {
         att.setId("ATT-" + id + "-" + today);
         att.setEmployee(e);
         att.setEmployeeName(e.getName());
-        att.setDepartment(e.getDepartment());
+        att.setDepartment(e.getDepartmentName());
         att.setDate(today);
         att.setDateLabel(formatDisplayDate(today));
         att.setWeekday(LocalDate.now().getDayOfWeek().toString().substring(0, 3));
@@ -435,18 +469,18 @@ public class HrmService {
 
         HrmLeaveBalance balance = newLeaveBalance(e);
         leaveBalanceRepository.save(balance);
-        pushActivity(id, "Employee created", e.getName() + " was added to " + e.getDepartment() + ".",
+        pushActivity(id, "Employee created", e.getName() + " was added to " + e.getDepartmentName() + ".",
                 "fas fa-user-plus", "success");
         audit("CREATE", "Employee", id);
         return HrmJson.toMap(e);
     }
 
-    private HrmLeaveBalance newLeaveBalance(HrmEmployee e) {
+    private HrmLeaveBalance newLeaveBalance(Employee e) {
         HrmLeaveBalance b = new HrmLeaveBalance();
-        b.setId(e.getId());
+        b.setId(e.getHrmId());
         b.setEmployee(e);
         b.setEmployeeName(e.getName());
-        b.setDepartment(e.getDepartment());
+        b.setDepartment(e.getDepartmentName());
         b.setAnnualTotal(20); b.setAnnualUsed(0); b.setAnnualPending(0);
         b.setSickTotal(12); b.setSickUsed(0); b.setSickPending(0);
         b.setUnpaidTotal(0); b.setUnpaidUsed(0); b.setUnpaidPending(0);
@@ -455,7 +489,7 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> updateEmployee(String id, Map<String, Object> payload) {
-        HrmEmployee e = requireEmployee(id);
+        Employee e = requireEmployee(id);
         String normalized = normalizeId(id);
         if (payload != null && payload.containsKey("status")) e.setStatus(str(payload.get("status")));
         applyEmployeePayload(e, payload, false);
@@ -467,25 +501,30 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> deleteEmployee(String id) {
-        HrmEmployee e = requireEmployee(id);
-        String empId = e.getId();
-        attendanceRepository.deleteAllByEmployee_Id(empId);
-        documentRepository.deleteAllByEmployee_Id(empId);
-        leaveRequestRepository.deleteAllByEmployee_Id(empId);
-        leaveBalanceRepository.deleteByEmployee_Id(empId);
+        Employee e = requireEmployee(id);
+        Integer empDbId = e.getId();
+        String empCode = e.getHrmId();
+        attendanceRepository.deleteAllByEmployee_Id(empDbId);
+        documentRepository.deleteAllByEmployee_Id(empDbId);
+        leaveRequestRepository.deleteAllByEmployee_Id(empDbId);
+        leaveBalanceRepository.deleteByEmployee_Id(empDbId);
         employeeRepository.delete(e);
-        audit("DELETE", "Employee", empId);
+        audit("DELETE", "Employee", empCode);
         return HrmJson.toMap(e);
     }
 
     // ---------------------------------------------------------------- organization
     @Transactional(readOnly = true)
     public Map<String, Object> getOrganizationOverview() {
-        List<Map<String, Object>> all = HrmJson.toMaps(employeeRepository.findAll());
-        List<String> depts = uniqueStr(all, "department");
+        List<Employee> employees = employeeRepository.findAll();
+        List<Map<String, Object>> all = HrmJson.toMaps(employees);
+        List<String> depts = departmentRepository.findAll().stream()
+                .map(Department::getName).filter(Objects::nonNull).distinct().collect(Collectors.toList());
         List<Map<String, Object>> byDep = new ArrayList<>();
         for (String name : depts) {
-            List<Map<String, Object>> members = all.stream().filter(e -> name.equals(e.get("department"))).toList();
+            List<Map<String, Object>> members = employees.stream()
+                    .filter(e -> e.getDepartment() != null && name.equals(e.getDepartment().getName()))
+                    .map(HrmJson::toMap).toList();
             Map<String, Object> lead = members.stream()
                     .filter(m -> all.stream().anyMatch(x -> nvl(x.get("manager")).equals(m.get("name"))))
                     .findFirst().orElse(members.isEmpty() ? null : members.get(0));
@@ -515,10 +554,18 @@ public class HrmService {
     @Transactional(readOnly = true)
     public Map<String, Object> getDepartmentDetail(String name) {
         String department = name == null ? "" : name.trim();
-        if (department.isBlank()) invalidRequest("Tên phòng ban không được để trống.");
+        if (department.isBlank()) invalidRequest("TA�n phA�ng ban khA�ng được để trống.");
+        Department dept = departmentRepository.findAll().stream()
+                .filter(d -> department.equalsIgnoreCase(nvl(d.getName())))
+                .findFirst().orElse(null);
+        if (dept == null) notFound("Phòng ban");
+        String canonicalName = dept.getName();
+        List<Employee> employees = employeeRepository.findByDepartment_Name(canonicalName);
+        if (employees.isEmpty()) employees = employeeRepository.findAll().stream()
+                .filter(e -> canonicalName.equals(e.getDepartmentName())).toList();
         List<Map<String, Object>> all = HrmJson.toMaps(employeeRepository.findAll());
-        List<Map<String, Object>> members = all.stream().filter(e -> department.equals(e.get("department"))).toList();
-        if (members.isEmpty()) notFound("Phòng ban");
+        List<Map<String, Object>> members = HrmJson.toMaps(employees);
+        if (members.isEmpty()) notFound("PhA�ng ban");
 
         Map<String, Object> lead = members.stream()
                 .filter(m -> all.stream().anyMatch(x -> nvl(x.get("manager")).equals(m.get("name"))))
@@ -573,7 +620,7 @@ public class HrmService {
         }
 
         Map<String, Object> r = new LinkedHashMap<>();
-        r.put("name", department);
+        r.put("name", canonicalName);
         r.put("manager", manager);
         r.put("headcount", members.size());
         r.put("locations", uniqueStr(members, "location"));
@@ -612,8 +659,8 @@ public class HrmService {
 
     @Transactional(readOnly = true)
     public Map<String, Object> getOrganizationChart() {
-        List<HrmEmployee> all = employeeRepository.findAll();
-        HrmEmployee rootEmp = all.stream().filter(e -> "Board of Directors".equals(e.getManager()))
+        List<Employee> all = employeeRepository.findAll();
+        Employee rootEmp = all.stream().filter(e -> "Board of Directors".equals(e.getManager()))
                 .findFirst().orElse(all.isEmpty() ? null : all.get(0));
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("root", buildOrgNode(rootEmp, new HashSet<>(), all));
@@ -621,15 +668,15 @@ public class HrmService {
         return r;
     }
 
-    private Map<String, Object> buildOrgNode(HrmEmployee employee, Set<String> visited, List<HrmEmployee> all) {
-        if (employee == null || visited.contains(employee.getId())) return null;
+    private Map<String, Object> buildOrgNode(Employee employee, Set<String> visited, List<Employee> all) {
+        if (employee == null || visited.contains(employee.getHrmId())) return null;
         Set<String> next = new HashSet<>(visited);
-        next.add(employee.getId());
+        next.add(employee.getHrmId());
         Map<String, Object> node = new LinkedHashMap<>();
         for (String k : List.of("id", "name", "position", "department", "manager", "initials"))
             node.put(k, HrmJson.toMap(employee).get(k));
         List<Map<String, Object>> reports = new ArrayList<>();
-        for (HrmEmployee rep : all) {
+        for (Employee rep : all) {
             if (employee.getName().equalsIgnoreCase(nvl(rep.getManager()))) {
                 Map<String, Object> child = buildOrgNode(rep, next, all);
                 if (child != null) reports.add(child);
@@ -739,7 +786,7 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> checkIn(String employeeId) {
-        HrmEmployee employee = requireEmployee(employeeId);
+        Employee employee = requireEmployee(employeeId);
         LocalDate now = LocalDate.now();
         String iso = now.toString();
         String stamp = String.format("%02d:%02d", java.time.LocalDateTime.now().getHour(), java.time.LocalDateTime.now().getMinute());
@@ -748,7 +795,7 @@ public class HrmService {
         record.setId(id);
         record.setEmployee(employee);
         record.setEmployeeName(employee.getName());
-        record.setDepartment(employee.getDepartment());
+        record.setDepartment(employee.getDepartmentName());
         record.setDate(iso);
         record.setDateLabel(formatDisplayDate(iso));
         record.setWeekday(now.getDayOfWeek().toString().substring(0, 3));
@@ -758,7 +805,7 @@ public class HrmService {
         record.setLateMinutes(0);
         record.setStatus("Present");
         attendanceRepository.save(record);
-        pushActivity(employee.getId(), "Check in", employee.getName() + " checked in at " + stamp + ".",
+        pushActivity(employee.getHrmId(), "Check in", employee.getName() + " checked in at " + stamp + ".",
                 "fas fa-right-to-bracket", "success");
         audit("CHECK_IN", "Attendance", id);
         return HrmJson.toMap(record);
@@ -766,10 +813,10 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> checkOut(String employeeId) {
-        HrmEmployee employee = requireEmployee(employeeId);
+        Employee employee = requireEmployee(employeeId);
         HrmAttendance record = attendanceRepository.findAllByEmployee_Id(employee.getId()).stream()
                 .filter(x -> "--".equals(x.getCheckOut())).findFirst().orElse(null);
-        if (record == null) notFound("Bản ghi chấm công");
+        if (record == null) notFound("Bản ghi chấm cA�ng");
         record.setCheckOut(String.format("%02d:%02d", java.time.LocalDateTime.now().getHour(), java.time.LocalDateTime.now().getMinute()));
         record.setHours("Recorded");
         attendanceRepository.save(record);
@@ -778,6 +825,14 @@ public class HrmService {
     }
 
     // ---------------------------------------------------------------- leave
+    private int nextLegacyLeaveId() {
+        return leaveRequestRepository.findAll().stream()
+                .map(HrmLeaveRequest::getLegacyId)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .max().orElse(0) + 1;
+    }
+
     @Transactional(readOnly = true)
     public Map<String, Object> getLeaveRequests(String search, String status, String type, String employeeId,
                                                 String sort, String sortDirection, Integer page, Integer pageSize) {
@@ -824,8 +879,9 @@ public class HrmService {
 
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getLeaveBalances(String employeeId) {
-        List<HrmLeaveBalance> balances = (employeeId == null || employeeId.isBlank())
-                ? leaveBalanceRepository.findAll() : leaveBalanceRepository.findByEmployee_Id(employeeId);
+        Employee filterEmployee = (employeeId == null || employeeId.isBlank()) ? null : findEmployeeEntity(employeeId);
+        List<HrmLeaveBalance> balances = filterEmployee == null
+                ? leaveBalanceRepository.findAll() : leaveBalanceRepository.findByEmployee_Id(filterEmployee.getId());
         List<Map<String, Object>> result = new ArrayList<>();
         for (HrmLeaveBalance b : balances) {
             Map<String, Object> m = HrmJson.toMap(b);
@@ -849,7 +905,7 @@ public class HrmService {
     @Transactional(readOnly = true)
     public Map<String, Object> getLeaveById(String id) {
         HrmLeaveRequest item = leaveRequestRepository.findById(id).orElse(null);
-        if (item == null) notFound("Yêu cầu nghỉ phép");
+        if (item == null) notFound("YA�u cầu nghỉ phA�p");
         Map<String, Object> r = HrmJson.toMap(item);
         List<Map<String, Object>> timeline = new ArrayList<>();
         timeline.add(timeline("Employee submitted request", item.getSubmitted(), "done"));
@@ -872,23 +928,24 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> createLeaveRequest(Map<String, Object> payload) {
-        HrmEmployee employee = requireEmployee(str(payload.get("employeeId")));
+        Employee employee = requireEmployee(str(payload.get("employeeId")));
         String type = nvl(payload.get("type"));
         if (type.isBlank()) type = "Annual Leave";
-        requireIn(type, "leaveTypes", "Loại nghỉ phép");
+        requireIn(type, "leaveTypes", "Loại nghỉ phA�p");
         String start = str(payload.get("start"));
         String end = str(payload.get("end"));
         requireIsoDate(start, "start");
         requireIsoDate(end, "end");
-        if (start.compareTo(end) > 0) invalidRequest("Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.");
+        if (start.compareTo(end) > 0) invalidRequest("NgA�y kết thA�c phải sau hoặc bằng ngA�y bắt đầu.");
         int days = intOf(payload.get("days"), 0);
-        if (days <= 0) invalidRequest("Số ngày nghỉ phải lớn hơn 0.");
+        if (days <= 0) invalidRequest("Số ngA�y nghỉ phải lớn hơn 0.");
 
         String id = nextIdFor(leaveRequestRepository.findAll().stream().map(HrmLeaveRequest::getId).toList(), "LV", 3, 1);
         HrmLeaveRequest item = new HrmLeaveRequest();
         item.setId(id);
         item.setEmployee(employee);
         item.setEmployeeName(employee.getName());
+        item.setLegacyId(nextLegacyLeaveId());
         item.setType(type);
         item.setStart(start);
         item.setEnd(end);
@@ -900,7 +957,7 @@ public class HrmService {
         leaveRequestRepository.save(item);
 
         adjustBalance(employee, type, days, true, false);
-        pushActivity(employee.getId(), "Leave requested", days + " day(s) of " + type + " requested.",
+        pushActivity(employee.getHrmId(), "Leave requested", days + " day(s) of " + type + " requested.",
                 "fas fa-calendar-plus", "info");
         audit("CREATE", "LeaveRequest", id);
         return HrmJson.toMap(item);
@@ -908,9 +965,9 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> updateLeaveStatus(String id, String status, String approver) {
-        requireIn(status, "leaveStatuses", "Trạng thái nghỉ phép");
+        requireIn(status, "leaveStatuses", "Trạng thA�i nghỉ phA�p");
         HrmLeaveRequest item = leaveRequestRepository.findById(id).orElse(null);
-        if (item == null) notFound("Yêu cầu nghỉ phép");
+        if (item == null) notFound("YA�u cầu nghỉ phA�p");
         String previous = item.getStatus();
         item.setStatus(status);
         if (approver != null && !approver.isBlank()) item.setApprover(approver);
@@ -926,7 +983,7 @@ public class HrmService {
         return HrmJson.toMap(item);
     }
 
-    private void adjustBalance(HrmEmployee employee, String type, int days, boolean pendingUp, boolean approve) {
+    private void adjustBalance(Employee employee, String type, int days, boolean pendingUp, boolean approve) {
         if (employee == null) return;
         HrmLeaveBalance b = leaveBalanceRepository.findByEmployee_Id(employee.getId()).stream().findFirst().orElse(null);
         if (b == null) {
@@ -990,7 +1047,7 @@ public class HrmService {
     @Transactional(readOnly = true)
     public Map<String, Object> getCandidateById(String id) {
         HrmCandidate candidate = candidateRepository.findById(id).orElse(null);
-        if (candidate == null) notFound("Ứng viên");
+        if (candidate == null) notFound("Ứng viA�n");
         Map<String, Object> r = HrmJson.toMap(candidate);
         r.put("interviews", HrmJson.toMaps(interviewRepository.findAllByCandidate_Id(id)));
         return r;
@@ -1000,7 +1057,7 @@ public class HrmService {
     public Map<String, Object> createCandidate(Map<String, Object> payload) {
         HrmCandidate c = HrmJson.fromMap(payload, HrmCandidate.class);
         c.setId(nextIdFor(candidateRepository.findAll().stream().map(HrmCandidate::getId).toList(), "CAN", 4, 1001));
-        if (c.getName() == null || c.getName().isBlank()) invalidRequest("Tên ứng viên không được để trống.");
+        if (c.getName() == null || c.getName().isBlank()) invalidRequest("TA�n ứng viA�n khA�ng được để trống.");
         c.setStage(c.getStage() == null ? "Applied" : c.getStage());
         requireIn(c.getStage(), "recruitmentStages", "Giai đoạn tuyển dụng");
         if (c.getApplied() == null || c.getApplied().isBlank()) c.setApplied(LocalDate.now().toString());
@@ -1014,7 +1071,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> updateCandidate(String id, Map<String, Object> payload) {
         HrmCandidate c = candidateRepository.findById(id).orElse(null);
-        if (c == null) notFound("Ứng viên");
+        if (c == null) notFound("Ứng viA�n");
         HrmCandidate updated = HrmJson.fromMap(payload, HrmCandidate.class);
         copyCandidateFields(updated, c);
         c.getAttributes().putAll(payload);
@@ -1040,7 +1097,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> deleteCandidate(String id) {
         HrmCandidate c = candidateRepository.findById(id).orElse(null);
-        if (c == null) notFound("Ứng viên");
+        if (c == null) notFound("Ứng viA�n");
         interviewRepository.findAllByCandidate_Id(id).forEach(interviewRepository::delete);
         candidateRepository.delete(c);
         audit("DELETE", "Candidate", id);
@@ -1051,7 +1108,7 @@ public class HrmService {
     public Map<String, Object> updateCandidateStage(String id, String stage) {
         requireIn(stage, "recruitmentStages", "Giai đoạn tuyển dụng");
         HrmCandidate c = candidateRepository.findById(id).orElse(null);
-        if (c == null) notFound("Ứng viên");
+        if (c == null) notFound("Ứng viA�n");
         c.setStage(stage);
         List<Map<String, Object>> history = c.getStageHistory() == null ? new ArrayList<>() : new ArrayList<>(c.getStageHistory());
         Map<String, Object> h = new LinkedHashMap<>();
@@ -1068,7 +1125,7 @@ public class HrmService {
     public Map<String, Object> scheduleInterview(Map<String, Object> payload) {
         String candidateId = str(payload.get("candidateId"));
         HrmCandidate candidate = candidateRepository.findById(candidateId).orElse(null);
-        if (candidate == null) notFound("Ứng viên");
+        if (candidate == null) notFound("Ứng viA�n");
         String date = str(payload.get("date"));
         requireIsoDate(date, "date");
         HrmInterview i = new HrmInterview();
@@ -1118,7 +1175,7 @@ public class HrmService {
         HrmPosition p = new HrmPosition();
         p.setId(nextIdFor(positionRepository.findAll().stream().map(HrmPosition::getId).toList(), "POS", 2, 1));
         p.setTitle(nvl(payload.get("title")));
-        if (p.getTitle().isBlank()) invalidRequest("Tiêu đề vị trí không được để trống.");
+        if (p.getTitle().isBlank()) invalidRequest("TiA�u đề vị trA� khA�ng được để trống.");
         p.setDepartment(nvl(payload.get("department")));
         p.setLocation(nvl(payload.getOrDefault("location", "Ho Chi Minh City")));
         p.setType(nvl(payload.getOrDefault("type", "Full-time")));
@@ -1136,7 +1193,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> updatePosition(String id, Map<String, Object> payload) {
         HrmPosition p = positionRepository.findById(id).orElse(null);
-        if (p == null) notFound("Vị trí tuyển dụng");
+        if (p == null) notFound("Vị trA� tuyển dụng");
         HrmPosition u = HrmJson.fromMap(payload, HrmPosition.class);
         if (u.getTitle() != null) p.setTitle(u.getTitle());
         if (u.getDepartment() != null) p.setDepartment(u.getDepartment());
@@ -1153,7 +1210,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> closePosition(String id) {
         HrmPosition p = positionRepository.findById(id).orElse(null);
-        if (p == null) notFound("Vị trí tuyển dụng");
+        if (p == null) notFound("Vị trA� tuyển dụng");
         p.setStatus("Closed");
         positionRepository.save(p);
         audit("CLOSE", "Position", id);
@@ -1178,7 +1235,7 @@ public class HrmService {
         HrmGoal g = new HrmGoal();
         g.setId(nextIdFor(goalRepository.findAll().stream().map(HrmGoal::getId).toList(), "GOAL", 2, 1));
         g.setTitle(nvl(payload.get("title")));
-        if (g.getTitle().isBlank()) invalidRequest("Tiêu đề mục tiêu không được để trống.");
+        if (g.getTitle().isBlank()) invalidRequest("TiA�u đề mục tiA�u khA�ng được để trống.");
         g.setOwner(nvl(payload.get("owner")));
         g.setDepartment(nvl(payload.get("department")));
         int progress = Math.min(100, Math.max(0, intOf(payload.get("progress"), 0)));
@@ -1187,7 +1244,7 @@ public class HrmService {
         g.setDueIso(due == null || due.isBlank() ? "2026-12-31" : due);
         g.setDue(due == null || due.isBlank() ? "31 Dec 2026" : formatDisplayDate(due));
         g.setPriority(nvl(payload.getOrDefault("priority", "Medium")));
-        requireIn(g.getPriority(), "goalPriorities", "Độ ưu tiên");
+        requireIn(g.getPriority(), "goalPriorities", "Độ ưu tiA�n");
         g.setMetric(nvl(payload.getOrDefault("metric", "Progress")));
         g.setTarget(nvl(payload.getOrDefault("target", "100%")));
         g.setStatus(goalStatus(progress));
@@ -1203,7 +1260,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> updateGoalProgress(String id, Object progress) {
         HrmGoal g = goalRepository.findById(id).orElse(null);
-        if (g == null) notFound("Mục tiêu");
+        if (g == null) notFound("Mục tiA�u");
         int p = Math.min(100, Math.max(0, intOf(progress, 0)));
         g.setProgress(p);
         g.setStatus(goalStatus(p));
@@ -1215,14 +1272,14 @@ public class HrmService {
     @Transactional(readOnly = true)
     public Map<String, Object> getReviewById(String id) {
         HrmReview r = reviewRepository.findById(id).orElse(null);
-        if (r == null) notFound("Đánh giá");
+        if (r == null) notFound("ĐA�nh giA�");
         return HrmJson.toMap(r);
     }
 
     @Transactional
     public Map<String, Object> updateReview(String id, Map<String, Object> payload) {
         HrmReview r = reviewRepository.findById(id).orElse(null);
-        if (r == null) notFound("Đánh giá");
+        if (r == null) notFound("ĐA�nh giA�");
         HrmReview u = HrmJson.fromMap(payload, HrmReview.class);
         copyReviewFields(u, r);
         r.getAttributes().putAll(payload);
@@ -1246,7 +1303,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> completeReview(String id, Map<String, Object> payload) {
         HrmReview r = reviewRepository.findById(id).orElse(null);
-        if (r == null) notFound("Đánh giá");
+        if (r == null) notFound("ĐA�nh giA�");
         HrmReview u = HrmJson.fromMap(payload, HrmReview.class);
         copyReviewFields(u, r);
         r.getAttributes().putAll(payload);
@@ -1266,7 +1323,7 @@ public class HrmService {
     public Map<String, Object> createKpi(Map<String, Object> payload) {
         HrmKpi k = HrmJson.fromMap(payload, HrmKpi.class);
         k.setId(nextIdFor(kpiRepository.findAll().stream().map(HrmKpi::getId).toList(), "KPI", 3, 1));
-        if (k.getName() == null || k.getName().isBlank()) invalidRequest("Tên KPI không được để trống.");
+        if (k.getName() == null || k.getName().isBlank()) invalidRequest("TA�n KPI khA�ng được để trống.");
         if (k.getStatus() == null || k.getStatus().isBlank()) k.setStatus("Active");
         fillAttributes(payload, k);
         kpiRepository.save(k);
@@ -1316,7 +1373,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> updateFeedback(String id, Map<String, Object> payload) {
         HrmFeedback f = feedbackRepository.findById(id).orElse(null);
-        if (f == null) notFound("Nhận xét");
+        if (f == null) notFound("Nhận xA�t");
         HrmFeedback u = HrmJson.fromMap(payload, HrmFeedback.class);
         if (u.getTone() != null) f.setTone(u.getTone());
         if (u.getText() != null) f.setText(u.getText());
@@ -1331,7 +1388,7 @@ public class HrmService {
     // ---------------------------------------------------------------- documents
     @Transactional
     public Map<String, Object> addEmployeeDocument(String employeeId, Map<String, Object> payload) {
-        HrmEmployee employee = requireEmployee(employeeId);
+        Employee employee = requireEmployee(employeeId);
         HrmDocument d = new HrmDocument();
         d.setId(nextIdFor(documentRepository.findAll().stream().map(HrmDocument::getId).toList(), "DOC", 2, 1));
         d.setEmployee(employee);
@@ -1344,7 +1401,7 @@ public class HrmService {
         d.setFileName(str(payload.get("fileName")));
         d.setContentType(str(payload.get("contentType")));
         documentRepository.save(d);
-        pushActivity(employee.getId(), "Document uploaded", d.getName() + " was added to the profile.",
+        pushActivity(employee.getHrmId(), "Document uploaded", d.getName() + " was added to the profile.",
                 "fas fa-file-arrow-up", "primary");
         audit("CREATE", "Document", d.getId());
         return HrmJson.toMap(d);
@@ -1353,7 +1410,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> removeEmployeeDocument(String documentId) {
         HrmDocument d = documentRepository.findById(documentId).orElse(null);
-        if (d == null) notFound("Tài liệu");
+        if (d == null) notFound("TA�i liệu");
         documentRepository.delete(d);
         pushActivity(d.getEmployeeId(), "Document removed", d.getName() + " was removed from the profile.",
                 "fas fa-file-circle-xmark", "warning");
@@ -1375,7 +1432,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> markNotificationRead(String id) {
         HrmNotification n = notificationRepository.findById(id).orElse(null);
-        if (n == null) notFound("Thông báo");
+        if (n == null) notFound("ThA�ng bA�o");
         n.setUnread(false);
         notificationRepository.save(n);
         return HrmJson.toMap(n);
@@ -1548,14 +1605,14 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> createOvertime(Map<String, Object> payload) {
-        HrmEmployee employee = findEmployeeEntity(normalizeId(payload.get("employeeId")));
+        Employee employee = findEmployeeEntity(normalizeId(payload.get("employeeId")));
         double hours = doubleOf(payload.get("hours"), 0);
         if (hours <= 0) invalidRequest("Số giờ tăng ca phải lớn hơn 0.");
         HrmOvertimeRequest o = new HrmOvertimeRequest();
         o.setId(nextIdFor(overtimeRepository.findAll().stream().map(HrmOvertimeRequest::getId).toList(), "OT", 3, 1));
         o.setEmployee(employee);
         o.setEmployeeName(employee == null ? nvl(payload.get("employeeName")) : employee.getName());
-        o.setDepartment(employee == null ? nvl(payload.get("department")) : employee.getDepartment());
+        o.setDepartment(employee == null ? nvl(payload.get("department")) : employee.getDepartmentName());
         o.setDate(str(payload.getOrDefault("date", LocalDate.now().toString())));
         requireIsoDate(o.getDate(), "date");
         o.setHours(hours);
@@ -1570,9 +1627,9 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> updateOvertimeStatus(String id, String status) {
-        requireIn(status, "overtimeStatuses", "Trạng thái tăng ca");
+        requireIn(status, "overtimeStatuses", "Trạng thA�i tăng ca");
         HrmOvertimeRequest o = overtimeRepository.findById(id).orElse(null);
-        if (o == null) notFound("Yêu cầu tăng ca");
+        if (o == null) notFound("YA�u cầu tăng ca");
         o.setStatus(status);
         overtimeRepository.save(o);
         audit("UPDATE_STATUS", "OvertimeRequest", id);
@@ -1597,10 +1654,10 @@ public class HrmService {
     @Transactional
     public Map<String, Object> createPayrollRun(Map<String, Object> payload) {
         String month = str(payload.get("month"));
-        if (month == null || !month.matches("\\d{4}-\\d{2}")) invalidRequest("Tháng bảng lương phải có dạng YYYY-MM.");
+        if (month == null || !month.matches("\\d{4}-\\d{2}")) invalidRequest("ThA�ng bảng lương phải cA� dạng YYYY-MM.");
         if (payrollRunRepository.findAll().stream().anyMatch(p -> month.equals(p.getMonth())
                 && Objects.equals(nvl(p.getDepartment()), nvl(payload.getOrDefault("department", "All")))))
-            invalidRequest("Đợt lương cho tháng/phòng ban này đã tồn tại.");
+            invalidRequest("Đợt lương cho thA�ng/phA�ng ban nA�y đA� tồn tại.");
         HrmPayrollRun p = new HrmPayrollRun();
         p.setId(nextIdFor(payrollRunRepository.findAll().stream().map(HrmPayrollRun::getId).toList(), "PR", 3, 1));
         p.setMonth(month);
@@ -1622,7 +1679,7 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> updatePayrollRunStatus(String id, String status) {
-        requireIn(status, "payrollStatuses", "Trạng thái bảng lương");
+        requireIn(status, "payrollStatuses", "Trạng thA�i bảng lương");
         HrmPayrollRun p = payrollRunRepository.findById(id).orElse(null);
         if (p == null) notFound("Bảng lương");
         p.setStatus(status);
@@ -1633,7 +1690,7 @@ public class HrmService {
     }
 
     private void generatePayslips(HrmPayrollRun run) {
-        for (HrmEmployee e : employeeRepository.findAll()) {
+        for (Employee e : employeeRepository.findAll()) {
             String payslipId = run.getId() + "-" + e.getId();
             if (payslipRepository.existsById(payslipId)) continue;
             double basic = Math.max(0, run.getAmount() == null ? 0 : run.getAmount());
@@ -1680,13 +1737,13 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> createOnboarding(Map<String, Object> payload) {
-        HrmEmployee employee = findEmployeeEntity(normalizeId(payload.get("employeeId")));
+        Employee employee = findEmployeeEntity(normalizeId(payload.get("employeeId")));
         HrmOnboardingTask t = new HrmOnboardingTask();
         t.setId(nextIdFor(onboardingRepository.findAll().stream().map(HrmOnboardingTask::getId).toList(), "ONB", 3, 1));
         t.setEmployee(employee);
         t.setEmployeeName(employee == null ? nvl(payload.get("employeeName")) : employee.getName());
         t.setTask(nvl(payload.get("task")));
-        if (t.getTask().isBlank()) invalidRequest("Tên nhiệm vụ không được để trống.");
+        if (t.getTask().isBlank()) invalidRequest("TA�n nhiệm vụ khA�ng được để trống.");
         t.setOwner(nvl(payload.get("owner")));
         t.setDueDate(str(payload.get("dueDate")));
         t.setStatus("Pending");
@@ -1698,7 +1755,7 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> updateOnboardingStatus(String id, String status) {
-        requireIn(status, "taskStatuses", "Trạng thái nhiệm vụ");
+        requireIn(status, "taskStatuses", "Trạng thA�i nhiệm vụ");
         HrmOnboardingTask t = onboardingRepository.findById(id).orElse(null);
         if (t == null) notFound("Nhiệm vụ onboarding");
         t.setStatus(status);
@@ -1714,13 +1771,13 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> createOffboarding(Map<String, Object> payload) {
-        HrmEmployee employee = findEmployeeEntity(normalizeId(payload.get("employeeId")));
+        Employee employee = findEmployeeEntity(normalizeId(payload.get("employeeId")));
         HrmOffboardingTask t = new HrmOffboardingTask();
         t.setId(nextIdFor(offboardingRepository.findAll().stream().map(HrmOffboardingTask::getId).toList(), "OFF", 3, 1));
         t.setEmployee(employee);
         t.setEmployeeName(employee == null ? nvl(payload.get("employeeName")) : employee.getName());
         t.setTask(nvl(payload.get("task")));
-        if (t.getTask().isBlank()) invalidRequest("Tên nhiệm vụ không được để trống.");
+        if (t.getTask().isBlank()) invalidRequest("TA�n nhiệm vụ khA�ng được để trống.");
         t.setOwner(nvl(payload.get("owner")));
         t.setDueDate(str(payload.get("dueDate")));
         t.setStatus("Pending");
@@ -1753,7 +1810,7 @@ public class HrmService {
     public Map<String, Object> createLeavePolicy(Map<String, Object> payload) {
         HrmLeavePolicy p = HrmJson.fromMap(payload, HrmLeavePolicy.class);
         p.setId(nextIdFor(leavePolicyRepository.findAll().stream().map(HrmLeavePolicy::getId).toList(), "LP", 3, 1));
-        if (p.getName() == null || p.getName().isBlank()) invalidRequest("Tên chính sách không được để trống.");
+        if (p.getName() == null || p.getName().isBlank()) invalidRequest("TA�n chA�nh sA�ch khA�ng được để trống.");
         fillAttributes(payload, p);
         leavePolicyRepository.save(p);
         audit("CREATE", "LeavePolicy", p.getId());
@@ -1763,7 +1820,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> updateLeavePolicy(String id, Map<String, Object> payload) {
         HrmLeavePolicy p = leavePolicyRepository.findById(id).orElse(null);
-        if (p == null) notFound("Chính sách nghỉ phép");
+        if (p == null) notFound("ChA�nh sA�ch nghỉ phA�p");
         HrmLeavePolicy u = HrmJson.fromMap(payload, HrmLeavePolicy.class);
         if (u.getName() != null) p.setName(u.getName());
         if (u.getType() != null) p.setType(u.getType());
@@ -1777,7 +1834,7 @@ public class HrmService {
         return HrmJson.toMap(p);
     }
 
-    /** Cộng dồn số ngày nghỉ hàng tháng cho nhân viên đang làm việc. Idempotent theo tháng. */
+    /** Cộng dồn số ngA�y nghỉ hA�ng thA�ng cho nhA�n viA�n đang lA�m việc. Idempotent theo thA�ng. */
     @Transactional
     public Map<String, Object> runLeaveAccrual() {
         String period = YearMonth.now().toString();
@@ -1790,7 +1847,7 @@ public class HrmService {
             return r;
         }
         int processed = 0;
-        for (HrmEmployee e : employeeRepository.findAll()) {
+        for (Employee e : employeeRepository.findAll()) {
             if (!"Active".equals(e.getStatus())) continue;
             HrmLeaveBalance b = leaveBalanceRepository.findByEmployee_Id(e.getId()).stream().findFirst()
                     .orElseGet(() -> newLeaveBalance(e));
@@ -1809,35 +1866,66 @@ public class HrmService {
     // ---------------------------------------------------------------- shifts & rosters
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getShiftSchedules() {
-        return HrmJson.toMaps(shiftScheduleRepository.findAll());
+        return shiftRepository.findAll().stream().map(this::shiftToMap).toList();
+    }
+
+    private Map<String, Object> shiftToMap(Shift s) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("id", s.getCode());
+        m.put("name", s.getName());
+        m.put("startTime", s.getStart() == null ? null : s.getStart().toLocalTime().toString());
+        m.put("endTime", s.getEnd() == null ? null : s.getEnd().toLocalTime().toString());
+        m.put("breakMinutes", s.getBreakMinutes());
+        m.put("location", s.getLocation());
+        return m;
+    }
+
+    private Shift requireShift(String code) {
+        return shiftRepository.findByCode(code).orElse(null);
     }
 
     @Transactional
     public Map<String, Object> createShiftSchedule(Map<String, Object> payload) {
-        HrmShiftSchedule s = HrmJson.fromMap(payload, HrmShiftSchedule.class);
-        s.setId(nextIdFor(shiftScheduleRepository.findAll().stream().map(HrmShiftSchedule::getId).toList(), "SH", 3, 1));
-        if (s.getName() == null || s.getName().isBlank()) invalidRequest("Tên ca làm không được để trống.");
-        fillAttributes(payload, s);
-        shiftScheduleRepository.save(s);
-        audit("CREATE", "ShiftSchedule", s.getId());
-        return HrmJson.toMap(s);
+        String code = nextIdFor(shiftRepository.findAll().stream()
+                .map(s -> nvl(s.getCode())).toList(), "SH", 3, 1);
+        String name = nvl(payload.get("name"));
+        if (name.isBlank()) invalidRequest("Shift name is required");
+        Shift s = new Shift();
+        s.setCode(code);
+        s.setName(name);
+        s.setStart(parseTime(str(payload.get("startTime"))));
+        s.setEnd(parseTime(str(payload.get("endTime"))));
+        s.setWorkingDay("Daily");
+        s.setBreakMinutes(intOf(payload.getOrDefault("breakMinutes", 0), 0));
+        s.setLocation(str(payload.get("location")));
+        shiftRepository.save(s);
+        audit("CREATE", "ShiftSchedule", code);
+        return shiftToMap(s);
+    }
+
+    private java.sql.Time parseTime(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return java.sql.Time.valueOf(value.length() == 5 ? value + ":00" : value);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Transactional
     public Map<String, Object> updateShiftSchedule(String id, Map<String, Object> payload) {
-        HrmShiftSchedule s = shiftScheduleRepository.findById(id).orElse(null);
-        if (s == null) notFound("Lịch ca");
-        HrmShiftSchedule u = HrmJson.fromMap(payload, HrmShiftSchedule.class);
-        if (u.getName() != null) s.setName(u.getName());
-        if (u.getStartTime() != null) s.setStartTime(u.getStartTime());
-        if (u.getEndTime() != null) s.setEndTime(u.getEndTime());
-        if (u.getBreakMinutes() != null) s.setBreakMinutes(u.getBreakMinutes());
-        if (u.getLocation() != null) s.setLocation(u.getLocation());
-        s.getAttributes().putAll(payload);
-        shiftScheduleRepository.save(s);
+        Shift s = requireShift(id);
+        if (s == null) notFound("Shift schedule");
+        if (payload.get("name") != null) s.setName(str(payload.get("name")));
+        if (payload.get("startTime") != null) s.setStart(parseTime(str(payload.get("startTime"))));
+        if (payload.get("endTime") != null) s.setEnd(parseTime(str(payload.get("endTime"))));
+        if (payload.get("breakMinutes") != null) s.setBreakMinutes(intOf(payload.get("breakMinutes"), 0));
+        if (payload.get("location") != null) s.setLocation(str(payload.get("location")));
+        shiftRepository.save(s);
         audit("UPDATE", "ShiftSchedule", id);
-        return HrmJson.toMap(s);
+        return shiftToMap(s);
     }
+
 
     @Transactional(readOnly = true)
     public Map<String, Object> getRosters(String month, String department) {
@@ -1856,19 +1944,19 @@ public class HrmService {
     @Transactional
     public Map<String, Object> assignRoster(Map<String, Object> payload) {
         String month = str(payload.get("month"));
-        if (month == null || !month.matches("\\d{4}-\\d{2}")) invalidRequest("Tháng phân ca phải có dạng YYYY-MM.");
+        if (month == null || !month.matches("\\d{4}-\\d{2}")) invalidRequest("ThA�ng phA�n ca phải cA� dạng YYYY-MM.");
         String employeeId = normalizeId(payload.get("employeeId"));
         String date = str(payload.get("date"));
         if (date != null) requireIsoDate(date, "date");
-        if (!month.equals(date == null ? "" : date.substring(0, 7))) invalidRequest("Ngày phân ca phải thuộc tháng đã chọn.");
+        if (!month.equals(date == null ? "" : date.substring(0, 7))) invalidRequest("NgA�y phA�n ca phải thuộc thA�ng đA� chọn.");
         HrmRoster item = HrmJson.fromMap(payload, HrmRoster.class);
         item.setId(nextIdFor(rosterRepository.findAll().stream().map(HrmRoster::getId).toList(), "RS", 3, 1));
         item.setEmployeeId(employeeId);
-        HrmEmployee employee = findEmployeeEntity(employeeId);
-        if (employee == null) notFound("Nhân viên");
-        if (!month.equals(date == null ? "" : date.substring(0, 7))) invalidRequest("Ngày phân ca không hợp lệ.");
+        Employee employee = findEmployeeEntity(employeeId);
+        if (employee == null) notFound("NhA�n viA�n");
+        if (!month.equals(date == null ? "" : date.substring(0, 7))) invalidRequest("NgA�y phA�n ca khA�ng hợp lệ.");
         item.setEmployeeName(employee.getName());
-        item.setDepartment(employee.getDepartment());
+        item.setDepartment(employee.getDepartmentName());
         fillAttributes(payload, item);
         rosterRepository.save(item);
         audit("CREATE", "Roster", item.getId());
@@ -1885,7 +1973,7 @@ public class HrmService {
     public Map<String, Object> createBenefit(Map<String, Object> payload) {
         HrmBenefit b = HrmJson.fromMap(payload, HrmBenefit.class);
         b.setId(nextIdFor(benefitRepository.findAll().stream().map(HrmBenefit::getId).toList(), "BN", 3, 1));
-        if (b.getName() == null || b.getName().isBlank()) invalidRequest("Tên phúc lợi không được để trống.");
+        if (b.getName() == null || b.getName().isBlank()) invalidRequest("TA�n phA�c lợi khA�ng được để trống.");
         fillAttributes(payload, b);
         benefitRepository.save(b);
         audit("CREATE", "Benefit", b.getId());
@@ -1895,7 +1983,7 @@ public class HrmService {
     @Transactional
     public Map<String, Object> updateBenefit(String id, Map<String, Object> payload) {
         HrmBenefit b = benefitRepository.findById(id).orElse(null);
-        if (b == null) notFound("Phúc lợi");
+        if (b == null) notFound("PhA�c lợi");
         HrmBenefit u = HrmJson.fromMap(payload, HrmBenefit.class);
         if (u.getName() != null) b.setName(u.getName());
         if (u.getType() != null) b.setType(u.getType());
@@ -1919,12 +2007,12 @@ public class HrmService {
     @Transactional
     public Map<String, Object> createBenefitEnrollment(Map<String, Object> payload) {
         String employeeId = normalizeId(payload.get("employeeId"));
-        HrmEmployee employee = findEmployeeEntity(employeeId);
-        if (employee == null) notFound("Nhân viên");
+        Employee employee = findEmployeeEntity(employeeId);
+        if (employee == null) notFound("NhA�n viA�n");
         HrmBenefit benefit = benefitRepository.findById(str(payload.get("benefitId"))).orElse(null);
-        if (benefit == null) notFound("Phúc lợi");
+        if (benefit == null) notFound("PhA�c lợi");
         if (benefitEnrollmentRepository.findAll().stream().anyMatch(e -> employeeId.equals(e.getEmployeeId())
-                && benefit.getId().equals(e.getBenefitId()))) invalidRequest("Nhân viên đã đăng ký phúc lợi này.");
+                && benefit.getId().equals(e.getBenefitId()))) invalidRequest("NhA�n viA�n đA� đăng kA� phA�c lợi nA�y.");
         HrmBenefitEnrollment item = HrmJson.fromMap(payload, HrmBenefitEnrollment.class);
         item.setId(nextIdFor(benefitEnrollmentRepository.findAll().stream().map(HrmBenefitEnrollment::getId).toList(), "BE", 3, 1));
         item.setEmployeeId(employeeId);
@@ -1956,14 +2044,14 @@ public class HrmService {
     @Transactional(readOnly = true)
     public Map<String, Object> getHrRequestById(String id) {
         HrmHrRequest item = hrRequestRepository.findById(id).orElse(null);
-        if (item == null) notFound("Yêu cầu nhân sự");
+        if (item == null) notFound("YA�u cầu nhA�n sự");
         return HrmJson.toMap(item);
     }
 
     @Transactional
     public Map<String, Object> createHrRequest(Map<String, Object> payload) {
         String employeeId = normalizeId(payload.get("employeeId"));
-        HrmEmployee employee = findEmployeeEntity(employeeId);
+        Employee employee = findEmployeeEntity(employeeId);
         HrmHrRequest item = HrmJson.fromMap(payload, HrmHrRequest.class);
         item.setId(nextIdFor(hrRequestRepository.findAll().stream().map(HrmHrRequest::getId).toList(), "HR", 3, 1));
         item.setEmployeeId(employeeId);
@@ -1978,9 +2066,9 @@ public class HrmService {
 
     @Transactional
     public Map<String, Object> updateHrRequestStatus(String id, String status) {
-        requireIn(status, "hrRequestStatuses", "Trạng thái yêu cầu");
+        requireIn(status, "hrRequestStatuses", "Trạng thA�i yA�u cầu");
         HrmHrRequest item = hrRequestRepository.findById(id).orElse(null);
-        if (item == null) notFound("Yêu cầu nhân sự");
+        if (item == null) notFound("YA�u cầu nhA�n sự");
         item.setStatus(status);
         hrRequestRepository.save(item);
         audit("UPDATE_STATUS", "HrRequest", id);
@@ -1997,7 +2085,7 @@ public class HrmService {
     public Map<String, Object> createAnnouncement(Map<String, Object> payload) {
         HrmAnnouncement a = HrmJson.fromMap(payload, HrmAnnouncement.class);
         a.setId(nextIdFor(announcementRepository.findAll().stream().map(HrmAnnouncement::getId).toList(), "ANN", 3, 1));
-        if (a.getTitle() == null || a.getTitle().isBlank()) invalidRequest("Tiêu đề thông báo không được để trống.");
+        if (a.getTitle() == null || a.getTitle().isBlank()) invalidRequest("TiA�u đề thA�ng bA�o khA�ng được để trống.");
         a.setCreated(LocalDate.now().toString());
         fillAttributes(payload, a);
         announcementRepository.save(a);

@@ -1,6 +1,7 @@
 package com.hrm.Entity.hrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hrm.Entity.user.Employee;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Tài liệu đính kèm trong hồ sơ nhân viên. */
+/** TĂ i liA�»‡u A�‘Ă­nh kĂ¨m trong hA�»“ sA�¡ nhĂ¢n viĂªn. */
 @Entity
 @Getter
 @Setter
@@ -29,7 +30,7 @@ public class HrmDocument {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "employee_id", nullable = false)
-    private HrmEmployee employee;
+    private Employee employee;
 
     private String name;
     private String type;
@@ -43,10 +44,10 @@ public class HrmDocument {
     private String contentType;
 
     public String getEmployeeId() {
-        return employee == null ? null : employee.getId();
+        return employee == null ? null : employee.getHrmId();
     }
 
-    /** FE dùng cả hai field link/url. */
+    /** FE dĂ¹ng cA�º£ hai field link/url. */
     public String getLink() {
         return url;
     }

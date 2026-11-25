@@ -5,7 +5,8 @@ import com.hrm.dto.response.report.AttendanceReport;
 import com.hrm.dto.response.report.LeaveReport;
 import com.hrm.dto.response.report.PayrollReport;
 import com.hrm.dto.response.report.SummaryReport;
-import com.hrm.repository.day_off.LeaveRepository;
+import com.hrm.Entity.hrm.HrmLeaveRequest;
+import com.hrm.repository.hrm.HrmLeaveRequestRepository;
 import com.hrm.repository.job.JobPostingRepository;
 import com.hrm.repository.timekeeping.TimeRepository;
 import com.hrm.repository.user.EmployeeRepository;
@@ -27,7 +28,7 @@ import java.util.Map;
 public class ReportService {
     EmployeeRepository employeeRepository;
     TimeRepository timeRepository;
-    LeaveRepository leaveRepository;
+    HrmLeaveRequestRepository leaveRequestRepository;
     PayrollRepository payrollRepository;
     JobPostingRepository jobPostingRepository;
 
@@ -70,17 +71,17 @@ public class ReportService {
 
     // báo cáo nghỉ phép: tổng đơn, số đơn theo trạng thái, tổng ngày nghỉ đã duyệt
     public LeaveReport generateLeave() {
-        double totalLeaveDays = leaveRepository.findAll().stream()
-                .filter(leave -> leave.getStatus() == LEAVE_APPROVED)
-                .mapToDouble(leave -> parseNumber(leave.getTotalTime()))
+        double totalLeaveDays = leaveRequestRepository.findAll().stream()
+                .filter(leave -> "Approved".equals(leave.getStatus()))
+                .mapToDouble(HrmLeaveRequest::getDays)
                 .sum();
 
         return LeaveReport.builder()
                 .title("Báo cáo nghỉ phép")
-                .totalLeaves(leaveRepository.count())
-                .pendingLeaves(leaveRepository.countByStatus(LEAVE_PENDING))
-                .approvedLeaves(leaveRepository.countByStatus(LEAVE_APPROVED))
-                .rejectedLeaves(leaveRepository.countByStatus(LEAVE_REJECTED))
+                .totalLeaves(leaveRequestRepository.count())
+                .pendingLeaves(leaveRequestRepository.countByStatus("Pending"))
+                .approvedLeaves(leaveRequestRepository.countByStatus("Approved"))
+                .rejectedLeaves(leaveRequestRepository.countByStatus("Rejected"))
                 .totalLeaveDays(totalLeaveDays)
                 .generatedAt(now())
                 .build();

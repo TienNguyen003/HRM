@@ -3,6 +3,7 @@ package com.hrm.hrm;
 import com.hrm.Exception.AppException;
 import com.hrm.Service.hrm.HrmService;
 import com.hrm.repository.hrm.*;
+import com.hrm.repository.user.EmployeeRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class HrmServiceBusinessTest {
 
     @Autowired HrmService service;
-    @Autowired HrmEmployeeRepository employeeRepository;
+    @Autowired EmployeeRepository employeeRepository;
     @Autowired HrmAttendanceRepository attendanceRepository;
     @Autowired HrmLeaveBalanceRepository leaveBalanceRepository;
     @Autowired HrmLeaveRequestRepository leaveRequestRepository;
@@ -47,9 +48,10 @@ class HrmServiceBusinessTest {
         String id = String.valueOf(created.get("id"));
 
         assertThat(id).matches("EMP-\\d{5}");
-        assertThat(employeeRepository.findById(id)).isPresent();
-        assertThat(attendanceRepository.findAllByEmployee_Id(id)).hasSize(1);
-        assertThat(leaveBalanceRepository.findByEmployee_Id(id)).hasSize(1);
+        Integer dbId = employeeRepository.findByEmployeeCode(id).orElseThrow().getId();
+        assertThat(employeeRepository.findById(dbId)).isPresent();
+        assertThat(attendanceRepository.findAllByEmployee_Id(dbId)).hasSize(1);
+        assertThat(leaveBalanceRepository.findByEmployee_Id(dbId)).hasSize(1);
         assertThat(service.isEmployeeIdAvailable(id)).isFalse();
         assertThat(service.isEmployeeIdAvailable("EMP-99999")).isTrue();
     }
@@ -121,11 +123,12 @@ class HrmServiceBusinessTest {
     void deleteEmployee_cascadesRelatedData() {
         Map<String, Object> emp = service.createEmployee(employeePayload("delete@test.io"));
         String id = String.valueOf(emp.get("id"));
+        Integer dbId = employeeRepository.findByEmployeeCode(id).orElseThrow().getId();
         service.deleteEmployee(id);
 
-        assertThat(employeeRepository.findById(id)).isEmpty();
-        assertThat(attendanceRepository.findAllByEmployee_Id(id)).isEmpty();
-        assertThat(leaveBalanceRepository.findByEmployee_Id(id)).isEmpty();
+        assertThat(employeeRepository.findById(dbId)).isEmpty();
+        assertThat(attendanceRepository.findAllByEmployee_Id(dbId)).isEmpty();
+        assertThat(leaveBalanceRepository.findByEmployee_Id(dbId)).isEmpty();
     }
 
     @Test
@@ -161,7 +164,9 @@ class HrmServiceBusinessTest {
         Map<String, Object> in = service.checkIn(id);
         assertThat(in.get("checkOut")).isEqualTo("--");
         service.checkOut(id);
-        assertThat(attendanceRepository.findAllByEmployee_Id(id))
+        Integer dbId = employeeRepository.findByEmployeeCode(id).orElseThrow().getId();
+        assertThat(attendanceRepository.findAllByEmployee_Id(dbId))
                 .anySatisfy(a -> assertThat(a.getCheckOut()).isNotEqualTo("--"));
     }
 }
+

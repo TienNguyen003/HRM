@@ -17,4 +17,7 @@ public class AssessmentRequest {
 
     @Min(value = 0, message = "Trường phải lớn hơn 0")
     int requirement;
+
+    /** Tin tuyển dụng áp dụng bộ tiêu chí này. */
+    Integer jobId;
 }
