@@ -5,6 +5,7 @@ import com.hrm.Mapper.role.PermissionMapper;
 import com.hrm.dto.request.role.PermissionRequest;
 import com.hrm.dto.response.role.PermissionResponse;
 import com.hrm.repository.role.PermissionRepository;
+import com.hrm.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PermissionService {
     PermissionRepository permissionRepository;
     PermissionMapper permissionMapper;
+    UserRepository userRepository;
 
     public PermissionResponse create(PermissionRequest request){
         Permission permission = permissionMapper.toPermission(request);
@@ -32,5 +34,10 @@ public class PermissionService {
 
     public void delete(String name){
         permissionRepository.deleteById(name);
+        // Xóa quyền -> mọi token đang lưu đều có thể chứa quyền đó.
+        userRepository.findAll().forEach(user -> {
+            user.setTokenVersion(user.getTokenVersion() + 1);
+            userRepository.save(user);
+        });
     }
 }

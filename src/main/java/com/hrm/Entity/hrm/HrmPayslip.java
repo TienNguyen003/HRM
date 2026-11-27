@@ -39,8 +39,13 @@ public class HrmPayslip {
     private String month;
     private Double basic;
     private Double allowances;
+    @Column(name = "overtime_pay")
+    private Double overtime;
+    @Column(name = "advance_pay")
+    private Double advance;
     private Double deductions;
     private Double net;
+    private String note;
     private String status;
     private String created;
 

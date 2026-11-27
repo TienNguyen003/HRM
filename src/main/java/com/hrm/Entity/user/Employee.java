@@ -1,6 +1,7 @@
 package com.hrm.Entity.user;
 
 import com.hrm.Entity.office.Department;
+import com.hrm.Entity.office.OfficeI;
 import com.hrm.Entity.wage.Formula;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -59,12 +61,20 @@ public class Employee {
     String birth_date;
     @Column(name = "joined_date")
     String joined_date;
+    /** @deprecated không còn được dùng; giữ cột/DTO chỉ để API cũ không vỡ. */
+    @Deprecated
     @Column(name = "shift_id")
     int shift_id;
+    /** @deprecated số dư nghỉ giờ nằm ở hrm_leave_balance. */
+    @Deprecated
     @Column(name = "vacation_time")
     float vacationTime;
+    /** @deprecated không còn được cập nhật sau khi gom nghỉ phép. */
+    @Deprecated
     @Column(name = "hour_off")
     int hourOff;
+    /** @deprecated số dư nghỉ giờ nằm ở hrm_leave_balance. */
+    @Deprecated
     @Column(name = "vacation_hours")
     int vacationHours;
     int timekeeping;
@@ -72,6 +82,11 @@ public class Employee {
 
     @ManyToOne
     Department department;
+
+    /** Địa điểm làm việc — nguồn là OfficeI; location ở trên chỉ là cache để trả response. */
+    @ManyToOne
+    @JoinColumn(name = "office_id")
+    OfficeI office;
 
     @ManyToOne
     Formula formula;

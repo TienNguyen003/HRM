@@ -10,6 +10,7 @@ import com.hrm.dto.request.role.RoleUpdateRequest;
 import com.hrm.dto.response.role.RoleResponse;
 import com.hrm.repository.role.PermissionRepository;
 import com.hrm.repository.role.RoleRepository;
+import com.hrm.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,10 +29,14 @@ public class RoleService {
     RoleRepository roleRepository;
     PermissionRepository permissionRepository;
     RoleMapper roleMapper;
+    RoleGuard roleGuard;
+    UserRepository userRepository;
 
     public RoleResponse create(RoleRequest request) {
         if(roleRepository.existsByName(request.getName()))
             throw new AppException(ErrorCode.ROLE_EXISTED);
+        roleGuard.assertNameAssignable(request.getName());
+        roleGuard.assertPermissionAssignable(request.getPermissions());
         var role = roleMapper.toRole(request);
 
         var permissions = permissionRepository.findAllById(request.getPermissions());
@@ -75,12 +80,33 @@ public class RoleService {
     public RoleResponse updateRole(RoleUpdateRequest request, String name){
         Role role = roleRepository.findById(name)
                 .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        roleGuard.assertNameAssignable(name);
+        roleGuard.assertPermissionAssignable(request.getPermissions());
         roleMapper.updateRole(role, request);
 
         var permissions = permissionRepository.findAllById(request.getPermissions());
         role.setPermissions(new HashSet<>(permissions));
 
+        // Đổi quyền của role -> token cũ của mọi user thuộc role này phải vô hiệu ngay.
+        userRepository.findByRole_Name(name).forEach(user -> {
+            user.setTokenVersion(user.getTokenVersion() + 1);
+            userRepository.save(user);
+        });
+
         return roleMapper.toRoleResponse(roleRepository.save(role));
+    }
+
+    /** Đảm bảo role có quyền super mà không ghi đè các quyền đã gán tay. */
+    @org.springframework.transaction.annotation.Transactional
+    public void ensureSuperPermission(String roleName) {
+        Role role = roleRepository.findById(roleName).orElse(null);
+        if (role == null) return;
+        var permissions = role.getPermissions() == null
+                ? new HashSet<com.hrm.Entity.role.Permission>()
+                : new HashSet<>(role.getPermissions());
+        permissionRepository.findById(PermissionCatalog.SUPER).ifPresent(permissions::add);
+        role.setPermissions(permissions);
+        roleRepository.save(role);
     }
 
     public void delete(String name){

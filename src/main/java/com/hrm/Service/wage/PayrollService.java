@@ -69,6 +69,8 @@ public class PayrollService {
         for (PayrollSttRequest requet : request) {
             Payroll payroll = payrollRepository.findById(requet.getId())
                     .orElseThrow(() -> new AppException(ErrorCode.WAGE_NOT_EXISTED));
+            if (payroll.getStatus() != 0)
+                throw new AppException(ErrorCode.HRM_INVALID_REQUEST, "Bảng lương này đã được xử lý.");
 
             payroll.setStatus(1);
             payrolls.add(payroll);

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class DocumentController {
     DocumentService documentService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('FILE_MANAGE')")
     @PostMapping
     ApiResponse<DocumentUploadResponse> upload(@RequestBody @Valid DocumentUploadRequest request) {
         return ApiResponse.<DocumentUploadResponse>builder()
@@ -29,6 +31,7 @@ public class DocumentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('FILE_MANAGE') or @requiredPermission.checkPermission('EMP_VIEW')")
     @GetMapping("/download")
     ApiResponse<DocumentDownloadResponse> download(@RequestParam int id) {
         return ApiResponse.<DocumentDownloadResponse>builder()
@@ -36,6 +39,7 @@ public class DocumentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('FILE_MANAGE') or @requiredPermission.checkPermission('EMP_VIEW')")
     @GetMapping("/preview")
     ApiResponse<DocumentPreview> preview(@RequestParam int id) {
         return ApiResponse.<DocumentPreview>builder()
@@ -43,6 +47,7 @@ public class DocumentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('FILE_MANAGE') or @requiredPermission.checkPermission('EMP_VIEW')")
     @GetMapping("/detail")
     ApiResponse<Document> getDetail(@RequestParam int id) {
         return ApiResponse.<Document>builder()
@@ -50,6 +55,7 @@ public class DocumentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('FILE_MANAGE') or @requiredPermission.checkPermission('EMP_VIEW') or @requiredPermission.checkPermission('SELF_VIEW')")
     @GetMapping
     ApiResponse<List<Document>> search(@RequestParam("pageNumber") int pageNumber,
                                        @RequestParam(name = "pageSize", defaultValue = "30") int pageSize,
@@ -61,6 +67,7 @@ public class DocumentController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('FILE_MANAGE')")
     @DeleteMapping
     ApiResponse<String> delete(@RequestParam int id) {
         documentService.delete(id);

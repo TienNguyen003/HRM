@@ -1,8 +1,6 @@
 package com.hrm.Controller;
 
-import com.hrm.Service.role.RoleService;
-import com.hrm.dto.response.role.PermissionResponse;
-import com.hrm.dto.response.role.RoleResponse;
+import com.hrm.Service.role.PermissionCatalog;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,42 +12,32 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Kiểm tra quyền theo một nguồn chân lý duy nhất: authority trong JWT.
+ *
+ * Không còn đoán role từ authority đầu tiên và không tra DB lúc kiểm tra:
+ * - mọi tên (legacy lẫn domain-action) được chuẩn hóa qua {@link PermissionCatalog};
+ * - quyền ALL là super permission, không gắn cứng với tên role;
+ * - token cũ chứa ROLE_ADMIN vẫn được hiểu là ALL để tương thích ngược.
+ */
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RequiredPermission {
-    RoleService roleService;
 
     public boolean checkPermission(String permission) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication.getAuthorities() == null) return false;
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getAuthorities() == null) return false;
+
+        String required = PermissionCatalog.canonical(permission);
+        if (required.isEmpty()) return false;
 
         Set<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                .map(PermissionCatalog::canonical)
                 .collect(Collectors.toSet());
 
-        // role ADMIN (super admin) được truy cập mọi endpoint
-        if (authorities.contains("ROLE_ADMIN")) return true;
-        // quyền ALL được phép truy cập mọi endpoint
-        if (authorities.contains("ALL")) return true;
-        if (authorities.contains(permission)) return true;
-
-        // fallback: đọc từ DB (trường hợp token cũ chưa có scope mới)
-        GrantedAuthority firstAuthority = authentication.getAuthorities().stream()
-                .findFirst()
-                .orElse(null);
-        if (firstAuthority == null) return false;
-
-        String role = firstAuthority.getAuthority().replace("ROLE_", "");
-        if (role.equals("NHÂN")) role = "NHÂN VIÊN";
-        RoleResponse roleResponse = roleService.getRole(role.replace("_", " "));
-        Set<String> permissionNames = roleResponse.getPermissions().stream()
-                .map(PermissionResponse::getName)
-                .collect(Collectors.toSet());
-        // quyền ALL được phép truy cập mọi endpoint
-        if (permissionNames.contains("ALL")) return true;
-        // role ADMIN (super admin) được truy cập mọi endpoint
-        if ("ADMIN".equals(roleResponse.getName())) return true;
-        return permissionNames.contains(permission);
+        return authorities.contains(PermissionCatalog.SUPER) || authorities.contains(required);
     }
 }

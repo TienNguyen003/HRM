@@ -19,7 +19,7 @@ public class DepartmentRequest {
     @NotBlank(message = "Tên ngắn không được để trống")
     String shortName;
 
-    @NotNull(message = "Công ty không được để trống")
-    @Min(value = 1, message = "Công ty phải lớn hơn 0")
+    @NotNull(message = "Văn phòng/Địa điểm không được để trống")
+    @Min(value = 1, message = "Văn phòng/Địa điểm phải lớn hơn 0")
     int officeId;
 }

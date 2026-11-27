@@ -2,19 +2,31 @@ package com.hrm.Service.hrm;
 
 import com.hrm.Entity.hrm.*;
 import com.hrm.Entity.office.Department;
+import com.hrm.Entity.office.OfficeI;
 import com.hrm.Entity.office.Shift;
+import com.hrm.Entity.role.Role;
 import com.hrm.Entity.user.Employee;
+import com.hrm.Entity.user.User;
+import com.hrm.Entity.wage.Formula;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.repository.hrm.*;
 import com.hrm.repository.office.DepartmentRepository;
+import com.hrm.repository.office.OfficeRepository;
 import com.hrm.repository.office.ShiftRepository;
+import com.hrm.repository.role.RoleRepository;
 import com.hrm.repository.user.EmployeeRepository;
+import com.hrm.Service.role.PermissionCatalog;
+import com.hrm.Service.role.RoleGuard;
+import com.hrm.repository.user.UserRepository;
+import com.hrm.repository.wage.FormulaRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +70,7 @@ public class HrmService {
     HrmOffboardingTaskRepository offboardingRepository;
     HrmLeavePolicyRepository leavePolicyRepository;
     DepartmentRepository departmentRepository;
+    OfficeRepository officeRepository;
     ShiftRepository shiftRepository;
     HrmRosterRepository rosterRepository;
     HrmBenefitRepository benefitRepository;
@@ -67,6 +80,64 @@ public class HrmService {
     HrmCompanyEventRepository companyEventRepository;
     HrmReferenceDataRepository referenceDataRepository;
     HrmAuditService auditService;
+    RoleGuard roleGuard;
+    PayrollCalculationService payrollCalculationService;
+    UserRepository userRepository;
+    RoleRepository roleRepository;
+    FormulaRepository formulaRepository;
+    PasswordEncoder passwordEncoder;
+
+    // ---------------------------------------------------------------- workflows
+    private static final Map<String, Set<String>> LEAVE_TRANSITIONS = Map.of(
+            "Pending", Set.of("Approved", "Rejected", "Cancelled"),
+            "Approved", Set.of("Cancelled"),
+            "Rejected", Set.of(),
+            "Cancelled", Set.of());
+    private static final Map<String, Set<String>> OVERTIME_TRANSITIONS = Map.of(
+            "Pending", Set.of("Approved", "Rejected"),
+            "Approved", Set.of(),
+            "Rejected", Set.of());
+    private static final Map<String, Set<String>> PAYROLL_TRANSITIONS = Map.of(
+            "Draft", Set.of("Approved", "Cancelled"),
+            "Approved", Set.of("Paid", "Cancelled"),
+            "Paid", Set.of(),
+            "Cancelled", Set.of());
+    private static final Map<String, Set<String>> TASK_TRANSITIONS = Map.of(
+            "Pending", Set.of("In Progress", "Completed", "Cancelled"),
+            "In Progress", Set.of("Completed", "Cancelled"),
+            "Completed", Set.of(),
+            "Cancelled", Set.of());
+    private static final Map<String, Set<String>> HR_REQUEST_TRANSITIONS = Map.of(
+            "Open", Set.of("In Progress", "Resolved", "Rejected", "Closed"),
+            "In Progress", Set.of("Resolved", "Rejected", "Closed"),
+            "Resolved", Set.of(),
+            "Rejected", Set.of(),
+            "Closed", Set.of());
+
+    /** Chuyển trạng thái hợp lệ; cùng trạng thái thì coi là no-op (idempotent). */
+    private void assertTransition(String from, String to, Map<String, Set<String>> transitions, String label) {
+        if (from == null || from.isBlank() || from.equals(to)) return;
+        Set<String> next = transitions.get(from);
+        if (next == null || !next.contains(to))
+            invalidRequest("Không thể chuyển " + label + " từ '" + from + "' sang '" + to + "'.");
+    }
+
+    /** Người tạo không được tự duyệt đơn của chính mình. */
+    private void assertNotSelfApproval(Employee owner, String status) {
+        if (!"Approved".equals(status) || owner == null) return;
+        Integer current = currentEmployeeDbId();
+        if (current != null && current.equals(owner.getId()))
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+    }
+
+    private void assertNotSelfApproval(String employeeHrmId, String status) {
+        if (!"Approved".equals(status) || employeeHrmId == null || employeeHrmId.isBlank()) return;
+        Integer current = currentEmployeeDbId();
+        if (current == null) return;
+        Employee me = employeeRepository.findById(current).orElse(null);
+        if (me != null && employeeHrmId.equals(me.getHrmId()))
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+    }
 
     // ---------------------------------------------------------------- helpers
     private void notFound(String label) {
@@ -123,6 +194,40 @@ public class HrmService {
         } catch (Exception e) {
             return fallback;
         }
+    }
+
+    /** id nhân viên (DB) của người đang đăng nhập; admin không kiêm nhân viên thì null. */
+    private Integer currentEmployeeDbId() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof Jwt jwt)) return null;
+        Object value = jwt.getClaim("idE");
+        if (value instanceof Number n) return n.intValue();
+        if (value == null) return null;
+        try {
+            return Integer.parseInt(String.valueOf(value));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /** Có quyền canonical (hoặc super) hay không — dùng để tự giới hạn dữ liệu SELF_*. */
+    private boolean hasPermission(String permission) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) return true; // luồng nội bộ không có principal
+        if (authentication.getAuthorities() == null) return false;
+        String required = PermissionCatalog.canonical(permission);
+        return authentication.getAuthorities().stream()
+                .map(a -> PermissionCatalog.canonical(a.getAuthority()))
+                .anyMatch(a -> a.equals(PermissionCatalog.SUPER) || a.equals(required));
+    }
+
+    /** Buộc chỉ xem dữ liệu của chính mình khi không có quyền xem toàn bộ. */
+    private String scopedEmployeeId(String requested, String fullViewPermission) {
+        if (hasPermission(fullViewPermission)) return requested;
+        Integer current = currentEmployeeDbId();
+        if (current == null) return "__NONE__";
+        Employee me = employeeRepository.findById(current).orElse(null);
+        return me == null ? "__NONE__" : me.getHrmId();
     }
 
     private boolean matches(Object value, String query) {
@@ -256,7 +361,12 @@ public class HrmService {
         Map<String, Object> r = new LinkedHashMap<>();
         for (String key : List.of("departments", "locations", "employmentTypes", "employeeStatuses",
                 "attendanceStatuses", "leaveTypes", "leaveStatuses", "recruitmentStages", "goalPriorities")) {
-            r.put(key, referenceValues(key));
+            if ("locations".equals(key)) {
+                r.put(key, officeRepository.getOffices().stream().map(OfficeI::getName)
+                        .filter(Objects::nonNull).distinct().toList());
+            } else {
+                r.put(key, referenceValues(key));
+            }
         }
         return r;
     }
@@ -327,6 +437,12 @@ public class HrmService {
 
     @Transactional(readOnly = true)
     public Map<String, Object> getEmployeeById(String id) {
+        if (!hasPermission("EMP_VIEW")) {
+            Integer current = currentEmployeeDbId();
+            Employee me = current == null ? null : employeeRepository.findById(current).orElse(null);
+            if (me == null || !(me.getHrmId().equals(id) || String.valueOf(current).equals(id)))
+                throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
         Employee emp = requireEmployee(id);
         Map<String, Object> r = HrmJson.toMap(emp);
         Integer empDbId = emp.getId();
@@ -357,6 +473,19 @@ public class HrmService {
             String iso = joinIso == null ? LocalDate.now().toString() : joinIso;
             e.setJoinedDateIso(iso);
             e.setJoined_date(formatDisplayDate(iso));
+        }
+
+        // Công thức lương gán cho nhân viên — bảng lương sẽ eval salaryFormula của nó.
+        if (create || payload.containsKey("formulaId")) {
+            Object raw = payload.get("formulaId");
+            if (raw == null || (raw instanceof String s && s.isBlank())) {
+                e.setFormula(null);
+            } else {
+                int formulaId = intOf(raw, 0);
+                Formula formula = formulaRepository.findById(formulaId)
+                        .orElseThrow(() -> new AppException(ErrorCode.FORMULA_NOT_EXISTED));
+                e.setFormula(formula);
+            }
         }
 
         Map<String, Object> ec = payload.get("emergencyContact") instanceof Map<?, ?> m
@@ -421,6 +550,9 @@ public class HrmService {
         if (create || payload.containsKey("department") || e.getDepartment() == null) {
             applyDepartment(e, e.getDepartmentName());
         }
+        if (create || payload.containsKey("location") || e.getOffice() == null) {
+            applyOffice(e, e.getLocation());
+        }
         requireIn(e.getStatus(), "employeeStatuses", "Trạng thA�i nhA�n viA�n");
         requireIn(e.getEmploymentType(), "employmentTypes", "Loại hA�nh lA�m việc");
     }
@@ -441,6 +573,46 @@ public class HrmService {
         e.setDepartment(dept);
     }
 
+    /** Employee.office (entity OfficeI) là nguồn đơn nhất cho location. */
+    private void applyOffice(Employee e, String name) {
+        String value = name == null || name.isBlank() ? "Ho Chi Minh City" : name.trim();
+        e.setLocation(value);
+        OfficeI office = officeRepository.findByName(value).orElseGet(() -> {
+            OfficeI created = new OfficeI();
+            created.setName(value);
+            created.setStatus(1);
+            return officeRepository.save(created);
+        });
+        e.setOffice(office);
+    }
+
+    /** Tuỳ chọn: tạo luôn tài khoản đăng nhập khi tạo nhân viên. User vẫn là bảng riêng. */
+    private void createOptionalUserAccount(Employee employee, Map<String, Object> payload) {
+        String username = nvl(payload.get("username"));
+        if (username.isBlank()) return;
+        String password = nvl(payload.get("password"));
+        String roleName = nvl(payload.get("roleName"));
+        if (password.isBlank()) invalidRequest("Password is required when username is provided");
+        if (roleName.isBlank()) invalidRequest("roleName is required when username is provided");
+        if (userRepository.existsByUsername(username))
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        if (userRepository.existsByEmployeeId(employee.getId()))
+            throw new AppException(ErrorCode.ACCOUNT_EXISTED);
+        Role role = roleRepository.findById(roleName)
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        roleGuard.assertAssignable(role);
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setStatus(1);
+        user.setMustChangePassword(true);
+        user.setRole(role);
+        user.setEmployee(employee);
+        userRepository.save(user);
+        audit("CREATE_USER", "User", username);
+    }
+
     @Transactional
     public Map<String, Object> createEmployee(Map<String, Object> payload) {
         String requested = normalizeId(payload.get("employeeId"));
@@ -450,6 +622,7 @@ public class HrmService {
         e.setEmployeeCode(id);
         applyEmployeePayload(e, payload, true);
         employeeRepository.save(e);
+        createOptionalUserAccount(e, payload);
 
         String today = LocalDate.now().toString();
         HrmAttendance att = new HrmAttendance();
@@ -690,10 +863,11 @@ public class HrmService {
     @Transactional(readOnly = true)
     public Map<String, Object> getAttendanceRecords(String date, String department, String employeeId, String status,
                                                     String sort, String sortDirection, Integer page, Integer pageSize) {
+        String scopedEmployeeId = scopedEmployeeId(employeeId, "ATT_VIEW");
         List<Map<String, Object>> filtered = HrmJson.toMaps(attendanceRepository.findAll()).stream().filter(r -> {
             boolean md = (date == null || date.isBlank()) || Objects.equals(str(r.get("date")), date);
             boolean mdep = (department == null || department.isBlank()) || Objects.equals(str(r.get("department")), department);
-            boolean me = (employeeId == null || employeeId.isBlank()) || Objects.equals(str(r.get("employeeId")), employeeId);
+            boolean me = (scopedEmployeeId == null || scopedEmployeeId.isBlank()) || Objects.equals(str(r.get("employeeId")), scopedEmployeeId);
             boolean ms = (status == null || status.isBlank()) || Objects.equals(str(r.get("status")), status);
             return md && mdep && me && ms;
         }).collect(Collectors.toList());
@@ -836,9 +1010,10 @@ public class HrmService {
     @Transactional(readOnly = true)
     public Map<String, Object> getLeaveRequests(String search, String status, String type, String employeeId,
                                                 String sort, String sortDirection, Integer page, Integer pageSize) {
+        String scopedEmployeeId = scopedEmployeeId(employeeId, "LEAVE_VIEW");
         List<Map<String, Object>> filtered = HrmJson.toMaps(leaveRequestRepository.findAll()).stream().filter(item -> {
             boolean ms = (status == null || status.isBlank()) || Objects.equals(str(item.get("status")), status);
-            boolean me = (employeeId == null || employeeId.isBlank()) || Objects.equals(str(item.get("employeeId")), employeeId);
+            boolean me = (scopedEmployeeId == null || scopedEmployeeId.isBlank()) || Objects.equals(str(item.get("employeeId")), scopedEmployeeId);
             boolean mt = (type == null || type.isBlank()) || Objects.equals(str(item.get("type")), type);
             boolean mq = (search == null || search.isBlank()) || matches(item.get("employeeName"), search)
                     || matches(item.get("id"), search) || matches(item.get("reason"), search);
@@ -969,6 +1144,8 @@ public class HrmService {
         HrmLeaveRequest item = leaveRequestRepository.findById(id).orElse(null);
         if (item == null) notFound("YA�u cầu nghỉ phA�p");
         String previous = item.getStatus();
+        assertTransition(previous, status, LEAVE_TRANSITIONS, "đơn nghỉ phép");
+        assertNotSelfApproval(item.getEmployee(), status);
         item.setStatus(status);
         if (approver != null && !approver.isBlank()) item.setApprover(approver);
         leaveRequestRepository.save(item);
@@ -1630,6 +1807,8 @@ public class HrmService {
         requireIn(status, "overtimeStatuses", "Trạng thA�i tăng ca");
         HrmOvertimeRequest o = overtimeRepository.findById(id).orElse(null);
         if (o == null) notFound("YA�u cầu tăng ca");
+        assertTransition(o.getStatus(), status, OVERTIME_TRANSITIONS, "đơn tăng ca");
+        assertNotSelfApproval(o.getEmployee(), status);
         o.setStatus(status);
         overtimeRepository.save(o);
         audit("UPDATE_STATUS", "OvertimeRequest", id);
@@ -1682,6 +1861,7 @@ public class HrmService {
         requireIn(status, "payrollStatuses", "Trạng thA�i bảng lương");
         HrmPayrollRun p = payrollRunRepository.findById(id).orElse(null);
         if (p == null) notFound("Bảng lương");
+        assertTransition(p.getStatus(), status, PAYROLL_TRANSITIONS, "đợt lương");
         p.setStatus(status);
         payrollRunRepository.save(p);
         if ("Approved".equals(status)) generatePayslips(p);
@@ -1690,23 +1870,81 @@ public class HrmService {
     }
 
     private void generatePayslips(HrmPayrollRun run) {
+        double fallbackBasic = Math.max(0, run.getAmount() == null ? 0 : run.getAmount());
         for (Employee e : employeeRepository.findAll()) {
+            Map<String, Object> calc = payrollCalculationService.calculate(e.getId(), run.getMonth(), fallbackBasic);
             String payslipId = run.getId() + "-" + e.getId();
-            if (payslipRepository.existsById(payslipId)) continue;
-            double basic = Math.max(0, run.getAmount() == null ? 0 : run.getAmount());
-            HrmPayslip slip = new HrmPayslip();
+            // Tính lại phiếu đã có thay vì bỏ qua: dữ liệu lương có thể thay đổi sau khi duyệt.
+            HrmPayslip slip = payslipRepository.findById(payslipId).orElseGet(HrmPayslip::new);
             slip.setId(payslipId);
             slip.setEmployee(e);
             slip.setEmployeeName(e.getName());
             slip.setMonth(run.getMonth());
-            slip.setBasic(basic);
-            slip.setAllowances(0.0);
-            slip.setDeductions(0.0);
-            slip.setNet(basic);
+            slip.setBasic(doubleOf(calc.get("basic"), 0));
+            slip.setAllowances(doubleOf(calc.get("allowances"), 0));
+            slip.setOvertime(doubleOf(calc.get("overtime"), 0));
+            slip.setAdvance(doubleOf(calc.get("advance"), 0));
+            slip.setDeductions(doubleOf(calc.get("deductions"), 0));
+            slip.setNet(doubleOf(calc.get("net"), 0));
+            slip.setNote(str(calc.get("note")));
             slip.setStatus("Generated");
             slip.setCreated(LocalDate.now().toString());
             payslipRepository.save(slip);
         }
+    }
+
+    /** Bảng lương chuẩn theo tháng: tính từ dữ liệu lương, chưa cần tạo đợt lương. */
+    @Transactional(readOnly = true)
+    public Map<String, Object> getPayrollTable(String month, String department, Integer page, Integer pageSize) {
+        String normalized = payrollCalculationService.normalizeMonth(month);
+        if (normalized == null || !normalized.matches("\\d{4}-\\d{2}"))
+            invalidRequest("Tháng bảng lương phải có dạng YYYY-MM.");
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Employee e : employeeRepository.findAll()) {
+            if (department != null && !department.isBlank() && !matchesDepartment(e, department)) continue;
+            Map<String, Object> row = payrollCalculationService.calculate(e.getId(), normalized, 0);
+            String payslipId = findPayslipId(e.getId(), normalized);
+            if (payslipId != null) {
+                payslipRepository.findById(payslipId).ifPresent(s -> {
+                    row.put("payslipId", s.getId());
+                    row.put("payslipStatus", s.getStatus());
+                });
+            }
+            rows.add(row);
+        }
+        rows.sort(Comparator.comparing(m -> str(m.get("employeeId"))));
+        Map<String, Object> result = new LinkedHashMap<>(paginate(rows, page == null ? 1 : page,
+                pageSize == null ? 10 : pageSize));
+        result.put("month", normalized);
+        result.put("allItems", rows);
+        return result;
+    }
+
+    /** Tính lại toàn bộ phiếu lương của một đợt (sau khi đổi lương/phụ cấp/tăng ca). */
+    @Transactional
+    public Map<String, Object> recalculatePayrollRun(String id) {
+        HrmPayrollRun run = payrollRunRepository.findById(id).orElse(null);
+        if (run == null) notFound("Bảng lương");
+        generatePayslips(run);
+        audit("RECALCULATE", "PayrollRun", id);
+        return HrmJson.toMap(run);
+    }
+
+    private boolean matchesDepartment(Employee employee, String department) {
+        if (employee.getDepartment() == null) return false;
+        return department.equalsIgnoreCase(employee.getDepartment().getName())
+                || (employee.getDepartment().getShortName() != null
+                && department.equalsIgnoreCase(employee.getDepartment().getShortName()));
+    }
+
+    private String findPayslipId(int employeeId, String month) {
+        // id phiếu = <runId>-<employeeDbId>; tìm theo employee + tháng để gắn vào bảng lương preview.
+        for (HrmPayrollRun run : payrollRunRepository.findAll()) {
+            if (!month.equals(run.getMonth())) continue;
+            String id = run.getId() + "-" + employeeId;
+            if (payslipRepository.existsById(id)) return id;
+        }
+        return null;
     }
 
     @Transactional(readOnly = true)
@@ -1758,6 +1996,8 @@ public class HrmService {
         requireIn(status, "taskStatuses", "Trạng thA�i nhiệm vụ");
         HrmOnboardingTask t = onboardingRepository.findById(id).orElse(null);
         if (t == null) notFound("Nhiệm vụ onboarding");
+        assertTransition(t.getStatus(), status, TASK_TRANSITIONS, "nhiệm vụ");
+        assertNotSelfApproval(t.getEmployee(), status);
         t.setStatus(status);
         onboardingRepository.save(t);
         audit("UPDATE_STATUS", "OnboardingTask", id);
@@ -2069,6 +2309,8 @@ public class HrmService {
         requireIn(status, "hrRequestStatuses", "Trạng thA�i yA�u cầu");
         HrmHrRequest item = hrRequestRepository.findById(id).orElse(null);
         if (item == null) notFound("YA�u cầu nhA�n sự");
+        assertTransition(item.getStatus(), status, HR_REQUEST_TRANSITIONS, "yêu cầu nhân sự");
+        assertNotSelfApproval(item.getEmployeeId(), status);
         item.setStatus(status);
         hrRequestRepository.save(item);
         audit("UPDATE_STATUS", "HrRequest", id);

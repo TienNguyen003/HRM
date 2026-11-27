@@ -84,7 +84,7 @@ public class AdvanceController {
                 .build();
     }
 
-    @PreAuthorize("ROLE_ROOT or @requiredPermission.checkPermission('ADV_ADD')")
+    @PreAuthorize("@requiredPermission.checkPermission('ADV_VIEW')")
     @GetMapping("/quota/{employeeId}")
     ApiResponse<Map<String, Object>> getQuota(@PathVariable int employeeId){
         Map<String, Object> quota = advanceService.getQuotaInfo(employeeId);

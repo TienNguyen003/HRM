@@ -44,6 +44,7 @@ public class EmployeeService {
 
         employee.setDepartment(department);
         employee.setFormula(formula);
+        employee.setJoinedDateIso(request.getJoined_date());
 
         return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
     }
@@ -61,6 +62,7 @@ public class EmployeeService {
 
         employee.setDepartment(department);
         employee.setFormula(formula);
+        employee.setJoinedDateIso(request.getJoined_date());
 
         return employeeMapper.toEmployeeRespone(employeeRepository.save(employee));
     }

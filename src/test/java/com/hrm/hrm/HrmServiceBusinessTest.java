@@ -4,6 +4,7 @@ import com.hrm.Exception.AppException;
 import com.hrm.Service.hrm.HrmService;
 import com.hrm.repository.hrm.*;
 import com.hrm.repository.user.EmployeeRepository;
+import com.hrm.repository.user.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,7 @@ class HrmServiceBusinessTest {
 
     @Autowired HrmService service;
     @Autowired EmployeeRepository employeeRepository;
+    @Autowired UserRepository userRepository;
     @Autowired HrmAttendanceRepository attendanceRepository;
     @Autowired HrmLeaveBalanceRepository leaveBalanceRepository;
     @Autowired HrmLeaveRequestRepository leaveRequestRepository;
@@ -54,6 +56,22 @@ class HrmServiceBusinessTest {
         assertThat(leaveBalanceRepository.findByEmployee_Id(dbId)).hasSize(1);
         assertThat(service.isEmployeeIdAvailable(id)).isFalse();
         assertThat(service.isEmployeeIdAvailable("EMP-99999")).isTrue();
+    }
+
+    @Test
+    void createEmployee_withAccountFields_createsSeparateUser() {
+        Map<String, Object> payload = employeePayload("with-account@test.io");
+        payload.put("username", "hruser01");
+        payload.put("password", "12345678");
+        payload.put("roleName", "ADMIN");
+
+        Map<String, Object> created = service.createEmployee(payload);
+        int dbId = employeeRepository.findByEmployeeCode(String.valueOf(created.get("id")))
+                .orElseThrow().getId();
+
+        var user = userRepository.findByEmployeeId(dbId).orElseThrow();
+        assertThat(user.getUsername()).isEqualTo("hruser01");
+        assertThat(user.getPassword()).isNotEqualTo("12345678");
     }
 
     @Test

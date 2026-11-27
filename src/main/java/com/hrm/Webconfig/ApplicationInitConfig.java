@@ -5,6 +5,7 @@ import com.hrm.Entity.role.Role;
 import com.hrm.Entity.user.User;
 import com.hrm.repository.role.PermissionRepository;
 import com.hrm.repository.role.RoleRepository;
+import com.hrm.Service.role.PermissionCatalog;
 import com.hrm.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -50,15 +51,16 @@ public class ApplicationInitConfig {
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository,
                                         PermissionRepository permissionRepository,
-                                        RoleRepository roleRepository) {
+                                        RoleRepository roleRepository,
+                                        com.hrm.Service.role.RoleService roleService) {
         return args -> {
             // seed quyền CV_* nếu chưa có trong DB
             CV_PERMISSIONS.forEach(permission -> {
                 if (!permissionRepository.existsById(permission.getName()))
                     permissionRepository.save(permission);
             });
-            // seed quyền HRM_* nếu chưa có trong DB
-            HRM_PERMISSIONS.forEach(name -> {
+            // seed mọi quyền canonical + alias legacy nếu chưa có trong DB
+            PermissionCatalog.allSeedNames().forEach(name -> {
                 if (!permissionRepository.existsById(name))
                     permissionRepository.save(Permission.builder().name(name).des(name).build());
             });
@@ -80,19 +82,11 @@ public class ApplicationInitConfig {
                 userRepository.save(user);
             }
 
-            // tài khoản admin luôn có toàn bộ quyền hiện có (kể cả các quyền mới thêm sau này
-            // như CV_VIEW/CV_ADD...) -> tránh trường hợp admin đăng nhập được mà không vào được module
-            userRepository.findByUsername(ADMIN_USERNAME).ifPresent(user -> {
-                if (user.getRole() == null) return;
-
-                roleRepository.findById(user.getRole().getName()).ifPresent(role -> {
-                    var permissions = new HashSet<>(permissionRepository.findAll());
-                    if (permissions.isEmpty()) return;
-
-                    role.setPermissions(permissions);
-                    roleRepository.save(role);
-                });
-            });
+            // Admin chỉ cần một quyền super (ALL). Không gán lại toàn bộ permission mỗi lần
+            // restart: việc thu hồi quyền của admin phải có tác dụng thật.
+            userRepository.findByUsername(ADMIN_USERNAME)
+                    .filter(user -> user.getRole() != null)
+                    .ifPresent(user -> roleService.ensureSuperPermission(user.getRole().getName()));
         };
     }
 }

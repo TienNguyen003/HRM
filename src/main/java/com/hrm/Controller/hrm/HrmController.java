@@ -348,22 +348,26 @@ public class HrmController {
         return ApiResponse.<Map<String, Object>>builder().result(hrmService.removeEmployeeDocument(documentId)).build();
     }
 
-    // notifications
+    // notifications (dữ liệu đã được service lọc theo người đăng nhập)
+    @PreAuthorize("@requiredPermission.checkPermission('SELF_VIEW')")
     @GetMapping("/notifications")
     ApiResponse<List<Map<String, Object>>> getNotifications() {
         return ApiResponse.<List<Map<String, Object>>>builder().result(hrmService.getNotifications()).build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SELF_VIEW')")
     @GetMapping("/notifications/unread-count")
     ApiResponse<Long> getUnreadNotificationCount() {
         return ApiResponse.<Long>builder().result(hrmService.getUnreadNotificationCount()).build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SELF_VIEW')")
     @PutMapping("/notifications/{id}/read")
     ApiResponse<Map<String, Object>> markNotificationRead(@PathVariable String id) {
         return ApiResponse.<Map<String, Object>>builder().result(hrmService.markNotificationRead(id)).build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('SELF_VIEW')")
     @PutMapping("/notifications/read-all")
     ApiResponse<List<Map<String, Object>>> markAllNotificationsRead() {
         return ApiResponse.<List<Map<String, Object>>>builder().result(hrmService.markAllNotificationsRead()).build();
@@ -433,6 +437,19 @@ public class HrmController {
     @PutMapping("/payroll-runs/{id}/status")
     ApiResponse<Map<String, Object>> updatePayrollRunStatus(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         return ApiResponse.<Map<String, Object>>builder().result(hrmService.updatePayrollRunStatus(id, String.valueOf(payload.get("status")))).build();
+    }
+    @PreAuthorize("@requiredPermission.checkPermission('PAYROLL_RUN')")
+    @PostMapping("/payroll-runs/{id}/recalculate")
+    ApiResponse<Map<String, Object>> recalculatePayrollRun(@PathVariable String id) {
+        return ApiResponse.<Map<String, Object>>builder().result(hrmService.recalculatePayrollRun(id)).build();
+    }
+    @PreAuthorize("@requiredPermission.checkPermission('PAYROLL_VIEW')")
+    @GetMapping("/payroll-table")
+    ApiResponse<Map<String, Object>> getPayrollTable(@RequestParam(required = false) String month,
+            @RequestParam(required = false) String department,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) {
+        return ApiResponse.<Map<String, Object>>builder().result(hrmService.getPayrollTable(month, department, page, pageSize)).build();
     }
     // payslips
     @PreAuthorize("@requiredPermission.checkPermission('PAYSLIP_VIEW')")
@@ -585,19 +602,22 @@ public class HrmController {
     }
 
     // announcements / events / birthdays
+    @PreAuthorize("@requiredPermission.checkPermission('SELF_VIEW')")
     @GetMapping("/announcements")
     ApiResponse<List<Map<String, Object>>> getAnnouncements() {
         return ApiResponse.<List<Map<String, Object>>>builder().result(hrmService.getAnnouncements()).build();
     }
-    @PreAuthorize("@requiredPermission.checkPermission('ORG_VIEW')")
+    @PreAuthorize("@requiredPermission.checkPermission('ORG_MANAGE')")
     @PostMapping("/announcements")
     ApiResponse<Map<String, Object>> createAnnouncement(@RequestBody Map<String, Object> payload) {
         return ApiResponse.<Map<String, Object>>builder().result(hrmService.createAnnouncement(payload)).build();
     }
+    @PreAuthorize("@requiredPermission.checkPermission('SELF_VIEW')")
     @GetMapping("/events")
     ApiResponse<List<Map<String, Object>>> getCompanyEvents(@RequestParam(required = false) String month) {
         return ApiResponse.<List<Map<String, Object>>>builder().result(hrmService.getCompanyEvents(month)).build();
     }
+    @PreAuthorize("@requiredPermission.checkPermission('SELF_VIEW')")
     @GetMapping("/birthdays")
     ApiResponse<List<Map<String, Object>>> getBirthdays(@RequestParam(required = false) String month) {
         return ApiResponse.<List<Map<String, Object>>>builder().result(hrmService.getBirthdays(month)).build();

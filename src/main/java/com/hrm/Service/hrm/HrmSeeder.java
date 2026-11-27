@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.hrm.Entity.hrm.*;
 import com.hrm.Entity.user.Employee;
 import com.hrm.repository.hrm.*;
+import com.hrm.repository.office.DepartmentRepository;
+import com.hrm.repository.office.OfficeRepository;
 import com.hrm.repository.user.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,8 @@ public class HrmSeeder implements ApplicationRunner {
     private final HrmReferenceDataRepository referenceDataRepository;
 
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+    private final OfficeRepository officeRepository;
     private final HrmAttendanceRepository attendanceRepository;
     private final HrmLeaveRequestRepository leaveRequestRepository;
     private final HrmLeaveBalanceRepository leaveBalanceRepository;
@@ -280,7 +284,7 @@ public class HrmSeeder implements ApplicationRunner {
         e.setEmploymentType(str(m.get("employmentType")));
         e.setStatus(str(m.get("status")));
         e.setJoinedDateIso(str(m.get("joinedDateIso")));
-        e.setJoined_date(str(m.get("joinedDate")));
+        e.setJoined_date(e.getJoinedDateIso() == null ? str(m.get("joinedDate")) : HrmJson.displayDate(e.getJoinedDateIso()));
         e.setEmail(str(m.get("email")));
         e.setPhone_number(str(m.get("phone")));
         e.setBirth_date(str(m.get("dateOfBirth")));
@@ -300,6 +304,25 @@ public class HrmSeeder implements ApplicationRunner {
         }
         if ((e.getName() == null || e.getName().isBlank()) && (e.getFirstName() != null || e.getLastName() != null)) {
             e.setName((nvl(e.getFirstName()) + " " + nvl(e.getLastName())).trim());
+        }
+        if (e.getDepartmentName() != null) {
+            e.setDepartment(departmentRepository.findByName(e.getDepartmentName())
+                    .orElseGet(() -> {
+                        com.hrm.Entity.office.Department d = new com.hrm.Entity.office.Department();
+                        d.setName(e.getDepartmentName());
+                        d.setShortName(e.getDepartmentName());
+                        d.setStatus(1);
+                        return departmentRepository.save(d);
+                    }));
+        }
+        if (e.getLocation() != null) {
+            e.setOffice(officeRepository.findByName(e.getLocation())
+                    .orElseGet(() -> {
+                        com.hrm.Entity.office.OfficeI o = new com.hrm.Entity.office.OfficeI();
+                        o.setName(e.getLocation());
+                        o.setStatus(1);
+                        return officeRepository.save(o);
+                    }));
         }
         return e;
     }

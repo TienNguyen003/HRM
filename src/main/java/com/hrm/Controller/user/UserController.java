@@ -59,6 +59,7 @@ public class UserController {
 				.build();
 	}
 
+	@PreAuthorize("@requiredPermission.checkPermission('USER_VIEW') or @requiredPermission.checkPermission('SELF_VIEW')")
 	@GetMapping("/user")
 	ApiResponse<UserResponse> getUser(@RequestParam String userId) {
 		return ApiResponse.<UserResponse>builder()
@@ -73,6 +74,7 @@ public class UserController {
 				.build();
 	}
 
+	@PreAuthorize("@requiredPermission.checkPermission('USER_EDIT')")
 	@GetMapping("/update-pass")
 	ApiResponse<String> updatePass(@RequestParam String userId, @RequestParam String new_pass) {
 		return ApiResponse.<String>builder()
@@ -88,7 +90,7 @@ public class UserController {
 				.build();
 	}
 
-//	@PreAuthorize("@requiredPermission.checkPermission('USER_CPASS')")
+	@PreAuthorize("@requiredPermission.checkPermission('SELF_UPDATE')")
 	@PutMapping("/change-pass")
 	ApiResponse<String> changePass(@RequestBody @Valid UserChangePassRequest request) {
 		return ApiResponse.<String>builder()

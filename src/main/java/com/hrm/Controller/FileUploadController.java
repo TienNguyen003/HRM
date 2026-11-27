@@ -5,6 +5,7 @@ import com.hrm.dto.response.ApiResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import java.io.IOException;
 public class FileUploadController {
     CloudinaryService cloudinaryService;
 
+    @PreAuthorize("@requiredPermission.checkPermission('FILE_MANAGE')")
     @PostMapping("/upload")
     public ApiResponse<String> uploadImage(@RequestParam("file") MultipartFile file,
                                       @RequestParam("folder") String folderName) throws IOException {

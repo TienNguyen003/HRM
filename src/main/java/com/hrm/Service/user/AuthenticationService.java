@@ -4,6 +4,7 @@ import com.hrm.Entity.token.InvalidateToken;
 import com.hrm.Entity.user.User;
 import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
+import com.hrm.Service.role.PermissionCatalog;
 import com.hrm.dto.request.token.AuthenticationRequest;
 import com.hrm.dto.request.token.IntrospectRequest;
 import com.hrm.dto.request.token.LogoutRequest;
@@ -43,6 +44,7 @@ public class AuthenticationService {
     private static final Logger log = LoggerFactory.getLogger(AuthenticationService.class);
     UserRepository userRepository;
     InvalidateTokenRepository tokenRepository;
+    PasswordEncoder passwordEncoder;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -63,6 +65,18 @@ public class AuthenticationService {
 
         try {
             verifyToken(token, false);
+            // Token của user bị khóa/xóa không còn hợp lệ, dù chưa hết hạn.
+            SignedJWT jwt = SignedJWT.parse(token);
+            String username = jwt.getJWTClaimsSet().getSubject();
+            User user = userRepository.findByUsername(username).orElse(null);
+            if (user == null || user.getStatus() == 0) {
+                isValid = false;
+            } else {
+                Object version = jwt.getJWTClaimsSet().getClaim("ver");
+                if (version instanceof Number n && n.intValue() != user.getTokenVersion()) isValid = false;
+                else if (version != null && !String.valueOf(version).equals(String.valueOf(user.getTokenVersion())))
+                    isValid = false;
+            }
         } catch (AppException e){
             isValid = false;
         }
@@ -76,7 +90,6 @@ public class AuthenticationService {
             var user = userRepository.findByUsername(authenticationRequest.getUsername())
                     .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
 
-            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
             boolean authenicated = passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword());
 
             if(!authenicated) throw new AppException(ErrorCode.PASSWORD_NO_INCORRECT);
@@ -138,6 +151,7 @@ public class AuthenticationService {
         var username = signedJwt.getJWTClaimsSet().getSubject();
         var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        if (user.getStatus() == 0) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         var token = generateToken(user);
         return AuthenticationResponse.builder()
@@ -148,7 +162,7 @@ public class AuthenticationService {
 
     private String generateToken(User user){
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-        JWTClaimsSet jwsClaimsSet = new JWTClaimsSet.Builder()
+        JWTClaimsSet.Builder claims = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issuer("hrm.com")
                 .issueTime(new Date())
@@ -157,8 +171,10 @@ public class AuthenticationService {
                 .claim("scope", buildScope(user))
                 .claim("id", user.getId())
                 .claim("mustChangePassword", user.isMustChangePassword())
-                .claim("idE", user.getEmployee().getId())
-                .build();
+                .claim("ver", user.getTokenVersion());
+        // Admin không nhất thiết kiêm nhân viên -> idE có thể null.
+        if (user.getEmployee() != null) claims.claim("idE", user.getEmployee().getId());
+        JWTClaimsSet jwsClaimsSet = claims.build();
         Payload payload = new Payload(jwsClaimsSet.toJSONObject());
 
         JWSObject jwt = new JWSObject(header, payload);
@@ -177,7 +193,8 @@ public class AuthenticationService {
                 stringJoiner.add("ROLE_" + user.getRole().getName().replace(" ", "_"));
                 if (!CollectionUtils.isEmpty(user.getRole().getPermissions()))
                     user.getRole().getPermissions().forEach(permission -> {
-                        stringJoiner.add(permission.getName());
+                        String canonical = PermissionCatalog.canonical(permission.getName());
+                        if (!canonical.isEmpty()) stringJoiner.add(canonical);
                     });
 
         return stringJoiner.toString();

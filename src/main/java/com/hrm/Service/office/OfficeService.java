@@ -7,7 +7,10 @@ import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.office.OfficeMapper;
 import com.hrm.dto.request.office.OfficeRequest;
 import com.hrm.dto.response.office.OfficeRespone;
+import com.hrm.repository.hrm.HrmReferenceDataRepository;
+import com.hrm.repository.office.DepartmentRepository;
 import com.hrm.repository.office.OfficeRepository;
+import com.hrm.repository.user.EmployeeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,25 +27,41 @@ import java.util.List;
 public class OfficeService {
     OfficeRepository officeRepository;
     OfficeMapper officeMapper;
+    HrmReferenceDataRepository referenceDataRepository;
+    DepartmentRepository departmentRepository;
+    EmployeeRepository employeeRepository;
 
     // thêm
     public OfficeRespone create(OfficeRequest request){
         if(officeRepository.existsByName(request.getName()))
             throw new AppException(ErrorCode.OFFICE_EXISTED);
 
-        OfficeI dayOffCategories = officeMapper.toOfficeI(request);
-
-        return officeMapper.toOfficeRespone(officeRepository.save(dayOffCategories));
+        OfficeI office = officeMapper.toOfficeI(request);
+        office.setStatus(1);
+        OfficeI saved = officeRepository.save(office);
+        syncReference(saved.getName(), null);
+        return officeMapper.toOfficeRespone(saved);
     }
 
     // cập nhật
     public OfficeRespone update(int id, OfficeRequest request){
-        OfficeI department = officeRepository.findById(id)
+        OfficeI office = officeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
 
-        officeMapper.updateOffice(department, request);
+        String oldName = office.getName();
+        officeMapper.updateOffice(office, request);
+        OfficeI saved = officeRepository.save(office);
 
-        return officeMapper.toOfficeRespone(officeRepository.save(department));
+        if (oldName != null && !oldName.equals(saved.getName())) {
+            syncReference(saved.getName(), oldName);
+            var affected = employeeRepository.findByOffice_Name(oldName);
+            affected.forEach(e -> {
+                e.setOffice(saved);
+                e.setLocation(saved.getName());
+            });
+            employeeRepository.saveAll(affected);
+        }
+        return officeMapper.toOfficeRespone(saved);
     }
 
     public String updateStt(int id, int status){
@@ -85,8 +104,34 @@ public class OfficeService {
     }
 
     // xóa
+    private void syncReference(String newName, String oldName) {
+        if (oldName != null) {
+            referenceDataRepository.findById("REF#LOCATIONS#" + oldName.toUpperCase())
+                    .ifPresent(referenceDataRepository::delete);
+        }
+        String refId = "REF#LOCATIONS#" + newName.toUpperCase();
+        if (newName != null && !referenceDataRepository.existsById(refId)) {
+            referenceDataRepository.save(new com.hrm.Entity.hrm.HrmReferenceData(
+                    refId, "locations", newName, newName, 0));
+        }
+    }
+
     public void delete(int id){
-        officeRepository.deleteById(id);
+        OfficeI office = officeRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
+        if (departmentRepository.findAll().stream()
+                .anyMatch(d -> d.getOfficeI() != null && office.getId() == d.getOfficeI().getId())) {
+            throw new AppException(ErrorCode.OFFICE_IN_USE);
+        }
+        var affected = employeeRepository.findByOffice_Name(office.getName());
+        affected.forEach(e -> {
+            e.setOffice(null);
+            e.setLocation("Unassigned");
+        });
+        employeeRepository.saveAll(affected);
+        referenceDataRepository.findById("REF#LOCATIONS#" + office.getName().toUpperCase())
+                .ifPresent(referenceDataRepository::delete);
+        officeRepository.delete(office);
     }
 }
 

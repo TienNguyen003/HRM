@@ -21,6 +21,9 @@ public class User {
 	int status;
 	boolean mustChangePassword = true;
 
+	/** Tăng khi đổi quyền/password/trạng thái để thu hồi token đang lưu. */
+	int tokenVersion;
+
 	@OneToOne
 	Employee employee;
 

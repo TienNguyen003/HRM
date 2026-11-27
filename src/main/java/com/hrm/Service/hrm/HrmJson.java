@@ -54,7 +54,9 @@ public final class HrmJson {
         m.put("manager", nvl(e.getManager()));
         m.put("employmentType", nvl(e.getEmploymentType()));
         m.put("status", nvl(e.getStatus()));
-        m.put("joinedDate", nvl(e.getJoined_date()));
+        String joinedIso = e.getJoinedDateIso() != null && !e.getJoinedDateIso().isBlank()
+                ? e.getJoinedDateIso() : e.getJoined_date();
+        m.put("joinedDate", displayDate(joinedIso));
         m.put("joinedDateIso", nvl(e.getJoinedDateIso()));
         m.put("email", nvl(e.getEmail()));
         m.put("phone", nvl(e.getPhone_number()));
@@ -73,10 +75,23 @@ public final class HrmJson {
         m.put("attendanceRate", e.getAttendanceRate());
         m.put("leaveBalance", e.getLeaveBalance());
         m.put("goals", e.getGoals());
+        m.put("formulaId", e.getFormula() == null ? null : e.getFormula().getId());
+        m.put("formulaName", e.getFormula() == null ? "" : nvl(e.getFormula().getName()));
         return m;
     }
 
     /** Mã EMP-00123; bản ghi cũ chưa có code thì suy từ id số. */
+    /** Format ISO YYYY-MM-DD sang dd MMM yyyy; trả nguyên chuỗi nếu không parse được. */
+    public static String displayDate(String iso) {
+        if (iso == null || iso.isBlank()) return "";
+        try {
+            return java.time.LocalDate.parse(iso)
+                    .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy"));
+        } catch (Exception e) {
+            return iso;
+        }
+    }
+
     public static String displayCode(com.hrm.Entity.user.Employee e) {
         return e.getHrmId();
     }

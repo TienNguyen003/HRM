@@ -12,6 +12,12 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
     @Query("SELECT COUNT(*) > 0 FROM Department d WHERE d.name = :name AND d.officeI.id = :officeId")
     boolean existsByNameAndId(String name, Integer officeId);
 
+    boolean existsByName(String name);
+
+    java.util.Optional<Department> findByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Integer id);
+
     @Query("SELECT d FROM Department d WHERE d.status = 1")
     List<Department> getAllDepartment();
 

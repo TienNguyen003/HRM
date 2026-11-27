@@ -311,7 +311,8 @@ CREATE INDEX IF NOT EXISTS idx_assessment_job ON assessment (job_id);
 CREATE INDEX IF NOT EXISTS idx_hrm_leave_legacy ON hrm_leave_request (legacy_id);
 
 -- Hibernate ddl-auto=update tự thêm các cột sau (đã có trong Entity):
---   employee.employee_code (UNIQUE uk_employee_code), employee.department_id
+--   employee.employee_code (UNIQUE uk_employee_code), employee.department_id, employee.office_id
+--   department.name (UNIQUE), officei (bảng office thật, tên do Hibernate sinh)
 --   hrm_leave_request.legacy_id
 --   shift.shift_code, shift.shift_name, shift.break_minutes, shift.location
 

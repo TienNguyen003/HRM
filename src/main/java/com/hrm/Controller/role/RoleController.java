@@ -49,6 +49,7 @@ public class RoleController {
                 .build();
     }
 
+    @PreAuthorize("@requiredPermission.checkPermission('PERM_VIEW')")
     @GetMapping("/role")
     ApiResponse<RoleResponse> getRole(@RequestParam(name = "name", required = false) String name){
         return ApiResponse.<RoleResponse>builder()

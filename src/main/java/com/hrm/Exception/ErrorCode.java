@@ -41,6 +41,7 @@ public enum ErrorCode {
 	// văn phòng
 	OFFICE_EXISTED(502, "Văn phòng đã tồn tại.", HttpStatus.BAD_REQUEST),
 	OFFICE_NOT_EXISTED(504, "Văn phòng không tồn tại.", HttpStatus.BAD_REQUEST),
+	OFFICE_IN_USE(503, "Văn phòng đang được phòng ban hoặc nhân viên sử dụng.", HttpStatus.BAD_REQUEST),
 
 	// ngân hàng
 	BANK_EXISTED(502, "Ngân hàng đã tồn tại.", HttpStatus.NOT_FOUND),

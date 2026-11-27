@@ -11,6 +11,8 @@ import java.util.List;
 public interface OfficeRepository extends JpaRepository<OfficeI, Integer> {
     boolean existsByName(String name);
 
+    java.util.Optional<OfficeI> findByName(String name);
+
     @Query("SELECT o FROM OfficeI o WHERE o.status = 1")
     List<OfficeI> getOffices();
 

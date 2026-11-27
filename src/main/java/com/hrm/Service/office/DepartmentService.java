@@ -32,7 +32,7 @@ public class DepartmentService {
 
     // thêm
     public DepartmentResponse create(DepartmentRequest request){
-        if(departmentRepository.existsByNameAndId(request.getName(), request.getOfficeId()) )
+        if(departmentRepository.existsByName(request.getName()))
             throw new AppException(ErrorCode.DEPARTMENT_EXISTED);
         OfficeI officeI = officeRepository.findById(request.getOfficeId())
                 .orElseThrow(() -> new AppException(ErrorCode.OFFICE_NOT_EXISTED));
@@ -45,7 +45,7 @@ public class DepartmentService {
 
     // cập nhật
     public DepartmentResponse update(int id, DepartmentRequest request){
-        if(departmentRepository.existsByNameAndId(request.getName(), request.getOfficeId()) )
+        if(departmentRepository.existsByNameAndIdNot(request.getName(), id))
             throw new AppException(ErrorCode.DEPARTMENT_EXISTED);
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.DEPARTMENT_NOT_EXISTED));

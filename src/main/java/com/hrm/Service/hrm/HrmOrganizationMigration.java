@@ -20,6 +20,7 @@ public class HrmOrganizationMigration implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
+        syncOffices();
         syncDepartments();
         migrateShifts();
     }
@@ -29,6 +30,24 @@ public class HrmOrganizationMigration implements ApplicationRunner {
                 "select count(*) from information_schema.tables where table_schema = database() and table_name = ?",
                 Integer.class, table);
         return count != null && count > 0;
+    }
+
+    /** Danh mục locations trong seed trở thành OfficeI — nguồn duy nhất cho location. */
+    private void syncOffices() {
+        if (!tableExists("officei")) return;
+        if (tableExists("hrm_reference_data")) {
+            jdbc.update("insert into officei (name, status) "
+                    + "select r.code, 1 from hrm_reference_data r "
+                    + "where r.category = 'locations' "
+                    + "and not exists (select 1 from officei o where o.name = r.code)");
+        }
+        jdbc.update("insert into officei (name, status) "
+                + "select distinct e.location, 1 from employee e "
+                + "where e.location is not null and e.location <> '' "
+                + "and not exists (select 1 from officei o where o.name = e.location)");
+        int linked = jdbc.update("update employee e join officei o on e.location = o.name "
+                + "set e.office_id = o.id where e.office_id is null");
+        if (linked > 0) log.info("[HRM Migration] Gắn Employee → OfficeI: {} bản ghi", linked);
     }
 
     private void syncDepartments() {

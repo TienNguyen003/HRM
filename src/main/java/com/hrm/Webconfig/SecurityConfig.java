@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,29 +20,26 @@ public class SecurityConfig {
 	@Value("${api.prefix}")
 	private String api;
 
-	@Bean
-	BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(10);
-	}
-
-	private final String[] PUBLIC_ENDPOINTS = {
-			"api/users", "api/auth/token",
-			"api/auth/introspect", "api/auth/logout",
-			"api/auth/refresh"
+	private static final String[] PUBLIC_ENDPOINTS = {
+			"/api/auth/token", "/api/auth/introspect",
+			"/api/auth/logout", "/api/auth/refresh"
 	};
 
 	@Autowired
 	private CustomJwtDecoder jwtDecoder;
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity httpSecurity,
+			org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) throws Exception {
 
 		httpSecurity.authorizeHttpRequests(request -> request
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-				.requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS).permitAll()
 				.requestMatchers("/ws/**").permitAll()
 				.anyRequest()
 				.authenticated());
+
+		httpSecurity.cors(cors -> cors.configurationSource(corsConfigurationSource));
 
 		httpSecurity.oauth2ResourceServer(oauth2 -> oauth2
 				.jwt(jwtConfigurer -> jwtConfigurer

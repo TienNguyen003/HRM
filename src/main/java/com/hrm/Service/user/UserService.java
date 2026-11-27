@@ -7,6 +7,7 @@ import com.hrm.Exception.AppException;
 import com.hrm.Exception.ErrorCode;
 import com.hrm.Mapper.user.UserMapper;
 import com.hrm.Service.EmailService;
+import com.hrm.Service.role.RoleGuard;
 import com.hrm.dto.request.user.user.UserChangePassRequest;
 import com.hrm.dto.request.user.user.UserCreationRequest;
 import com.hrm.dto.request.user.user.UserRsPass;
@@ -21,8 +22,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class UserService {
 	EmployeeRepository employeeRepository;
 	UserMapper userMapper;
 	PasswordEncoder passwordEncoder;
+	RoleGuard roleGuard;
 	
 	public UserResponse createUser(UserCreationRequest request) {
 		if(userRepository.existsByUsername(request.getUsername()))
@@ -50,6 +52,7 @@ public class UserService {
 				.orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_EXISTED));
 		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRoleName())
 				.orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+		roleGuard.assertAssignable(role);
 		User user = userMapper.toUser(request);
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setMustChangePassword(true);
@@ -61,7 +64,7 @@ public class UserService {
 	}
 
 	public List<UserResponse> getAll(){
-		return userRepository.findAllUserActive().stream().map(userMapper::toUserResponse).toList();
+		return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
 	}
 
 	public List<UserResponse> getUsers(String name, String username, String department, String office, String role, int pageNumber, int pageSize){
@@ -81,8 +84,11 @@ public class UserService {
 				.build();
 	}
 
-	@PostAuthorize("returnObject.id == authentication.principal.getClaimAsString('id') or !hasRole('NHÂN')")
 	public UserResponse getUser(String id) {
+		var authentication = SecurityContextHolder.getContext().getAuthentication();
+		String currentId = authentication instanceof Jwt jwt ? jwt.getClaimAsString("id") : null;
+		if ((currentId == null || !currentId.equals(id)) && !roleGuard.hasPermission("USER_VIEW"))
+			throw new AppException(ErrorCode.UNAUTHORIZED);
 		return userMapper.toUserResponse(userRepository.findById(id)
 				.orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED)));
 	}
@@ -94,8 +100,10 @@ public class UserService {
 
 		com.hrm.Entity.role.Role role = roleRepository.findById(request.getRoleName())
 				.orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+		roleGuard.assertAssignable(role);
 		user.setRole(role);
-		
+		bumpTokenVersion(user);
+
 		return userMapper.toUserResponse(userRepository.save(user));
 	}
 
@@ -104,6 +112,7 @@ public class UserService {
 				.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
 		user.setStatus(status);
+		bumpTokenVersion(user);
 		userMapper.toUserResponse(userRepository.save(user));
 		return "Update success";
 	}
@@ -111,10 +120,9 @@ public class UserService {
 	public void deleteUser(String id) {
 		User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_EXISTED));
 		userRepository.deleteById(id);
-		employeeRepository.deleteById(user.getEmployee().getId());
+		if (user.getEmployee() != null) employeeRepository.deleteById(user.getEmployee().getId());
 	}
 
-	@PostAuthorize("returnObject.id == authentication.principal.getClaimAsString('id') or !hasRole('NHÂN')")
 	public UserResponse getInfo(){
 		var context = SecurityContextHolder.getContext();
 		String name = context.getAuthentication().getName();
@@ -147,9 +155,14 @@ public class UserService {
 			throw new AppException(ErrorCode.PASSWORD_NO_MATCH);
 		user.setPassword(passwordEncoder.encode(request.getNew_pass()));
         user.setMustChangePassword(false);
+		bumpTokenVersion(user);
 		userRepository.save(user);
 
 		return "Change success";
+	}
+
+	private void bumpTokenVersion(User user) {
+		user.setTokenVersion(user.getTokenVersion() + 1);
 	}
 
 	public String updatePass(String userId, String new_pass) {
@@ -158,6 +171,7 @@ public class UserService {
 
         user.setMustChangePassword(true);
 		user.setPassword(passwordEncoder.encode(new_pass));
+		bumpTokenVersion(user);
 		userRepository.save(user);
 
 		return "Update success";

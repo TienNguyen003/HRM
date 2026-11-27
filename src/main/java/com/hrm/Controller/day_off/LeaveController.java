@@ -99,7 +99,7 @@ public class LeaveController {
                 .build();
     }
 
-    @PreAuthorize("ROLE_ROOT or @requiredPermission.checkPermission('REQ_EDIT')")
+    @PreAuthorize("@requiredPermission.checkPermission('REQ_VIEW')")
     @GetMapping("/remaining-hours/{employeeId}")
     ApiResponse<Map<String, Integer>> getRemainingHours(@PathVariable int employeeId){
         Employee employee = employeeRepository.findById(employeeId)
